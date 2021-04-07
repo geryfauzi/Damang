@@ -1165,4 +1165,18 @@
     <string name="dan_olahraga_anda">dan olahraga anda !</string>
     <string name="next">Next</string>
     <string name="skip">Skip</string>
+    <string name="pantau_kondisi_jantung">Pantau Kondisi Jantung</string>
+    <string name="selalu_pantau_kondisi_kesehatan">Selalu pantau kondisi kesehatan</string>
+    <string name="anda_melalui_data_detak_jantung">anda melalui data detak jantung</string>
+    <string name="laporan_kesehatan">Laporan Kesehatan</string>
+    <string name="dapatkan_laporan_kesehatan">Dapatkan laporan kesehatan</string>
+    <string name="dengan_mudah_melalui_aplikasi">dengan mudah melalui aplikasi</string>
+    <string name="pendamping_olahraga">Pendamping Olahraga</string>
+    <string name="berolahraga_dengan_aman_dan">Berolahraga dengan aman dan</string>
+    <string name="tenang_melalui_fitur_pendamping">tenang melalui fitur pendamping</string>
+    <string name="olahraga_pada_aplikasi">olahraga pada aplikasi</string>
+    <string name="mulai_sekarang">Mulai Sekarang!</string>
+    <string name="mulai_aplikasi_damang">Mulai aplikasi Damang</string>
+    <string name="sekarang_juga">sekarang juga!</string>
+    <string name="mulai">Mulai</string>
 </resources>

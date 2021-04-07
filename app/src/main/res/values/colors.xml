@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="slide1" type="color">#4FA5D2</color>
+    <color name="slide2" type="color">#FFFFFF</color>
+    <color name="slide3" type="color">#48F9DD</color>
+    <color name="slide4" type="color">#00D4C6</color>
+    <color name="slide5" type="color">#FFFFFF</color>
+
     <color name="primary_light" type="color">#ff3d00</color>
     <color name="primarydark_light" type="color">#dd2c00</color>
 
