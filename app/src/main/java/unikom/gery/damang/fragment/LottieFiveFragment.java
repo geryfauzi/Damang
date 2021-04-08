@@ -7,21 +7,20 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import unikom.gery.damang.R;
+import unikom.gery.damang.SharedPreference;
 import unikom.gery.damang.activities.ControlCenterv2;
-import unikom.gery.damang.activities.WelcomeActivity;
 
 public class LottieFiveFragment extends Fragment implements View.OnClickListener {
 
+    SharedPreference sharedPreference;
     private Button btnMulai;
 
     @SuppressLint("ResourceAsColor")
@@ -31,6 +30,7 @@ public class LottieFiveFragment extends Fragment implements View.OnClickListener
         super.onViewCreated(view, savedInstanceState);
         btnMulai = view.findViewById(R.id.btnMulai);
         btnMulai.setOnClickListener(this);
+        sharedPreference = new SharedPreference(view.getContext());
     }
 
     @Nullable
@@ -42,6 +42,9 @@ public class LottieFiveFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View view) {
         if (view == btnMulai) {
+            //Set Shared Prefence First Time to False
+            sharedPreference.setFirstTime(false);
+            //Moving to Main Activity
             Intent intent = new Intent(view.getContext(), ControlCenterv2.class);
             startActivity(intent);
             getActivity().finish();
