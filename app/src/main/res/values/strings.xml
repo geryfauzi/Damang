@@ -3,10 +3,10 @@
     <string name="app_name">Damang</string>
     <string name="title_activity_controlcenter">Damang</string>
     <string name="action_settings">Pengaturan</string>
-    <string name="action_debug">Debug</string>
-    <string name="action_quit">Quit</string>
+    <string name="action_debug">Area Testing</string>
+    <string name="action_quit">Keluar</string>
     <string name="action_donate">Donate</string>
-    <string name="controlcenter_fetch_activity_data">Synchronize</string>
+    <string name="controlcenter_fetch_activity_data">Sinkronisasi</string>
     <string name="controlcenter_find_device">Find lost device</string>
     <string name="find_lost_device_message">Search for %1$s?</string>
     <string name="controlcenter_take_screenshot">Take Screenshot</string>
@@ -99,8 +99,8 @@
     <string name="title_activity_settings">Settings</string>
     <string name="pref_header_general">General settings</string>
     <string name="pref_title_general_autoconnectonbluetooth">Connect to Gadgetbridge device when Bluetooth is turned on</string>
-    <string name="pref_title_general_autostartonboot">Start automatically</string>
-    <string name="pref_title_general_autoreconnect">Reconnect automatically</string>
+    <string name="pref_title_general_autostartonboot">Mulai Otomatis</string>
+    <string name="pref_title_general_autoreconnect">Reconnect Otomatis</string>
     <string name="pref_title_audio_player">Preferred Audioplayer</string>
     <string name="pref_default">Default</string>
     <string name="pref_header_datetime">Date and Time</string>
@@ -349,15 +349,15 @@
     <string name="appversion_by_creator">%1$s by %2$s</string>
     <string name="title_activity_discovery">Device discovery</string>
     <string name="discovery_stop_scanning">Stop scanning</string>
-    <string name="discovery_start_scanning">Start discovery</string>
-    <string name="action_discover">Connect new device</string>
+    <string name="discovery_start_scanning">Cari Perangkat</string>
+    <string name="action_discover">Tambahkan Perangkat</string>
     <string name="device_with_rssi">%1$s (%2$s)</string>
     <string name="title_activity_android_pairing">Pair device</string>
     <string name="android_pairing_hint">Use the Android Bluetooth pairing dialog to pair the device.</string>
     <string name="title_activity_mi_band_pairing">Pair your Mi Band</string>
-    <string name="pairing">Pairing with %s…</string>
-    <string name="pairing_creating_bond_with">"Creating bond with %1$s (%2$s)"</string>
-    <string name="pairing_unable_to_pair_with">"Unable to pair with %1$s (%2$s)"</string>
+    <string name="pairing">Menghubungkan ke %s…</string>
+    <string name="pairing_creating_bond_with">"Membuat koneksi dengan %1$s (%2$s)"</string>
+    <string name="pairing_unable_to_pair_with">"Gagal terhubung dengan %1$s (%2$s)"</string>
     <string name="pairing_in_progress">Bonding in progress: %1$s (%2$s)</string>
     <string name="pairing_already_bonded">"Already bonded with %1$s (%2$s), connecting…"</string>
     <string name="message_cannot_pair_no_mac">No MAC address passed, cannot pair.</string>
@@ -373,10 +373,10 @@
     <string name="miband_pairing_using_dummy_userdata">No valid user data given, using dummy user data for now.</string>
     <string name="miband_pairing_tap_hint">When your Mi Band vibrates and blinks, tap it a few times in a row.</string>
     <string name="appinstaller_install">Install</string>
-    <string name="discovery_connected_devices_hint">Make your device discoverable. Currently connected devices will likely not be discovered. Activate location (e.g. GPS) on Android 6+. Disable Privacy Guard for Gadgetbridge, because it may crash and reboot your phone. If no device is found after a few minutes, try again after rebooting your mobile device.</string>
+    <string name="discovery_connected_devices_hint">Pastikan perangkat anda dapat ditemukan. Perangkat yang sedang terhubung ke perangkat lain tidak akan bisa ditemukan. Aktifkan GPS untuk Android versi 6+. Jika tidak ada perangkat yang ditemukan, coba untuk merestart android anda.</string>
     <string name="discovery_need_to_enter_authkey">This device needs a secret auth key, long press on the device to enter it. Read the wiki.</string>
     <string name="discovery_entered_invalid_authkey">The secret auth key you entered is invalid! Long press on the device to edit.</string>
-    <string name="discovery_note">Note:</string>
+    <string name="discovery_note">Catatan :</string>
     <string name="candidate_item_device_image">Device image</string>
     <string name="miband_prefs_alias">Name/Alias</string>
     <string name="pref_header_vibration_count">Vibration count</string>
@@ -1179,4 +1179,8 @@
     <string name="mulai_aplikasi_damang">Mulai aplikasi Damang</string>
     <string name="sekarang_juga">sekarang juga!</string>
     <string name="mulai">Mulai</string>
+    <string name="sebelum_memulai">Sebelum memulai,</string>
+    <string name="silahkan_masuk_menggunakan">Silahkan masuk menggunakan</string>
+    <string name="akun_google_anda">akun Google anda</string>
+    <string name="masuk_dengan_google">Masuk Dengan Google</string>
 </resources>

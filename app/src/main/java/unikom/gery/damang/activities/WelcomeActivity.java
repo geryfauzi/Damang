@@ -24,18 +24,17 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            this.getSupportActionBar().hide();
-        } catch (NullPointerException e) {
-        }
+        //
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getSupportActionBar().hide();
+        //
         setContentView(R.layout.activity_welcome);
         sharedPreference = new SharedPreference(this);
         //Checking if the it's the first time user open the app on his current device
         if (!sharedPreference.isFirstTime()) {
             //Moving to Main Activity
-            Intent intent = new Intent(this, ControlCenterv2.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
         }

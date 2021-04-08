@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import unikom.gery.damang.R;
 import unikom.gery.damang.SharedPreference;
 import unikom.gery.damang.activities.ControlCenterv2;
+import unikom.gery.damang.activities.LoginActivity;
 
 public class LottieFiveFragment extends Fragment implements View.OnClickListener {
 
@@ -45,7 +46,7 @@ public class LottieFiveFragment extends Fragment implements View.OnClickListener
             //Set Shared Prefence First Time to False
             sharedPreference.setFirstTime(false);
             //Moving to Main Activity
-            Intent intent = new Intent(view.getContext(), ControlCenterv2.class);
+            Intent intent = new Intent(view.getContext(), LoginActivity.class);
             startActivity(intent);
             getActivity().finish();
         }
