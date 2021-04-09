@@ -36,7 +36,7 @@
     <string name="calendar_six_months">6 months</string>
     <string name="calendar_year">Year</string>
     <!-- Strings related to Debug Activity -->
-    <string name="title_activity_debug">Debug</string>
+    <string name="title_activity_debug">Area Testing</string>
     <string name="debugactivity_really_factoryreset_title">Really factory reset?</string>
     <string name="debugactivity_really_factoryreset">Doing a factory reset will delete all data from the connected device (if supported). Xiaomi/Huami devices also change Bluetooth MAC address, so they appear as a new devices to Gadgetbridge.</string>
     <!-- Strings related to AppManager -->
@@ -998,7 +998,7 @@
     <string name="fdroid_url" translatable="false">F-Droid: <a href="https://f-droid.org/packages/unikom.gery.gadgetbridge/">https://f-droid.org/packages/unikom.gery.gadgetbridge/</a></string>
     <string name="about_title">About</string>
     <string name="about_version">Version %s</string>
-    <string name="about_activity_title">About Gadgetbridge</string>
+    <string name="about_activity_title">Tentang Damang</string>
     <string name="about_description">Cloudless copylefted libre replacement for closed source Android gadget apps from vendors.</string>
     <string name="about_core_team_title">Core Team (in order of first code contribution)</string>
     <string name="about_contributors">Contributors</string>
