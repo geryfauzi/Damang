@@ -58,6 +58,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/GadgetbridgeTheme">
+        <activity android:name=".activities.LoginActivity"></activity>
         <activity android:name=".activities.WelcomeActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -71,9 +72,7 @@
             android:name=".activities.ControlCenterv2"
             android:label="@string/title_activity_controlcenter"
             android:launchMode="singleTop"
-            android:theme="@style/SplashTheme">
-
-        </activity>
+            android:theme="@style/SplashTheme"></activity>
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"

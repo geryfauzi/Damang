@@ -58,7 +58,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
-import de.cketti.library.changelog.ChangeLog;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.GBDeviceAdapterv2;
@@ -207,16 +206,6 @@ public class ControlCenterv2 extends AppCompatActivity
             checkAndRequestPermissions();
         }
 
-        ChangeLog cl = createChangeLog();
-        if (cl.isFirstRun()) {
-            try {
-                cl.getLogDialog().show();
-            } catch (Exception ignored) {
-                GB.toast(getBaseContext(), "Error showing Changelog", Toast.LENGTH_LONG, GB.ERROR);
-
-            }
-        }
-
         GBApplication.deviceService().start();
 
         if (GB.isBluetoothEnabled() && deviceList.isEmpty() && Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -277,31 +266,20 @@ public class ControlCenterv2 extends AppCompatActivity
                 startActivity(debugIntent);
                 return true;
             case R.id.action_data_management:
-                Intent dbIntent = new Intent(this, DataManagementActivity.class);
-                startActivity(dbIntent);
+//                Intent dbIntent = new Intent(this, DataManagementActivity.class);
+//                startActivity(dbIntent);
+                Toast.makeText(getApplicationContext(),"Masih OTW...",Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_blacklist:
-                Intent blIntent = new Intent(this, AppBlacklistActivity.class);
-                startActivity(blIntent);
+//                Intent blIntent = new Intent(this, AppBlacklistActivity.class);
+//                startActivity(blIntent);
+                Toast.makeText(getApplicationContext(),"Masih OTW...",Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.device_action_discover:
                 launchDiscoveryActivity();
                 return true;
             case R.id.action_quit:
                 GBApplication.quit();
-                return true;
-            case R.id.donation_link:
-                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://liberapay.com/Gadgetbridge")); //TODO: centralize if ever used somewhere else
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-                return true;
-            case R.id.external_changelog:
-                ChangeLog cl = createChangeLog();
-                try {
-                    cl.getLogDialog().show();
-                } catch (Exception ignored) {
-                    GB.toast(getBaseContext(), "Error showing Changelog", Toast.LENGTH_LONG, GB.ERROR);
-                }
                 return true;
             case R.id.about:
                 Intent aboutIntent = new Intent(this, AboutActivity.class);
@@ -310,15 +288,6 @@ public class ControlCenterv2 extends AppCompatActivity
         }
 
         return true;
-    }
-
-    private ChangeLog createChangeLog() {
-        String css = ChangeLog.DEFAULT_CSS;
-        css += "body { "
-                + "color: " + AndroidUtils.getTextColorHex(getBaseContext()) + "; "
-                + "background-color: " + AndroidUtils.getBackgroundColorHex(getBaseContext()) + ";" +
-                "}";
-        return new ChangeLog(this, css);
     }
 
     private void launchDiscoveryActivity() {

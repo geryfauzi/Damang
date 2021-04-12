@@ -2,11 +2,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Damang</string>
     <string name="title_activity_controlcenter">Damang</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_debug">Debug</string>
-    <string name="action_quit">Quit</string>
+    <string name="action_settings">Pengaturan</string>
+    <string name="action_debug">Area Testing</string>
+    <string name="action_quit">Keluar</string>
     <string name="action_donate">Donate</string>
-    <string name="controlcenter_fetch_activity_data">Synchronize</string>
+    <string name="controlcenter_fetch_activity_data">Sinkronisasi</string>
     <string name="controlcenter_find_device">Find lost device</string>
     <string name="find_lost_device_message">Search for %1$s?</string>
     <string name="controlcenter_take_screenshot">Take Screenshot</string>
@@ -36,7 +36,7 @@
     <string name="calendar_six_months">6 months</string>
     <string name="calendar_year">Year</string>
     <!-- Strings related to Debug Activity -->
-    <string name="title_activity_debug">Debug</string>
+    <string name="title_activity_debug">Area Testing</string>
     <string name="debugactivity_really_factoryreset_title">Really factory reset?</string>
     <string name="debugactivity_really_factoryreset">Doing a factory reset will delete all data from the connected device (if supported). Xiaomi/Huami devices also change Bluetooth MAC address, so they appear as a new devices to Gadgetbridge.</string>
     <!-- Strings related to AppManager -->
@@ -96,11 +96,11 @@
     <string name="miband_firmware_unknown_warning">"This firmware is untested and may not be compatible with Gadgetbridge.\n\nYou are DISCOURAGED from flashing it!"</string>
     <string name="miband_firmware_suggest_whitelist">If you still want to proceed and things continue to work properly afterwards, please tell the Gadgetbridge developers to whitelist the %s firmware version.</string>
     <!-- Strings related to Settings -->
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_settings">Pengaturan</string>
     <string name="pref_header_general">General settings</string>
     <string name="pref_title_general_autoconnectonbluetooth">Connect to Gadgetbridge device when Bluetooth is turned on</string>
-    <string name="pref_title_general_autostartonboot">Start automatically</string>
-    <string name="pref_title_general_autoreconnect">Reconnect automatically</string>
+    <string name="pref_title_general_autostartonboot">Mulai Otomatis</string>
+    <string name="pref_title_general_autoreconnect">Reconnect Otomatis</string>
     <string name="pref_title_audio_player">Preferred Audioplayer</string>
     <string name="pref_default">Default</string>
     <string name="pref_header_datetime">Date and Time</string>
@@ -322,13 +322,13 @@
     <!-- developer/debug preferences-->
     <string name="pref_disable_new_ble_scanning">Disable new BLE scanning</string>
     <string name="pref_summary_disable_new_ble_scanning">Check this option if your device cannot be found during discovery</string>
-    <string name="not_connected">Not connected</string>
-    <string name="connecting">Connecting</string>
-    <string name="connected">Connected</string>
+    <string name="not_connected">Tidak Terhubung</string>
+    <string name="connecting">Menghubungkan</string>
+    <string name="connected">Terhubung</string>
     <string name="unknown_state">Unknown state</string>
     <string name="_unknown_">(unknown)</string>
     <string name="test">Test</string>
-    <string name="test_notification">Test notification</string>
+    <string name="test_notification">Test Notifikasi</string>
     <string name="this_is_a_test_notification_from_gadgetbridge">This is a test notification from Gadgetbridge</string>
     <string name="find_my_phone_notification">Find my phone</string>
     <string name="bluetooth_is_not_supported_">Bluetooth is not supported.</string>
@@ -338,7 +338,7 @@
     <string name="tap_connected_device_for_vibration">Tap connected device for vibration</string>
     <string name="tap_a_device_to_connect">Tap a device to connect</string>
     <string name="cannot_connect_bt_address_invalid_">Cannot connect. Bluetooth address invalid?</string>
-    <string name="gadgetbridge_running">Gadgetbridge running</string>
+    <string name="gadgetbridge_running">Damang sedang berjalan</string>
     <string name="installing_binary_d_d">Installing binary %1$d/%2$d</string>
     <string name="installation_failed_">Installation failed</string>
     <string name="installation_successful">Installed</string>
@@ -347,17 +347,17 @@
     <string name="n_a">N/A</string>
     <string name="initialized">initialized</string>
     <string name="appversion_by_creator">%1$s by %2$s</string>
-    <string name="title_activity_discovery">Device discovery</string>
+    <string name="title_activity_discovery">Temukan Perangkat</string>
     <string name="discovery_stop_scanning">Stop scanning</string>
-    <string name="discovery_start_scanning">Start discovery</string>
-    <string name="action_discover">Connect new device</string>
+    <string name="discovery_start_scanning">Cari Perangkat</string>
+    <string name="action_discover">Tambahkan Perangkat</string>
     <string name="device_with_rssi">%1$s (%2$s)</string>
-    <string name="title_activity_android_pairing">Pair device</string>
+    <string name="title_activity_android_pairing">Hubungkan Perangkat</string>
     <string name="android_pairing_hint">Use the Android Bluetooth pairing dialog to pair the device.</string>
-    <string name="title_activity_mi_band_pairing">Pair your Mi Band</string>
-    <string name="pairing">Pairing with %s…</string>
-    <string name="pairing_creating_bond_with">"Creating bond with %1$s (%2$s)"</string>
-    <string name="pairing_unable_to_pair_with">"Unable to pair with %1$s (%2$s)"</string>
+    <string name="title_activity_mi_band_pairing">Hubungkan ke Mi Band</string>
+    <string name="pairing">Menghubungkan ke %s…</string>
+    <string name="pairing_creating_bond_with">"Membuat koneksi dengan %1$s (%2$s)"</string>
+    <string name="pairing_unable_to_pair_with">"Gagal terhubung dengan %1$s (%2$s)"</string>
     <string name="pairing_in_progress">Bonding in progress: %1$s (%2$s)</string>
     <string name="pairing_already_bonded">"Already bonded with %1$s (%2$s), connecting…"</string>
     <string name="message_cannot_pair_no_mac">No MAC address passed, cannot pair.</string>
@@ -373,10 +373,10 @@
     <string name="miband_pairing_using_dummy_userdata">No valid user data given, using dummy user data for now.</string>
     <string name="miband_pairing_tap_hint">When your Mi Band vibrates and blinks, tap it a few times in a row.</string>
     <string name="appinstaller_install">Install</string>
-    <string name="discovery_connected_devices_hint">Make your device discoverable. Currently connected devices will likely not be discovered. Activate location (e.g. GPS) on Android 6+. Disable Privacy Guard for Gadgetbridge, because it may crash and reboot your phone. If no device is found after a few minutes, try again after rebooting your mobile device.</string>
+    <string name="discovery_connected_devices_hint">Pastikan perangkat anda dapat ditemukan. Perangkat yang sedang terhubung ke perangkat lain tidak akan bisa ditemukan. Aktifkan GPS untuk Android versi 6+. Jika tidak ada perangkat yang ditemukan, coba untuk merestart android anda.</string>
     <string name="discovery_need_to_enter_authkey">This device needs a secret auth key, long press on the device to enter it. Read the wiki.</string>
     <string name="discovery_entered_invalid_authkey">The secret auth key you entered is invalid! Long press on the device to edit.</string>
-    <string name="discovery_note">Note:</string>
+    <string name="discovery_note">Catatan :</string>
     <string name="candidate_item_device_image">Device image</string>
     <string name="miband_prefs_alias">Name/Alias</string>
     <string name="pref_header_vibration_count">Vibration count</string>
@@ -673,8 +673,8 @@
     <string name="activity_prefs_activetime_minutes">Daily target: active time in minutes</string>
     <string name="pref_title_pebble_health_store_raw">Store raw record in the database</string>
     <string name="pref_summary_pebble_health_store_raw">Stores the data \"as is\", increasing the database usage to allow for later interpretation.</string>
-    <string name="action_db_management">Data management</string>
-    <string name="title_activity_db_management">Data management</string>
+    <string name="action_db_management">Laporan Data</string>
+    <string name="title_activity_db_management">Laporan Data</string>
     <string name="activity_db_management_import_export_explanation">The export/import operations use the following path (see below) to a directory on your device. This directory is accessible to other Android apps and your computer. Do note, that this directory and all containing files are deleted if you uninstall Gadgetbridge. The data includes:\n Export_preference - global settings\n Export_preference_MAC - device specific settings\n Gadgetbridge - device and activity database\n Gadgetbridge_date - database exported on a date\n *.gpx - GPS recordings\n *.log - log files\nExpect to find your exported files (or place the files you want to import) there:</string>
     <string name="activity_db_management_merge_old_title">Legacy database delete</string>
     <string name="dbmanagementactivvity_cannot_access_export_path">Cannot access export path. Please contact the developers.</string>
@@ -878,7 +878,7 @@
     <string name="menuitem_alarm">Alarm</string>
     <string name="menuitem_timer">Timer</string>
     <string name="menuitem_compass">Compass</string>
-    <string name="menuitem_settings">Settings</string>
+    <string name="menuitem_settings">Pengaturan</string>
     <string name="menuitem_alipay">Alipay</string>
     <string name="preferences_qhybrid_settings">Q Hybrid Settings</string>
     <string name="menuitem_music">Music</string>
@@ -998,7 +998,7 @@
     <string name="fdroid_url" translatable="false">F-Droid: <a href="https://f-droid.org/packages/unikom.gery.gadgetbridge/">https://f-droid.org/packages/unikom.gery.gadgetbridge/</a></string>
     <string name="about_title">About</string>
     <string name="about_version">Version %s</string>
-    <string name="about_activity_title">About Gadgetbridge</string>
+    <string name="about_activity_title">Tentang Damang</string>
     <string name="about_description">Cloudless copylefted libre replacement for closed source Android gadget apps from vendors.</string>
     <string name="about_core_team_title">Core Team (in order of first code contribution)</string>
     <string name="about_contributors">Contributors</string>
@@ -1179,4 +1179,10 @@
     <string name="mulai_aplikasi_damang">Mulai aplikasi Damang</string>
     <string name="sekarang_juga">sekarang juga!</string>
     <string name="mulai">Mulai</string>
+    <string name="sebelum_memulai">Sebelum memulai,</string>
+    <string name="silahkan_masuk_menggunakan">Silahkan masuk menggunakan</string>
+    <string name="akun_google_anda">akun Google anda</string>
+    <string name="masuk_dengan_google">Masuk Dengan Google</string>
+    <string name="gery_akbar_fauzi">Gery Akbar Fauzi</string>
+    <string name="geryakbarfauzi_gmail_com">geryakbarfauzi@gmail.com</string>
 </resources>

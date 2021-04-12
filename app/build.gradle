@@ -83,10 +83,10 @@ dependencies {
     implementation "org.slf4j:slf4j-api:1.7.24"
     implementation "com.github.PhilJay:MPAndroidChart:v3.1.0"
     implementation "com.github.pfichtner:durationformatter:0.1.1"
-    implementation "de.cketti.library.changelog:ckchangelog:1.2.2"
     implementation "net.e175.klaus:solarpositioning:0.0.9"
     implementation "com.airbnb.android:lottie:3.7.0"
     implementation "androidx.multidex:multidex:2.0.1"
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
     // use pristine greendao instead of our custom version, since our custom jitpack-packaged
     // version contains way too much and our custom patches are in the generator only.
     implementation "org.greenrobot:greendao:2.2.1"
