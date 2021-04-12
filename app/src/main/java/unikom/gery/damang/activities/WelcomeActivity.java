@@ -11,7 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import me.relex.circleindicator.CircleIndicator;
 import unikom.gery.damang.R;
-import unikom.gery.damang.SharedPreference;
+import unikom.gery.damang.util.SharedPreference;
 import unikom.gery.damang.adapter.WelcomeAdapter;
 
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {

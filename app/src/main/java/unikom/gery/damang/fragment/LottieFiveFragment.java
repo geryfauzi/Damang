@@ -15,8 +15,7 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import unikom.gery.damang.R;
-import unikom.gery.damang.SharedPreference;
-import unikom.gery.damang.activities.ControlCenterv2;
+import unikom.gery.damang.util.SharedPreference;
 import unikom.gery.damang.activities.LoginActivity;
 
 public class LottieFiveFragment extends Fragment implements View.OnClickListener {

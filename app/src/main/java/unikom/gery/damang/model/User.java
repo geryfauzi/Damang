@@ -18,8 +18,8 @@ public class User implements Parcelable {
     private String email;
     private String name;
     private String dateofBirth;
-    private Double weight;
-    private Double height;
+    private Float weight;
+    private Float height;
     private String photo;
 
     public User() {
@@ -30,8 +30,8 @@ public class User implements Parcelable {
         email = in.readString();
         name = in.readString();
         dateofBirth = in.readString();
-        weight = in.readDouble();
-        height = in.readDouble();
+        weight = in.readFloat();
+        height = in.readFloat();
         photo = in.readString();
     }
 
@@ -74,19 +74,19 @@ public class User implements Parcelable {
         this.dateofBirth = dateofBirth;
     }
 
-    public Double getWeight() {
+    public Float getWeight() {
         return weight;
     }
 
-    public void setWeight(Double weight) {
+    public void setWeight(Float weight) {
         this.weight = weight;
     }
 
-    public Double getHeight() {
+    public Float getHeight() {
         return height;
     }
 
-    public void setHeight(Double height) {
+    public void setHeight(Float height) {
         this.height = height;
     }
 
