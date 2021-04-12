@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     sharedPreference.setLoggedIn(true);
                 }
             } catch (ApiException e) {
-
+                Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
             }
         }
     }
