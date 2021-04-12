@@ -74,6 +74,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (account != null) {
                     Toast.makeText(getApplicationContext(), account.getDisplayName(), Toast.LENGTH_SHORT).show();
                     sharedPreference.setLoggedIn(true);
+                    startActivity(new Intent(getApplicationContext(), ControlCenterv2.class));
+                    finish();
                 }
             } catch (ApiException e) {
                 Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
