@@ -26,7 +26,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import unikom.gery.damang.GBException;
-import unikom.gery.damang.activities.ControlCenterv2;
+import unikom.gery.damang.activities.HomeActivity;
 import unikom.gery.damang.entities.AbstractActivitySample;
 import unikom.gery.damang.entities.DaoSession;
 import unikom.gery.damang.entities.Device;
@@ -110,7 +110,7 @@ public class UnknownDeviceCoordinator extends AbstractDeviceCoordinator {
 
     @Override
     public Class<? extends Activity> getPairingActivity() {
-        return ControlCenterv2.class;
+        return HomeActivity.class;
     }
 
     @Override

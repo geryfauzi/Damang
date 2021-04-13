@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -56,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //Session Initiation
         sharedPreference = new SharedPreference(this);
         if (sharedPreference.isLoggedIn()) {
-            startActivity(new Intent(getApplicationContext(), ControlCenterv2.class));
+            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
             finish();
         }
         //
@@ -70,6 +71,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         startActivityForResult(signIntent, 1);
     }
 
+    private void setUserLogin(Response<CheckUser> response) {
+        sharedPreference.setLoggedIn(true);
+        user.setEmail(response.body().getEmail());
+        user.setName(response.body().getEmail());
+        user.setDateofBirth(response.body().getDateofBirth());
+        user.setHeight(response.body().getHeight());
+        user.setWeight(response.body().getWeight());
+        user.setPhoto(response.body().getPhoto());
+        sharedPreference.setUser(user);
+        startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+        finish();
+    }
+
     private void checkEmail(GoogleSignInAccount account) {
         Api api = BaseApi.getRetrofit().create(Api.class);
         Call<CheckUser> response = api.checkUser(account.getEmail());
@@ -78,18 +92,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
                 if (response.body().getCode() == 1) {
-                    sharedPreference.setLoggedIn(true);
-                    user.setEmail(response.body().getEmail());
-                    user.setName(response.body().getEmail());
-                    user.setDateofBirth(response.body().getDateofBirth());
-                    user.setHeight(response.body().getHeight());
-                    user.setWeight(response.body().getWeight());
-                    user.setPhoto(response.body().getPhoto());
-                    sharedPreference.setUser(user);
-                    startActivity(new Intent(getApplicationContext(), ControlCenterv2.class));
-                    finish();
-                } else
+                    setUserLogin(response);
+                } else {
                     Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getApplicationContext(), RegisterFormActivity.class));
+                }
             }
 
             @Override
@@ -110,7 +117,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     checkEmail(account);
                 }
             } catch (ApiException e) {
-                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                Log.d("Error : ",e.toString());
             }
         }
     }

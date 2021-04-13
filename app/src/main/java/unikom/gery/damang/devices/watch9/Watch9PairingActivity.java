@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import unikom.gery.damang.R;
 import unikom.gery.damang.activities.AbstractGBActivity;
-import unikom.gery.damang.activities.ControlCenterv2;
+import unikom.gery.damang.activities.HomeActivity;
 import unikom.gery.damang.activities.DiscoveryActivity;
 import unikom.gery.damang.devices.DeviceCoordinator;
 import unikom.gery.damang.impl.GBDevice;
@@ -93,7 +93,7 @@ public class Watch9PairingActivity extends AbstractGBActivity implements Bonding
 
     @Override
     public void onBondingComplete(boolean success) {
-        startActivity(new Intent(this, ControlCenterv2.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+        startActivity(new Intent(this, HomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         finish();
     }
 

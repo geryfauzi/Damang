@@ -68,7 +68,7 @@ import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
 
 //TODO: extend AbstractGBActivity, but it requires actionbar that is not available
-public class ControlCenterv2 extends AppCompatActivity
+public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GBActivity {
 
     public static final int MENU_REFRESH_CODE = 1;

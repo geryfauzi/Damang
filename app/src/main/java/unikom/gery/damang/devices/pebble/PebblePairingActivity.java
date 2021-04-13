@@ -39,7 +39,7 @@ import de.greenrobot.dao.query.Query;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
 import unikom.gery.damang.activities.AbstractGBActivity;
-import unikom.gery.damang.activities.ControlCenterv2;
+import unikom.gery.damang.activities.HomeActivity;
 import unikom.gery.damang.activities.DiscoveryActivity;
 import unikom.gery.damang.database.DBHandler;
 import unikom.gery.damang.devices.DeviceCoordinator;
@@ -168,7 +168,7 @@ public class PebblePairingActivity extends AbstractGBActivity implements Bonding
     public void onBondingComplete(boolean success) {
         unregisterBroadcastReceivers();
         if (success) {
-            startActivity(new Intent(this, ControlCenterv2.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            startActivity(new Intent(this, HomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         } else {
             startActivity(new Intent(this, DiscoveryActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }

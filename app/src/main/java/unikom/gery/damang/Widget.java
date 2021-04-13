@@ -58,7 +58,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import unikom.gery.damang.activities.ControlCenterv2;
+import unikom.gery.damang.activities.HomeActivity;
 import unikom.gery.damang.activities.SettingsActivity;
 import unikom.gery.damang.activities.WidgetAlarmsActivity;
 import unikom.gery.damang.activities.charts.ChartsActivity;
@@ -137,7 +137,7 @@ public class Widget extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.todaywidget_header_container, refreshDataIntent);
 
         //open GB main window
-        Intent startMainIntent = new Intent(context, ControlCenterv2.class);
+        Intent startMainIntent = new Intent(context, HomeActivity.class);
         PendingIntent startMainPIntent = PendingIntent.getActivity(context, 0, startMainIntent, 0);
         views.setOnClickPendingIntent(R.id.todaywidget_header_icon, startMainPIntent);
 
