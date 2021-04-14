@@ -10,4 +10,15 @@ public interface Api {
     @POST("user/checkUser.php")
     @FormUrlEncoded
     Call<CheckUser> checkUser(@Field("email") String email);
+
+    @POST("user/userRegister.php")
+    @FormUrlEncoded
+    Call<CheckUser> register(
+            @Field("email") String email,
+            @Field("nama") String nama,
+            @Field("tanggalLahir") String tanggalLahir,
+            @Field("weight") Float weight,
+            @Field("height") Float height,
+            @Field("photo") String photo
+    );
 }

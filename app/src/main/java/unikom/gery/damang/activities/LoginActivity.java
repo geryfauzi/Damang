@@ -1,5 +1,6 @@
 package unikom.gery.damang.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -38,6 +39,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleSignInOptions googleSignInOptions;
     private SharedPreference sharedPreference;
     private User user;
+    private ProgressDialog progressDialog;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -61,6 +63,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             finish();
         }
         //
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Harap Tunggu...");
+        progressDialog.setCancelable(false);
+
         btnLogin = findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
     }
@@ -74,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void setUserLogin(Response<CheckUser> response) {
         sharedPreference.setLoggedIn(true);
         user.setEmail(response.body().getEmail());
-        user.setName(response.body().getEmail());
+        user.setName(response.body().getName());
         user.setDateofBirth(response.body().getDateofBirth());
         user.setHeight(response.body().getHeight());
         user.setWeight(response.body().getWeight());
@@ -85,12 +91,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void checkEmail(GoogleSignInAccount account) {
+        progressDialog.show();
         Api api = BaseApi.getRetrofit().create(Api.class);
         Call<CheckUser> response = api.checkUser(account.getEmail());
         user = new User();
         response.enqueue(new Callback<CheckUser>() {
             @Override
             public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
+                progressDialog.hide();
                 if (response.body().getCode() == 1) {
                     setUserLogin(response);
                 } else {
@@ -101,6 +109,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<CheckUser> call, Throwable t) {
+                progressDialog.hide();
                 Toast.makeText(getApplicationContext(), t.toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -117,7 +126,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     checkEmail(account);
                 }
             } catch (ApiException e) {
-                Log.d("Error : ",e.toString());
+                Log.d("Error : ", e.toString());
             }
         }
     }
