@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -87,6 +88,21 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         etNama.setText(name);
     }
 
+    private boolean checkInputForm() {
+        boolean status = false;
+        if (TextUtils.isEmpty(etEmail.getText().toString().trim()))
+            status = true;
+        if (TextUtils.isEmpty(etNama.getText().toString().trim()))
+            status = true;
+        if (etTanggalLahir.getText().toString().trim().equals("Tanggal Lahir"))
+            status = true;
+        if (TextUtils.isEmpty(etHeight.getText().toString().trim()))
+            status = true;
+        if (TextUtils.isEmpty(etWeight.getText().toString().trim()))
+            status = true;
+        return status;
+    }
+
     private void setUserSession(User data) {
         sharedPreference.setLoggedIn(true);
         user.setEmail(data.getEmail());
@@ -113,7 +129,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         return user;
     }
 
-    private void Regsiter(final User data) {
+    private void register(final User data) {
         progressDialog.show();
         Api api = BaseApi.getRetrofit().create(Api.class);
         Call<CheckUser> response = api.register(data.getEmail(), data.getName(), data.getDateofBirth(), data.getWeight(), data.getHeight(), data.getPhoto());
@@ -156,7 +172,10 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onClick(View view) {
         if (view == btnRegister) {
-            Regsiter(getUserData());
+            if (checkInputForm())
+                Toast.makeText(getApplicationContext(), "Harap isi semua data isian!", Toast.LENGTH_SHORT).show();
+            else
+                register(getUserData());
         } else if (view == etTanggalLahir) {
             pickDate();
         }
