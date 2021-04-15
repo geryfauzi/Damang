@@ -6,11 +6,11 @@
     <color name="slide4" type="color">#00D4C6</color>
     <color name="slide5" type="color">#FFFFFF</color>
 
-    <color name="primary_light" type="color">#ff3d00</color>
-    <color name="primarydark_light" type="color">#dd2c00</color>
+    <color name="primary_light" type="color">#0090E8</color>
+    <color name="primarydark_light" type="color">#0090E8</color>
 
-    <color name="primary_dark" type="color">#ff3d00</color>
-    <color name="primarydark_dark" type="color">#dd2c00</color>
+    <color name="primary_dark" type="color">#0090E8</color>
+    <color name="primarydark_dark" type="color">#0090E8</color>
 
     <color name="accent" type="color">#0091ea</color>
 
