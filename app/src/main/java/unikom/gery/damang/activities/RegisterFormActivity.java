@@ -9,9 +9,12 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,10 +38,10 @@ import unikom.gery.damang.model.User;
 import unikom.gery.damang.response.CheckUser;
 import unikom.gery.damang.util.SharedPreference;
 
-public class RegisterFormActivity extends AppCompatActivity implements View.OnClickListener {
+public class RegisterFormActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private GoogleSignInAccount account;
-    private String email, name, photo;
+    private String email, name, photo, gender;
     private EditText etEmail, etNama, etHeight, etWeight;
     private TextView etTanggalLahir;
     private Button btnRegister;
@@ -46,6 +49,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
     private User user;
     private SharedPreference sharedPreference;
     private ProgressDialog progressDialog;
+    private Spinner spinnerGender;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -66,6 +70,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         etWeight = findViewById(R.id.etBeratBadan);
         etTanggalLahir = findViewById(R.id.etTanggalLahir);
         btnRegister = findViewById(R.id.btnRegister);
+        spinnerGender = findViewById(R.id.spinnerGender);
 
         account = GoogleSignIn.getLastSignedInAccount(this);
         email = account.getEmail();
@@ -78,9 +83,17 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
 
         btnRegister.setOnClickListener(this);
         etTanggalLahir.setOnClickListener(this);
+        spinnerGender.setOnItemSelectedListener(this);
         calendar = Calendar.getInstance();
         sharedPreference = new SharedPreference(this);
         setUserDataToView();
+        spinnerInitiation();
+    }
+
+    private void spinnerInitiation() {
+        String[] jenisKelamin = {"Laki - Laki", "Perempuan"};
+        ArrayAdapter arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, jenisKelamin);
+        spinnerGender.setAdapter(arrayAdapter);
     }
 
     private void setUserDataToView() {
@@ -100,6 +113,8 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
             status = true;
         if (TextUtils.isEmpty(etWeight.getText().toString().trim()))
             status = true;
+        if (gender.equals(""))
+            status = true;
         return status;
     }
 
@@ -108,6 +123,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         user.setEmail(data.getEmail());
         user.setName(data.getName());
         user.setDateofBirth(data.getDateofBirth());
+        user.setGender(data.getGender());
         user.setHeight(data.getHeight());
         user.setWeight(data.getHeight());
         user.setPhoto(data.getPhoto());
@@ -123,6 +139,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         user.setName(etNama.getText().toString().trim());
         user.setEmail(etEmail.getText().toString().trim());
         user.setPhoto(photo);
+        user.setGender(gender);
         user.setWeight(Float.parseFloat(etWeight.getText().toString().trim()));
         user.setHeight(Float.parseFloat(etHeight.getText().toString().trim()));
         user.setDateofBirth(etTanggalLahir.getText().toString().trim());
@@ -132,7 +149,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
     private void register(final User data) {
         progressDialog.show();
         Api api = BaseApi.getRetrofit().create(Api.class);
-        Call<CheckUser> response = api.register(data.getEmail(), data.getName(), data.getDateofBirth(), data.getWeight(), data.getHeight(), data.getPhoto());
+        Call<CheckUser> response = api.register(data.getEmail(), data.getName(), data.getDateofBirth(), data.getGender(), data.getWeight(), data.getHeight(), data.getPhoto());
         response.enqueue(new Callback<CheckUser>() {
             @Override
             public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
@@ -179,5 +196,15 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         } else if (view == etTanggalLahir) {
             pickDate();
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        gender = adapterView.getItemAtPosition(i).toString();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }

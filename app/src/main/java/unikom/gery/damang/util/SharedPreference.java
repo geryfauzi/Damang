@@ -13,6 +13,7 @@ public class SharedPreference {
     private static final String email = "email";
     private static final String name = "name";
     private static final String dateOfBirth = "dateOfBirth";
+    private static final String gender = "gender";
     private static final String weight = "weight";
     private static final String height = "height";
     private static final String photo = "photo";
@@ -49,6 +50,7 @@ public class SharedPreference {
         editor.putString(email, value.getEmail());
         editor.putString(name, value.getName());
         editor.putString(dateOfBirth, value.getDateofBirth());
+        editor.putString(gender, value.getGender());
         editor.putFloat(weight, value.getWeight());
         editor.putFloat(height, value.getHeight());
         editor.putString(photo, value.getPhoto());

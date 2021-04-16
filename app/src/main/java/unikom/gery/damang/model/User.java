@@ -18,6 +18,7 @@ public class User implements Parcelable {
     private String email;
     private String name;
     private String dateofBirth;
+    private String gender;
     private Float weight;
     private Float height;
     private String photo;
@@ -30,6 +31,7 @@ public class User implements Parcelable {
         email = in.readString();
         name = in.readString();
         dateofBirth = in.readString();
+        gender = in.readString();
         weight = in.readFloat();
         height = in.readFloat();
         photo = in.readString();
@@ -40,11 +42,20 @@ public class User implements Parcelable {
         return 0;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(email);
         parcel.writeString(name);
         parcel.writeString(dateofBirth);
+        parcel.writeString(gender);
         parcel.writeDouble(height);
         parcel.writeDouble(weight);
         parcel.writeString(photo);

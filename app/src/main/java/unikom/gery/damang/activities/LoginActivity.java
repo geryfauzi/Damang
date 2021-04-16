@@ -82,6 +82,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         user.setEmail(response.body().getEmail());
         user.setName(response.body().getName());
         user.setDateofBirth(response.body().getDateofBirth());
+        user.setGender(response.body().getGender());
         user.setHeight(response.body().getHeight());
         user.setWeight(response.body().getWeight());
         user.setPhoto(response.body().getPhoto());

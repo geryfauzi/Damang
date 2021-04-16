@@ -17,6 +17,7 @@ public interface Api {
             @Field("email") String email,
             @Field("nama") String nama,
             @Field("tanggalLahir") String tanggalLahir,
+            @Field("gender") String gender,
             @Field("weight") Float weight,
             @Field("height") Float height,
             @Field("photo") String photo

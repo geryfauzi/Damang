@@ -13,6 +13,8 @@ public class CheckUser {
     private String name;
     @SerializedName("dateofBirth")
     private String dateofBirth;
+    @SerializedName("gender")
+    private String gender;
     @SerializedName("weight")
     private Float weight;
     @SerializedName("height")
@@ -20,12 +22,13 @@ public class CheckUser {
     @SerializedName("photo")
     private String photo;
 
-    public CheckUser(int code, String message, String email, String name, String dateofBirth, Float weight, Float height, String photo) {
+    public CheckUser(int code, String message, String email, String name, String dateofBirth, String gender, Float weight, Float height, String photo) {
         this.code = code;
         this.message = message;
         this.email = email;
         this.name = name;
         this.dateofBirth = dateofBirth;
+        this.gender = gender;
         this.weight = weight;
         this.height = height;
         this.photo = photo;
@@ -53,6 +56,10 @@ public class CheckUser {
 
     public Float getWeight() {
         return weight;
+    }
+
+    public String getGender() {
+        return gender;
     }
 
     public Float getHeight() {
