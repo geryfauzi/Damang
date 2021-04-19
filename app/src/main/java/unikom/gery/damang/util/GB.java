@@ -48,7 +48,7 @@ import java.nio.ByteOrder;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.GBEnvironment;
 import unikom.gery.damang.R;
-import unikom.gery.damang.activities.ControlCenterv2;
+import unikom.gery.damang.activities.HomeActivity;
 import unikom.gery.damang.activities.SettingsActivity;
 import unikom.gery.damang.deviceevents.GBDeviceEventScreenshot;
 import unikom.gery.damang.impl.GBDevice;
@@ -90,7 +90,7 @@ public class GB {
     public static final String ACTION_SET_INFO_TEXT = "GB_Set_Info_Text";
 
     private static PendingIntent getContentIntent(Context context) {
-        Intent notificationIntent = new Intent(context, ControlCenterv2.class);
+        Intent notificationIntent = new Intent(context, HomeActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
@@ -365,7 +365,7 @@ public class GB {
 
     private static Notification createTransferNotification(String title, String text, boolean ongoing,
                                                            int percentage, Context context) {
-        Intent notificationIntent = new Intent(context, ControlCenterv2.class);
+        Intent notificationIntent = new Intent(context, HomeActivity.class);
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if(isRunningOreoOrLater()) {
             NotificationChannel channel = notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID_TRANSFER);
@@ -418,7 +418,7 @@ public class GB {
 
     private static Notification createInstallNotification(String text, boolean ongoing,
                                                           int percentage, Context context) {
-        Intent notificationIntent = new Intent(context, ControlCenterv2.class);
+        Intent notificationIntent = new Intent(context, HomeActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
@@ -448,7 +448,7 @@ public class GB {
     }
 
     private static Notification createBatteryNotification(String text, String bigText, Context context) {
-        Intent notificationIntent = new Intent(context, ControlCenterv2.class);
+        Intent notificationIntent = new Intent(context, HomeActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,

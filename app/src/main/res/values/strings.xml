@@ -1185,4 +1185,11 @@
     <string name="masuk_dengan_google">Masuk Dengan Google</string>
     <string name="gery_akbar_fauzi">Gery Akbar Fauzi</string>
     <string name="geryakbarfauzi_gmail_com">geryakbarfauzi@gmail.com</string>
+    <string name="lengkapi_data_diri_anda">Lengkapi Data Diri Anda</string>
+    <string name="nama_lengkap">Nama Lengkap</string>
+    <string name="alamat_email">Alamat Email</string>
+    <string name="tanggal_lahir">Tanggal Lahir</string>
+    <string name="berat_badan">Berat Badan</string>
+    <string name="tinggi_badan_sentimeter">Tinggi Badan (Sentimeter)</string>
+    <string name="daftar">Daftar</string>
 </resources>

@@ -7,6 +7,7 @@
         <uses-permission android:name="android.permission.INTERNET" />
     -->
     <!-- Used for Bluetooth access -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- Since Android 10 -->
@@ -58,7 +59,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/GadgetbridgeTheme">
-        <activity android:name=".activities.LoginActivity"></activity>
+        <activity android:name=".activities.RegisterFormActivity"></activity>
+        <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.WelcomeActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -69,14 +71,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.ControlCenterv2"
+            android:name=".activities.HomeActivity"
             android:label="@string/title_activity_controlcenter"
             android:launchMode="singleTop"
-            android:theme="@style/SplashTheme"></activity>
+            android:theme="@style/SplashTheme" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.AboutUserPreferencesActivity"
             android:label="@string/activity_prefs_about_you"
@@ -96,12 +98,12 @@
         <activity
             android:name=".activities.ActivitySummariesActivity"
             android:label="@string/activity_summaries"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.appmanager.AppManagerActivity"
             android:label="@string/title_activity_appmanager"
             android:launchMode="singleTop"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.AppBlacklistActivity"
             android:label="@string/title_activity_appblacklist"
@@ -113,7 +115,7 @@
         <activity
             android:name=".activities.FwAppInstallerActivity"
             android:label="@string/title_activity_fw_app_insaller"
-            android:parentActivityName=".activities.ControlCenterv2">
+            android:parentActivityName=".activities.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -405,18 +407,18 @@
         <activity
             android:name=".activities.DebugActivity"
             android:label="@string/title_activity_debug"
-            android:parentActivityName=".activities.ControlCenterv2"
+            android:parentActivityName=".activities.HomeActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.AboutActivity"
             android:label="@string/about_activity_title"
-            android:parentActivityName=".activities.ControlCenterv2"
+            android:parentActivityName=".activities.HomeActivity"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.BatteryInfoActivity"
             android:label="@string/battery_detail_activity_title"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ActivitySummaryDetail"
             android:label="@string/activity_summary_detail"
@@ -430,12 +432,12 @@
         <activity
             android:name=".activities.DataManagementActivity"
             android:label="@string/title_activity_db_management"
-            android:parentActivityName=".activities.ControlCenterv2"
+            android:parentActivityName=".activities.HomeActivity"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.DiscoveryActivity"
             android:label="@string/title_activity_discovery"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.AndroidPairingActivity"
             android:label="@string/title_activity_android_pairing" />
@@ -460,15 +462,15 @@
         <activity
             android:name=".activities.charts.ChartsActivity"
             android:label="@string/title_activity_charts"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ConfigureAlarms"
             android:label="@string/title_activity_set_alarm"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.devicesettings.DeviceSettingsActivity"
             android:label="@string/title_activity_device_specific_settings"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.AlarmDetails"
             android:label="@string/title_activity_alarm_details"
@@ -477,7 +479,7 @@
         <activity
             android:name=".activities.VibrationActivity"
             android:label="@string/title_activity_vibration"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.NotificationFilterActivity"
             android:label="@string/title_activity_notification_filter"
@@ -547,7 +549,7 @@
             android:parentActivityName=".activities.appmanager.AppManagerActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="unikom.gery.damang.activities.ControlCenterv2" />
+                android:value="unikom.gery.damang.activities.HomeActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -562,7 +564,7 @@
             android:name=".devices.qhybrid.ConfigActivity"
             android:exported="true"
             android:label="@string/qhybrid_title_watchface_apps"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".devices.qhybrid.QHybridAppChoserActivity"
             android:exported="true"
@@ -572,7 +574,7 @@
             android:name=".devices.qhybrid.HRConfigActivity"
             android:exported="true"
             android:label="@string/qhybrid_title_watchface_apps"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".devices.qhybrid.WidgetSettingsActivity"
             android:label="@string/add_widget"
