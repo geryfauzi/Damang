@@ -34,6 +34,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -65,6 +66,7 @@ import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.model.ActivitySample;
 import unikom.gery.damang.model.DeviceService;
+import unikom.gery.damang.service.ServiceReceiver;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
@@ -111,6 +113,7 @@ public class HomeActivity extends AppCompatActivity
     };
     private boolean pesterWithPermissions = true;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AbstractGBActivity.init(this, AbstractGBActivity.NO_ACTIONBAR);
@@ -196,6 +199,8 @@ public class HomeActivity extends AppCompatActivity
         }
 
         sharedPreference = new SharedPreference(this);
+        ServiceReceiver serviceReceiver = new ServiceReceiver();
+        serviceReceiver.setReceiver(this);
     }
 
     @Override
@@ -256,7 +261,7 @@ public class HomeActivity extends AppCompatActivity
             case R.id.action_blacklist:
 //                Intent blIntent = new Intent(this, AppBlacklistActivity.class);
 //                startActivity(blIntent);
-                Toast.makeText(getApplicationContext(), "Masih OTW...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), Integer.toString(sharedPreference.getHeartRate()), Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.device_action_discover:
                 launchDiscoveryActivity();
