@@ -66,6 +66,9 @@
         <receiver
             android:name=".service.ServiceReceiver"
             android:process=":remote" />
+        <receiver
+            android:name=".service.DataReceiver"
+            android:process=":remote" />
 
         <activity android:name=".activities.RegisterFormActivity"></activity>
         <activity android:name=".activities.LoginActivity" />

@@ -105,9 +105,9 @@ public class HomeActivity extends AppCompatActivity
                 case DeviceManager.ACTION_DEVICES_CHANGED:
                     refreshPairedDevices();
                     break;
-                case DeviceService.ACTION_REALTIME_SAMPLES:
-                    handleRealtimeSample(intent.getSerializableExtra(DeviceService.EXTRA_REALTIME_SAMPLE));
-                    break;
+//                case DeviceService.ACTION_REALTIME_SAMPLES:
+//                    handleRealtimeSample(intent.getSerializableExtra(DeviceService.EXTRA_REALTIME_SAMPLE));
+//                    break;
             }
         }
     };
@@ -148,14 +148,14 @@ public class HomeActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                launchDiscoveryActivity();
-                gbDevice = deviceList.get(0);
-                if (gbDevice.isInitialized() || gbDevice.isConnected()) {
-                    Toast.makeText(getApplicationContext(), "Please, jadilah...", Toast.LENGTH_SHORT).show();
-                    GBApplication.deviceService().onHeartRateTest();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
-                }
+                launchDiscoveryActivity();
+//                gbDevice = deviceList.get(0);
+//                if (gbDevice.isInitialized() || gbDevice.isConnected()) {
+//                    Toast.makeText(getApplicationContext(), "Please, jadilah...", Toast.LENGTH_SHORT).show();
+//                    GBApplication.deviceService().onHeartRateTest();
+//                } else {
+//                    Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
+//                }
             }
         });
 
@@ -167,7 +167,7 @@ public class HomeActivity extends AppCompatActivity
         filterLocal.addAction(GBApplication.ACTION_LANGUAGE_CHANGE);
         filterLocal.addAction(GBApplication.ACTION_QUIT);
         filterLocal.addAction(DeviceManager.ACTION_DEVICES_CHANGED);
-        filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
+//        filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filterLocal);
 
         refreshPairedDevices();
