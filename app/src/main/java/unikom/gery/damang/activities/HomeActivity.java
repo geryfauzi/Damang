@@ -25,7 +25,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
@@ -51,6 +50,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -63,9 +63,12 @@ import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.GBDeviceAdapterv2;
 import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
+import unikom.gery.damang.model.ActivitySample;
+import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
+import unikom.gery.damang.util.SharedPreference;
 
 //TODO: extend AbstractGBActivity, but it requires actionbar that is not available
 public class HomeActivity extends AppCompatActivity
@@ -79,6 +82,8 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
+    private SharedPreference sharedPreference;
+    private GBDevice gbDevice;
     private DeviceManager deviceManager;
     private GBDeviceAdapterv2 mGBDeviceAdapter;
     private RecyclerView deviceListView;
@@ -97,6 +102,9 @@ public class HomeActivity extends AppCompatActivity
                     break;
                 case DeviceManager.ACTION_DEVICES_CHANGED:
                     refreshPairedDevices();
+                    break;
+                case DeviceService.ACTION_REALTIME_SAMPLES:
+                    handleRealtimeSample(intent.getSerializableExtra(DeviceService.EXTRA_REALTIME_SAMPLE));
                     break;
             }
         }
@@ -128,7 +136,7 @@ public class HomeActivity extends AppCompatActivity
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this));
 
-        List<GBDevice> deviceList = deviceManager.getDevices();
+        final List<GBDevice> deviceList = deviceManager.getDevices();
         mGBDeviceAdapter = new GBDeviceAdapterv2(this, deviceList);
 
         deviceListView.setAdapter(this.mGBDeviceAdapter);
@@ -137,46 +145,18 @@ public class HomeActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchDiscoveryActivity();
+//                launchDiscoveryActivity();
+                gbDevice = deviceList.get(0);
+                if (gbDevice.isInitialized() || gbDevice.isConnected()) {
+                    Toast.makeText(getApplicationContext(), "Please, jadilah...", Toast.LENGTH_SHORT).show();
+                    GBApplication.deviceService().onHeartRateTest();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         showFabIfNeccessary();
-
-        /* uncomment to enable fixed-swipe to reveal more actions
-
-        ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.LEFT , ItemTouchHelper.RIGHT) {
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if(dX>50)
-                    dX = 50;
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-
-            }
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                GB.toast(getBaseContext(), "onMove", Toast.LENGTH_LONG, GB.ERROR);
-
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                GB.toast(getBaseContext(), "onSwiped", Toast.LENGTH_LONG, GB.ERROR);
-
-            }
-
-            @Override
-            public void onChildDrawOver(Canvas c, RecyclerView recyclerView,
-                                        RecyclerView.ViewHolder viewHolder, float dX, float dY,
-                                        int actionState, boolean isCurrentlyActive) {
-            }
-        });
-
-        swipeToDismissTouchHelper.attachToRecyclerView(deviceListView);
-        */
 
         registerForContextMenu(deviceListView);
 
@@ -184,6 +164,7 @@ public class HomeActivity extends AppCompatActivity
         filterLocal.addAction(GBApplication.ACTION_LANGUAGE_CHANGE);
         filterLocal.addAction(GBApplication.ACTION_QUIT);
         filterLocal.addAction(DeviceManager.ACTION_DEVICES_CHANGED);
+        filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filterLocal);
 
         refreshPairedDevices();
@@ -213,6 +194,8 @@ public class HomeActivity extends AppCompatActivity
         } else {
             GBApplication.deviceService().requestDeviceInfo();
         }
+
+        sharedPreference = new SharedPreference(this);
     }
 
     @Override
@@ -268,12 +251,12 @@ public class HomeActivity extends AppCompatActivity
             case R.id.action_data_management:
 //                Intent dbIntent = new Intent(this, DataManagementActivity.class);
 //                startActivity(dbIntent);
-                Toast.makeText(getApplicationContext(),"Masih OTW...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Masih OTW...", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_blacklist:
 //                Intent blIntent = new Intent(this, AppBlacklistActivity.class);
 //                startActivity(blIntent);
-                Toast.makeText(getApplicationContext(),"Masih OTW...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Masih OTW...", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.device_action_discover:
                 launchDiscoveryActivity();
@@ -416,5 +399,13 @@ public class HomeActivity extends AppCompatActivity
             isLanguageInvalid = true;
         }
         AndroidUtils.setLanguage(this, language);
+    }
+
+    private void handleRealtimeSample(Serializable extra) {
+        if (extra instanceof ActivitySample) {
+            ActivitySample sample = (ActivitySample) extra;
+            sharedPreference.setHeartRate(sample.getHeartRate());
+            GB.toast(this, "Detak jantung anda: " + sample.getHeartRate(), Toast.LENGTH_LONG, GB.INFO);
+        }
     }
 }
