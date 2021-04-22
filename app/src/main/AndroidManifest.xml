@@ -61,13 +61,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/GadgetbridgeTheme">
         <service
-            android:name=".service.BackgroundService"
+            android:name=".service.NormalService"
             android:process=":remote" />
         <receiver
-            android:name=".service.ServiceReceiver"
-            android:process=":remote" />
-        <receiver
-            android:name=".service.DataReceiver"
+            android:name=".service.NormalReceiver"
             android:process=":remote" />
 
         <activity android:name=".activities.RegisterFormActivity"></activity>

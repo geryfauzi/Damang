@@ -15,7 +15,7 @@ import java.io.Serializable;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.model.ActivitySample;
 
-public class BackgroundService extends Service {
+public class NormalService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -38,12 +38,4 @@ public class BackgroundService extends Service {
         Log.d("onCreate()", "After service created");
     }
 
-
-    private void handleRealtimeSample(Serializable extra) {
-        if (extra instanceof ActivitySample) {
-            ActivitySample sample = (ActivitySample) extra;
-            Toast.makeText(getApplicationContext(), sample.getHeartRate(), Toast.LENGTH_SHORT).show();
-        } else
-            Toast.makeText(getApplicationContext(), "Not found :/", Toast.LENGTH_SHORT).show();
-    }
 }

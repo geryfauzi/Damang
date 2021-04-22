@@ -65,8 +65,7 @@ import unikom.gery.damang.adapter.GBDeviceAdapterv2;
 import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.model.ActivitySample;
-import unikom.gery.damang.model.DeviceService;
-import unikom.gery.damang.service.ServiceReceiver;
+import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
@@ -199,8 +198,8 @@ public class HomeActivity extends AppCompatActivity
         }
 
         sharedPreference = new SharedPreference(this);
-        ServiceReceiver serviceReceiver = new ServiceReceiver();
-        serviceReceiver.setReceiver(this);
+        NormalReceiver normalReceiver = new NormalReceiver();
+        normalReceiver.setReceiver(this);
     }
 
     @Override
