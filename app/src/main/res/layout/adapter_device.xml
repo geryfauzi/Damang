@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardViewDevice"
     android:layout_width="match_parent"
     android:layout_height="130dp"
     android:layout_marginBottom="8dp"
     app:cardBackgroundColor="#E8EFF5"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -68,7 +73,7 @@
             android:id="@+id/txtDeviceBattery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="100%"
+            android:text="@string/tidak_diketahui"
             app:layout_constraintBottom_toBottomOf="@+id/imgDeviceBattery"
             app:layout_constraintStart_toEndOf="@+id/imgDeviceBattery"
             app:layout_constraintTop_toTopOf="@+id/imgDeviceBattery" />
@@ -77,8 +82,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginTop="16dp"
             android:id="@+id/imgDeviceMore"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentEnd="true"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"

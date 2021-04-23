@@ -46,6 +46,18 @@ public class SharedPreference {
         return sharedPreference.getBoolean(firstTime, true);
     }
 
+    public User getUser() {
+        User user = new User();
+        user.setEmail(sharedPreference.getString(email, ""));
+        user.setName(sharedPreference.getString(name, ""));
+        user.setDateofBirth(sharedPreference.getString(dateOfBirth, ""));
+        user.setGender(sharedPreference.getString(gender, ""));
+        user.setWeight(sharedPreference.getFloat(weight, 0));
+        user.setHeight(sharedPreference.getFloat(height, 0));
+        user.setPhoto(sharedPreference.getString(photo, ""));
+        return user;
+    }
+
     public void setUser(User value) {
         SharedPreferences.Editor editor = sharedPreference.edit();
         editor.putString(email, value.getEmail());
