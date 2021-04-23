@@ -16,6 +16,7 @@ public class HeartRate implements Parcelable {
             return new HeartRate[size];
         }
     };
+    private String email;
     private String id_sport;
     private String id_sleep;
     private String date_time;
@@ -29,6 +30,7 @@ public class HeartRate implements Parcelable {
     }
 
     protected HeartRate(Parcel in) {
+        this.email = in.readString();
         this.id_sport = in.readString();
         this.id_sleep = in.readString();
         this.date_time = in.readString();
@@ -37,6 +39,14 @@ public class HeartRate implements Parcelable {
         this.status = in.readString();
         this.latitude = in.readString();
         this.longitude = in.readString();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getId_sport() {
@@ -110,6 +120,7 @@ public class HeartRate implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.email);
         dest.writeString(this.id_sport);
         dest.writeString(this.id_sleep);
         dest.writeString(this.date_time);
@@ -121,6 +132,7 @@ public class HeartRate implements Parcelable {
     }
 
     public void readFromParcel(Parcel source) {
+        this.email = source.readString();
         this.id_sport = source.readString();
         this.id_sleep = source.readString();
         this.date_time = source.readString();
