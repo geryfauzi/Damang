@@ -46,6 +46,26 @@ public class DBHelper extends SQLiteOpenHelper {
             DBContract.UserColumns.HEIGHT,
             DBContract.UserColumns.PHOTO);
 
+    private static final String SQL_CREATE_TABLE_HEART_RATE = String.format("CREATE TABLE %s" +
+                    " (%s TEXT, %s TEXT, %s TEXT, %s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL, " +
+                    "%s TEXT NOT NULL, %s TEXT, %s TEXT," +
+                    " FOREIGN KEY (%s) REFERENCES %s (%s), " +
+                    "FOREIGN KEY (%s) REFERENCES %s (%s), " +
+                    "FOREIGN KEY (%s) REFERENCES %s (%s))",
+            DBContract.TABLE_HEART_RATE,
+            DBContract.HeartRateColumn.EMAIL,
+            DBContract.HeartRateColumn.ID_SPORT,
+            DBContract.HeartRateColumn.ID_SLEEP,
+            DBContract.HeartRateColumn.DATE_TIME,
+            DBContract.HeartRateColumn.HEART_RATE,
+            DBContract.HeartRateColumn.MODE,
+            DBContract.HeartRateColumn.STATUS,
+            DBContract.HeartRateColumn.LATITUDE,
+            DBContract.HeartRateColumn.LONGITUDE,
+            DBContract.HeartRateColumn.EMAIL, DBContract.TABLE_USER, DBContract.UserColumns.EMAIL,
+            DBContract.HeartRateColumn.ID_SPORT, DBContract.TABLE_SPORT, DBContract.SportColumns._ID,
+            DBContract.HeartRateColumn.ID_SLEEP, DBContract.TABLE_SLEEP, DBContract.SleepColumns._ID);
+
     public static String DATABASE_NAME = "db_damang";
 
     public DBHelper(Context context) {
@@ -56,12 +76,16 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_SPORT);
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_SLEEP);
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE_USER);
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE_HEART_RATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DBContract.TABLE_HEART_RATE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DBContract.TABLE_SPORT);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DBContract.TABLE_SLEEP);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DBContract.TABLE_USER);
         onCreate(sqLiteDatabase);
     }
 }

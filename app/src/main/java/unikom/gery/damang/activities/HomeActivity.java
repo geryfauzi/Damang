@@ -38,6 +38,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -78,6 +79,7 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
+    private CardView cvNoDevice;
     private User user;
     private ImageView imgProfile;
     private SharedPreference sharedPreference;
@@ -124,15 +126,16 @@ public class HomeActivity extends AppCompatActivity
         deviceManager = ((GBApplication) getApplication()).getDeviceManager();
         imgProfile = findViewById(R.id.imgProfileHome);
         deviceListView = findViewById(R.id.rvDeviceHome);
+        cvNoDevice = findViewById(R.id.cvNoDevice);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this));
 
         final List<GBDevice> deviceList = deviceManager.getDevices();
         mGBDeviceAdapter = new DeviceAdapter(this, deviceList);
-
         deviceListView.setAdapter(this.mGBDeviceAdapter);
-
         registerForContextMenu(deviceListView);
+        if (deviceList.size() > 0)
+            cvNoDevice.setVisibility(View.INVISIBLE);
 
         IntentFilter filterLocal = new IntentFilter();
         filterLocal.addAction(GBApplication.ACTION_LANGUAGE_CHANGE);
@@ -179,6 +182,13 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), Integer.toString(sharedPreference.getHeartRate()), Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        cvNoDevice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchDiscoveryActivity();
             }
         });
     }

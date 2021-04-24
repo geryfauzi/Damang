@@ -38,4 +38,16 @@ public class DBContract {
         static String HEIGHT = "height";
         static String PHOTO = "photo";
     }
+
+    static final class HeartRateColumn implements BaseColumns {
+        static String EMAIL = "email";
+        static String ID_SPORT = "id_sport";
+        static String ID_SLEEP = "id_sleep";
+        static String DATE_TIME = "date_time";
+        static String HEART_RATE = "heart_rate";
+        static String MODE = "mode";
+        static String STATUS = "status";
+        static String LATITUDE = "latitude";
+        static String LONGITUDE = "longitude";
+    }
 }

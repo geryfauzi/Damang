@@ -1194,4 +1194,6 @@
     <string name="daftar">Daftar</string>
     <string name="mi_band_3">Mi Band 3</string>
     <string name="tidak_diketahui">Tidak Diketahui</string>
+    <string name="belum_ada_perangkat">Belum ada perangkat</string>
+    <string name="tambahkan_perangkat">Tambahkan Perangkat</string>
 </resources>
