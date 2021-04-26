@@ -27,7 +27,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -42,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -134,6 +135,8 @@ import unikom.gery.damang.service.devices.huami.operations.UpdateFirmwareOperati
 import unikom.gery.damang.service.devices.miband.NotificationStrategy;
 import unikom.gery.damang.service.devices.miband.RealtimeSamplesSupport;
 import unikom.gery.damang.service.serial.GBDeviceProtocol;
+import unikom.gery.damang.sqlite.dml.HeartRateHelper;
+import unikom.gery.damang.sqlite.table.HeartRate;
 import unikom.gery.damang.util.AlarmUtils;
 import unikom.gery.damang.util.DeviceHelper;
 import unikom.gery.damang.util.GB;
@@ -1714,14 +1717,36 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("realtime sample: " + sample);
                         }
-
-                        Log.d("Tag", "Detak jantung : " + sample.getHeartRate());
+                        String status = "";
+                        if (sample.getHeartRate() < 60)
+                            status = "Rendah";
+                        else if (sample.getHeartRate() >= 60)
+                            status = "Normal";
+                        else if (sample.getHeartRate() > 100)
+                            status = "Tinggi";
 
                         SharedPreference sharedPreference = new SharedPreference(getContext());
-                        sharedPreference.setHeartRate(sample.getHeartRate());
+                        String mode = sharedPreference.getMode();
+                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                        String date = format.format(new Date(System.currentTimeMillis()));
 
-                        Toast.makeText(getContext(), Integer.toString(sample.getHeartRate()), Toast.LENGTH_SHORT).show();
+                        //Menyimpan ke database
+                        HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
+                        HeartRate heartRate = new HeartRate();
+                        heartRate.setEmail(sharedPreference.getUser().getEmail());
+                        heartRate.setHeart_rate(sample.getHeartRate());
+                        heartRate.setMode(mode);
+                        heartRate.setStatus(status);
+                        heartRate.setDate_time(date);
+                        if (mode.equals("Sport")) {
 
+                        } else if (mode.equals("Sleep")) {
+
+                        } else if (mode.equals("Normal")) {
+                            if (sample.getHeartRate() > 0)
+                                heartRateHelper.insertHeartRateNormalMode(heartRate);
+                        }
+                        //
                         Intent intent = new Intent(DeviceService.ACTION_REALTIME_SAMPLES)
                                 .putExtra(DeviceService.EXTRA_REALTIME_SAMPLE, sample);
                         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);

@@ -47,7 +47,7 @@ public class DBHelper extends SQLiteOpenHelper {
             DBContract.UserColumns.PHOTO);
 
     private static final String SQL_CREATE_TABLE_HEART_RATE = String.format("CREATE TABLE %s" +
-                    " (%s TEXT, %s TEXT, %s TEXT, %s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL, " +
+                    " (%s TEXT NOT NULL, %s TEXT, %s TEXT, %s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL, " +
                     "%s TEXT NOT NULL, %s TEXT, %s TEXT," +
                     " FOREIGN KEY (%s) REFERENCES %s (%s), " +
                     "FOREIGN KEY (%s) REFERENCES %s (%s), " +
@@ -74,8 +74,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL(SQL_CREATE_TABLE_SPORT);
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_SLEEP);
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE_SPORT);
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_USER);
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_HEART_RATE);
     }

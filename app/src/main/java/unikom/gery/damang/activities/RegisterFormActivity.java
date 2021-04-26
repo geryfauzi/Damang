@@ -36,6 +36,7 @@ import unikom.gery.damang.api.Api;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.response.CheckUser;
+import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.util.SharedPreference;
 
 public class RegisterFormActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -50,6 +51,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
     private SharedPreference sharedPreference;
     private ProgressDialog progressDialog;
     private Spinner spinnerGender;
+    private HeartRateHelper heartRateHelper;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -86,6 +88,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         spinnerGender.setOnItemSelectedListener(this);
         calendar = Calendar.getInstance();
         sharedPreference = new SharedPreference(this);
+        heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
         setUserDataToView();
         spinnerInitiation();
     }
@@ -127,6 +130,7 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         user.setHeight(data.getHeight());
         user.setWeight(data.getHeight());
         user.setPhoto(data.getPhoto());
+        heartRateHelper.insertUser(user);
         sharedPreference.setUser(user);
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

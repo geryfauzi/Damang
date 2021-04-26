@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.annotation.RequiresApi;
@@ -14,8 +13,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import me.relex.circleindicator.CircleIndicator;
 import unikom.gery.damang.R;
-import unikom.gery.damang.util.SharedPreference;
 import unikom.gery.damang.adapter.WelcomeAdapter;
+import unikom.gery.damang.sqlite.ddl.DBHelper;
+import unikom.gery.damang.util.SharedPreference;
 
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,6 +43,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
+        } else {
+            DBHelper dbHelper = new DBHelper(getApplicationContext());
         }
         //Walkthrought Initiation
         viewPager = findViewById(R.id.pager);

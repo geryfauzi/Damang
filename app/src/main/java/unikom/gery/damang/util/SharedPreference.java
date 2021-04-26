@@ -19,6 +19,7 @@ public class SharedPreference {
     private static final String photo = "photo";
     //
     private static final String heartRate = "heartRate";
+    private static final String mode = "mode";
     private final SharedPreferences sharedPreference;
 
 
@@ -67,6 +68,16 @@ public class SharedPreference {
         editor.putFloat(weight, value.getWeight());
         editor.putFloat(height, value.getHeight());
         editor.putString(photo, value.getPhoto());
+        editor.apply();
+    }
+
+    public String getMode() {
+        return sharedPreference.getString(mode, "Normal");
+    }
+
+    public void setMode(String value) {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putString(mode, value);
         editor.apply();
     }
 

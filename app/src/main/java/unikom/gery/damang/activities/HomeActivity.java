@@ -173,8 +173,7 @@ public class HomeActivity extends AppCompatActivity
         }
 
         sharedPreference = new SharedPreference(this);
-        user = sharedPreference.getUser();
-        Glide.with(getApplicationContext()).load(user.getPhoto()).into(imgProfile);
+        Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
         NormalReceiver normalReceiver = new NormalReceiver();
         normalReceiver.setReceiver(this);
 
@@ -184,7 +183,7 @@ public class HomeActivity extends AppCompatActivity
                 Toast.makeText(getApplicationContext(), Integer.toString(sharedPreference.getHeartRate()), Toast.LENGTH_SHORT).show();
             }
         });
-        
+
         cvNoDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -30,6 +30,7 @@ import unikom.gery.damang.api.Api;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.response.CheckUser;
+import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.util.SharedPreference;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -40,6 +41,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private SharedPreference sharedPreference;
     private User user;
     private ProgressDialog progressDialog;
+    private HeartRateHelper heartRateHelper;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -57,6 +59,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
         //Session Initiation
+        heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
         sharedPreference = new SharedPreference(this);
         if (sharedPreference.isLoggedIn()) {
             startActivity(new Intent(getApplicationContext(), HomeActivity.class));
@@ -87,6 +90,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         user.setWeight(response.body().getWeight());
         user.setPhoto(response.body().getPhoto());
         sharedPreference.setUser(user);
+        heartRateHelper.insertUser(sharedPreference.getUser());
         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
         finish();
     }
