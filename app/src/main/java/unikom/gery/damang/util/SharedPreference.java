@@ -18,6 +18,8 @@ public class SharedPreference {
     private static final String height = "height";
     private static final String photo = "photo";
     //
+    private static final String heartRate = "heartRate";
+    private static final String mode = "mode";
     private final SharedPreferences sharedPreference;
 
 
@@ -45,6 +47,18 @@ public class SharedPreference {
         return sharedPreference.getBoolean(firstTime, true);
     }
 
+    public User getUser() {
+        User user = new User();
+        user.setEmail(sharedPreference.getString(email, ""));
+        user.setName(sharedPreference.getString(name, ""));
+        user.setDateofBirth(sharedPreference.getString(dateOfBirth, ""));
+        user.setGender(sharedPreference.getString(gender, ""));
+        user.setWeight(sharedPreference.getFloat(weight, 0));
+        user.setHeight(sharedPreference.getFloat(height, 0));
+        user.setPhoto(sharedPreference.getString(photo, ""));
+        return user;
+    }
+
     public void setUser(User value) {
         SharedPreferences.Editor editor = sharedPreference.edit();
         editor.putString(email, value.getEmail());
@@ -54,6 +68,27 @@ public class SharedPreference {
         editor.putFloat(weight, value.getWeight());
         editor.putFloat(height, value.getHeight());
         editor.putString(photo, value.getPhoto());
+        editor.apply();
+    }
+
+    public String getMode() {
+        return sharedPreference.getString(mode, "Normal");
+    }
+
+    public void setMode(String value) {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putString(mode, value);
+        editor.apply();
+    }
+
+    //Ini hanya untuk area uji coba saja
+    public int getHeartRate() {
+        return sharedPreference.getInt(heartRate, 0);
+    }
+
+    public void setHeartRate(int value) {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putInt(heartRate, value);
         editor.apply();
     }
 }

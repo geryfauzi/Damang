@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -89,11 +91,14 @@ import unikom.gery.damang.service.devices.common.SimpleNotification;
 import unikom.gery.damang.service.devices.miband.operations.FetchActivityOperation;
 import unikom.gery.damang.service.devices.miband.operations.UpdateFirmwareOperation;
 import unikom.gery.damang.service.serial.GBDeviceProtocol;
+import unikom.gery.damang.sqlite.dml.HeartRateHelper;
+import unikom.gery.damang.sqlite.table.HeartRate;
 import unikom.gery.damang.util.AlarmUtils;
 import unikom.gery.damang.util.DateTimeUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.NotificationUtils;
 import unikom.gery.damang.util.Prefs;
+import unikom.gery.damang.util.SharedPreference;
 
 import static unikom.gery.damang.devices.miband.MiBandConst.DEFAULT_VALUE_FLASH_COLOUR;
 import static unikom.gery.damang.devices.miband.MiBandConst.DEFAULT_VALUE_FLASH_COUNT;
@@ -116,20 +121,30 @@ import static unikom.gery.damang.devices.miband.MiBandConst.getNotificationPrefS
 
 public class MiBandSupport extends AbstractBTLEDeviceSupport {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MiBandSupport.class);
     /**
      * This is just for temporary testing of Mi1A double firmware update.
      * DO NOT SET TO TRUE UNLESS YOU KNOW WHAT YOU'RE DOING!
      */
     public static final boolean MI_1A_HR_FW_UPDATE_TEST_MODE_ENABLED = false;
+    static final byte[] reboot = new byte[]{MiBandService.COMMAND_REBOOT};
+    static final byte[] factoryReset = new byte[]{MiBandService.COMMAND_FACTORYRESET};
+    static final byte[] startHeartMeasurementManual = new byte[]{0x15, MiBandService.COMMAND_SET_HR_MANUAL, 1};
+    static final byte[] stopHeartMeasurementManual = new byte[]{0x15, MiBandService.COMMAND_SET_HR_MANUAL, 0};
+    static final byte[] startHeartMeasurementContinuous = new byte[]{0x15, MiBandService.COMMAND_SET__HR_CONTINUOUS, 1};
+    static final byte[] stopHeartMeasurementContinuous = new byte[]{0x15, MiBandService.COMMAND_SET__HR_CONTINUOUS, 0};
+    static final byte[] startHeartMeasurementSleep = new byte[]{0x15, MiBandService.COMMAND_SET_HR_SLEEP, 1};
+    static final byte[] stopHeartMeasurementSleep = new byte[]{0x15, MiBandService.COMMAND_SET_HR_SLEEP, 0};
+    static final byte[] startRealTimeStepsNotifications = new byte[]{MiBandService.COMMAND_SET_REALTIME_STEPS_NOTIFICATION, 1};
+    static final byte[] stopRealTimeStepsNotifications = new byte[]{MiBandService.COMMAND_SET_REALTIME_STEPS_NOTIFICATION, 0};
+    private static final Logger LOG = LoggerFactory.getLogger(MiBandSupport.class);
+    private static final byte[] startSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 1};
+    private static final byte[] stopSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 0};
+    private final GBDeviceEventVersionInfo versionCmd = new GBDeviceEventVersionInfo();
+    private final GBDeviceEventBatteryInfo batteryCmd = new GBDeviceEventBatteryInfo();
     private volatile boolean telephoneRinging;
     private volatile boolean isLocatingDevice;
     private volatile boolean isReadingSensorData;
-
     private DeviceInfo mDeviceInfo;
-
-    private final GBDeviceEventVersionInfo versionCmd = new GBDeviceEventVersionInfo();
-    private final GBDeviceEventBatteryInfo batteryCmd = new GBDeviceEventBatteryInfo();
     private RealtimeSamplesSupport realtimeSamplesSupport;
     private boolean alarmClockRining;
     private boolean alarmClockRinging;
@@ -141,6 +156,74 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
         addSupportedService(MiBandService.UUID_SERVICE_MIBAND_SERVICE);
         addSupportedService(MiBandService.UUID_SERVICE_HEART_RATE);
         addSupportedService(GattService.UUID_SERVICE_IMMEDIATE_ALERT);
+    }
+
+    /**
+     * Analyse and decode sensor data from ADXL362 accelerometer
+     *
+     * @param value to decode
+     * @return nothing
+     * <p>
+     * Each axis raw value is 16bits long and look like : ttssvvvvvvvvvvvv
+     * tt : 2 bits for the type of data (00=x, 01=y, 10=z, 11=temperature)
+     * ss : sign of the value
+     * vvvvvvvvvvvv : accelerometer value encoded using two complements
+     * <p>
+     * TODO: Because each accelerometer is different, all values should be calibrated with  :
+     * a scale factor
+     * an offset factor
+     */
+    private static void handleSensorData(byte[] value) {
+        int counter = 0, step = 0;
+        double xAxis = 0.0, yAxis = 0.0, zAxis = 0.0;
+        double scale_factor = 1000.0;
+        double gravity = 9.81;
+
+        if ((value.length - 2) % 6 != 0) {
+            LOG.warn("GOT UNEXPECTED SENSOR DATA WITH LENGTH: " + value.length);
+            LOG.warn("DATA: " + GB.hexdump(value, 0, value.length));
+        } else {
+            counter = (value[0] & 0xff) | ((value[1] & 0xff) << 8);
+            for (int idx = 0; idx < ((value.length - 2) / 6); idx++) {
+                step = idx * 6;
+
+                // Analyse X-axis data
+                int xAxisRawValue = (value[step + 2] & 0xff) | ((value[step + 3] & 0xff) << 8);
+                int xAxisSign = (value[step + 3] & 0x30) >> 4;
+                int xAxisType = (value[step + 3] & 0xc0) >> 6;
+                if (xAxisSign == 0) {
+                    xAxis = xAxisRawValue & 0xfff;
+                } else {
+                    xAxis = (xAxisRawValue & 0xfff) - 4097;
+                }
+                xAxis = (xAxis * 1.0 / scale_factor) * gravity;
+
+                // Analyse Y-axis data
+                int yAxisRawValue = (value[step + 4] & 0xff) | ((value[step + 5] & 0xff) << 8);
+                int yAxisSign = (value[step + 5] & 0x30) >> 4;
+                int yAxisType = (value[step + 5] & 0xc0) >> 6;
+                if (yAxisSign == 0) {
+                    yAxis = yAxisRawValue & 0xfff;
+                } else {
+                    yAxis = (yAxisRawValue & 0xfff) - 4097;
+                }
+                yAxis = (yAxis / scale_factor) * gravity;
+
+                // Analyse Z-axis data
+                int zAxisRawValue = (value[step + 6] & 0xff) | ((value[step + 7] & 0xff) << 8);
+                int zAxisSign = (value[step + 7] & 0x30) >> 4;
+                int zAxisType = (value[step + 7] & 0xc0) >> 6;
+                if (zAxisSign == 0) {
+                    zAxis = zAxisRawValue & 0xfff;
+                } else {
+                    zAxis = (zAxisRawValue & 0xfff) - 4097;
+                }
+                zAxis = (zAxis / scale_factor) * gravity;
+
+                // Print results in log
+                LOG.info("READ SENSOR DATA VALUES: counter:" + counter + " step:" + step + " x-axis:" + String.format("%.03f", xAxis) + " y-axis:" + String.format("%.03f", yAxis) + " z-axis:" + String.format("%.03f", zAxis) + ";");
+            }
+        }
     }
 
     @Override
@@ -166,16 +249,6 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
 
     private MiBandSupport readDate(TransactionBuilder builder) {
         builder.read(getCharacteristic(MiBandService.UUID_CHARACTERISTIC_DATE_TIME));
-        return this;
-    }
-
-    public MiBandSupport setLowLatency(TransactionBuilder builder) {
-        builder.write(getCharacteristic(MiBandService.UUID_CHARACTERISTIC_LE_PARAMS), getLowLatency());
-        return this;
-    }
-
-    public MiBandSupport setHighLatency(TransactionBuilder builder) {
-        builder.write(getCharacteristic(MiBandService.UUID_CHARACTERISTIC_LE_PARAMS), getHighLatency());
         return this;
     }
 
@@ -245,13 +318,14 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
 
     /**
      * Adds a custom notification to the given transaction builder
-     *  @param vibrationProfile specifies how and how often the Band shall vibrate.
+     *
+     * @param vibrationProfile   specifies how and how often the Band shall vibrate.
      * @param simpleNotification
      * @param flashTimes
      * @param flashColour
      * @param originalColour
      * @param flashDuration
-     * @param extraAction      an extra action to be executed after every vibration and flash sequence. Allows to abort the repetition, for example.
+     * @param extraAction        an extra action to be executed after every vibration and flash sequence. Allows to abort the repetition, for example.
      * @param builder
      */
     private MiBandSupport sendCustomNotification(VibrationProfile vibrationProfile, @Nullable SimpleNotification simpleNotification, int flashTimes, int flashColour, int originalColour, long flashDuration, BtLEAction extraAction, TransactionBuilder builder) {
@@ -272,22 +346,6 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
             return new V2NotificationStrategy(this);
         }
     }
-
-    static final byte[] reboot = new byte[]{MiBandService.COMMAND_REBOOT};
-    static final byte[] factoryReset = new byte[]{MiBandService.COMMAND_FACTORYRESET};
-
-    static final byte[] startHeartMeasurementManual = new byte[]{0x15, MiBandService.COMMAND_SET_HR_MANUAL, 1};
-    static final byte[] stopHeartMeasurementManual = new byte[]{0x15, MiBandService.COMMAND_SET_HR_MANUAL, 0};
-    static final byte[] startHeartMeasurementContinuous = new byte[]{0x15, MiBandService.COMMAND_SET__HR_CONTINUOUS, 1};
-    static final byte[] stopHeartMeasurementContinuous = new byte[]{0x15, MiBandService.COMMAND_SET__HR_CONTINUOUS, 0};
-    static final byte[] startHeartMeasurementSleep = new byte[]{0x15, MiBandService.COMMAND_SET_HR_SLEEP, 1};
-    static final byte[] stopHeartMeasurementSleep = new byte[]{0x15, MiBandService.COMMAND_SET_HR_SLEEP, 0};
-
-    static final byte[] startRealTimeStepsNotifications = new byte[]{MiBandService.COMMAND_SET_REALTIME_STEPS_NOTIFICATION, 1};
-    static final byte[] stopRealTimeStepsNotifications = new byte[]{MiBandService.COMMAND_SET_REALTIME_STEPS_NOTIFICATION, 0};
-
-    private static final byte[] startSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 1};
-    private static final byte[] stopSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 0};
 
     /**
      * Part of device initialization process. Do not call manually.
@@ -332,31 +390,6 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
         return this;
     }
 
-   /* private MiBandSupport requestHRInfo(TransactionBuilder builder) {
-        LOG.debug("Requesting HR Info!");
-        BluetoothGattCharacteristic HRInfo = getCharacteristic(MiBandService.UUID_CHAR_HEART_RATE_MEASUREMENT);
-        builder.read(HRInfo);
-        BluetoothGattCharacteristic HR_Point = getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT);
-        builder.read(HR_Point);
-        return this;
-    }
-    *//**
-     * Part of HR test. Do not call manually.
-     *
-     * @param transaction
-     * @return
-     *//*
-    private MiBandSupport heartrate(TransactionBuilder transaction) {
-        LOG.info("Attempting to read HR ...");
-        BluetoothGattCharacteristic characteristic = getCharacteristic(MiBandService.UUID_CHAR_HEART_RATE_MEASUREMENT);
-        if (characteristic != null) {
-            transaction.write(characteristic, new byte[]{MiBandService.COMMAND_SET__HR_CONTINUOUS});
-        } else {
-            LOG.info("Unable to read HR from  MI device -- characteristic not available");
-        }
-        return this;
-    }*/
-
     /**
      * Part of device initialization process. Do not call manually.
      *
@@ -382,6 +415,31 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
         }
         return this;
     }
+
+   /* private MiBandSupport requestHRInfo(TransactionBuilder builder) {
+        LOG.debug("Requesting HR Info!");
+        BluetoothGattCharacteristic HRInfo = getCharacteristic(MiBandService.UUID_CHAR_HEART_RATE_MEASUREMENT);
+        builder.read(HRInfo);
+        BluetoothGattCharacteristic HR_Point = getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT);
+        builder.read(HR_Point);
+        return this;
+    }
+    *//**
+     * Part of HR test. Do not call manually.
+     *
+     * @param transaction
+     * @return
+     *//*
+    private MiBandSupport heartrate(TransactionBuilder transaction) {
+        LOG.info("Attempting to read HR ...");
+        BluetoothGattCharacteristic characteristic = getCharacteristic(MiBandService.UUID_CHAR_HEART_RATE_MEASUREMENT);
+        if (characteristic != null) {
+            transaction.write(characteristic, new byte[]{MiBandService.COMMAND_SET__HR_CONTINUOUS});
+        } else {
+            LOG.info("Unable to read HR from  MI device -- characteristic not available");
+        }
+        return this;
+    }*/
 
     /**
      * Part of device initialization process. Do not call manually.
@@ -678,6 +736,7 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
         // don't synchronize, this is not really important
         return alarmClockRinging;
     }
+
     private boolean isTelephoneRinging() {
         // don't synchronize, this is not really important
         return telephoneRinging;
@@ -805,6 +864,11 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
         return getLatency(minConnectionInterval, maxConnectionInterval, latency, timeout, advertisementInterval);
     }
 
+    public MiBandSupport setHighLatency(TransactionBuilder builder) {
+        builder.write(getCharacteristic(MiBandService.UUID_CHARACTERISTIC_LE_PARAMS), getHighLatency());
+        return this;
+    }
+
     private byte[] getLatency(int minConnectionInterval, int maxConnectionInterval, int latency, int timeout, int advertisementInterval) {
         byte result[] = new byte[12];
         result[0] = (byte) (minConnectionInterval & 0xff);
@@ -831,6 +895,11 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
         int advertisementInterval = 0;
 
         return getLatency(minConnectionInterval, maxConnectionInterval, latency, timeout, advertisementInterval);
+    }
+
+    public MiBandSupport setLowLatency(TransactionBuilder builder) {
+        builder.write(getCharacteristic(MiBandService.UUID_CHARACTERISTIC_LE_PARAMS), getLowLatency());
+        return this;
     }
 
     @Override
@@ -1037,6 +1106,36 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("realtime sample: " + sample);
                         }
+                        String status = "";
+                        if (sample.getHeartRate() < 60)
+                            status = "Rendah";
+                        else if (sample.getHeartRate() >= 60)
+                            status = "Normal";
+                        else if (sample.getHeartRate() > 100)
+                            status = "Tinggi";
+
+                        SharedPreference sharedPreference = new SharedPreference(getContext());
+                        String mode = sharedPreference.getMode();
+                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                        String date = format.format(new Date(System.currentTimeMillis()));
+
+                        //Menyimpan ke database
+                        HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
+                        HeartRate heartRate = new HeartRate();
+                        heartRate.setEmail(sharedPreference.getUser().getEmail());
+                        heartRate.setHeart_rate(sample.getHeartRate());
+                        heartRate.setMode(mode);
+                        heartRate.setStatus(status);
+                        heartRate.setDate_time(date);
+                        if (mode.equals("Sport")) {
+
+                        } else if (mode.equals("Sleep")) {
+
+                        } else if (mode.equals("Normal")) {
+                            if (sample.getHeartRate() > 0)
+                                heartRateHelper.insertHeartRateNormalMode(heartRate);
+                        }
+                        //
 
                         Intent intent = new Intent(DeviceService.ACTION_REALTIME_SAMPLES)
                                 .putExtra(DeviceService.EXTRA_REALTIME_SAMPLE, sample);
@@ -1229,7 +1328,7 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
 
             Prefs prefs = new Prefs(GBApplication.getDeviceSpecificSharedPrefs(gbDevice.getAddress()));
             int availableSlots = prefs.getInt(DeviceSettingsPreferenceConst.PREF_RESERVER_ALARMS_CALENDAR, 0);
-            if (availableSlots >3) {
+            if (availableSlots > 3) {
                 availableSlots = 3;
             }
             if (availableSlots > 0) {
@@ -1285,76 +1384,5 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
     @Override
     public void onSendWeather(WeatherSpec weatherSpec) {
 
-    }
-
-    /**
-     * Analyse and decode sensor data from ADXL362 accelerometer
-     * @param value to decode
-     * @return nothing
-     *
-     * Each axis raw value is 16bits long and look like : ttssvvvvvvvvvvvv
-     *   tt : 2 bits for the type of data (00=x, 01=y, 10=z, 11=temperature)
-     *   ss : sign of the value
-     *   vvvvvvvvvvvv : accelerometer value encoded using two complements
-     *
-     * TODO: Because each accelerometer is different, all values should be calibrated with  :
-     *   a scale factor
-     *   an offset factor
-     */
-    private static void handleSensorData(byte[] value) {
-        int counter=0, step=0;
-        double xAxis=0.0, yAxis=0.0, zAxis=0.0;
-        double scale_factor = 1000.0;
-        double gravity = 9.81;
-
-        if ((value.length - 2) % 6 != 0) {
-            LOG.warn("GOT UNEXPECTED SENSOR DATA WITH LENGTH: " + value.length);
-            LOG.warn("DATA: " + GB.hexdump(value, 0, value.length));
-        }
-        else {
-            counter = (value[0] & 0xff) | ((value[1] & 0xff) << 8);
-            for (int idx = 0; idx < ((value.length - 2) / 6); idx++) {
-                step = idx * 6;
-
-                // Analyse X-axis data
-                int xAxisRawValue = (value[step+2] & 0xff) | ((value[step+3] & 0xff) << 8);
-                int xAxisSign = (value[step+3] & 0x30) >> 4;
-                int xAxisType = (value[step+3] & 0xc0) >> 6;
-                if (xAxisSign == 0) {
-                    xAxis = xAxisRawValue & 0xfff;
-                }
-                else {
-                    xAxis = (xAxisRawValue & 0xfff) - 4097;
-                }
-                xAxis = (xAxis*1.0 / scale_factor) * gravity;
-
-                // Analyse Y-axis data
-                int yAxisRawValue = (value[step+4] & 0xff) | ((value[step+5] & 0xff) << 8);
-                int yAxisSign = (value[step+5] & 0x30) >> 4;
-                int yAxisType = (value[step+5] & 0xc0) >> 6;
-                if (yAxisSign == 0) {
-                    yAxis = yAxisRawValue & 0xfff;
-                }
-                else {
-                    yAxis = (yAxisRawValue & 0xfff) - 4097;
-                }
-                yAxis = (yAxis / scale_factor) * gravity;
-
-                // Analyse Z-axis data
-                int zAxisRawValue = (value[step+6] & 0xff) | ((value[step+7] & 0xff) << 8);
-                int zAxisSign = (value[step+7] & 0x30) >> 4;
-                int zAxisType = (value[step+7] & 0xc0) >> 6;
-                if (zAxisSign == 0) {
-                    zAxis = zAxisRawValue & 0xfff;
-                }
-                else {
-                    zAxis = (zAxisRawValue & 0xfff) - 4097;
-                }
-                zAxis = (zAxis / scale_factor) * gravity;
-
-                // Print results in log
-                LOG.info("READ SENSOR DATA VALUES: counter:"+counter+" step:"+step+" x-axis:"+ String.format("%.03f",xAxis)+" y-axis:"+String.format("%.03f",yAxis)+" z-axis:"+String.format("%.03f",zAxis)+";");
-            }
-        }
     }
 }

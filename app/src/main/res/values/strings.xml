@@ -21,7 +21,7 @@
     <string name="controlcenter_navigation_drawer_open">Open navigation drawer</string>
     <string name="controlcenter_navigation_drawer_close">Close navigation drawer</string>
     <string name="controlcenter_snackbar_need_longpress">Long press the card to disconnect</string>
-    <string name="controlcenter_snackbar_disconnecting">Disconnecting</string>
+    <string name="controlcenter_snackbar_disconnecting">Memutuskan koneksi dengan perangkat...</string>
     <string name="controlcenter_snackbar_connecting">Connecting…</string>
     <string name="controlcenter_snackbar_requested_screenshot">Taking a screenshot of the device</string>
     <string name="controlcenter_calibrate_device">Calibrate Device</string>
@@ -1192,4 +1192,8 @@
     <string name="berat_badan">Berat Badan</string>
     <string name="tinggi_badan_sentimeter">Tinggi Badan (Sentimeter)</string>
     <string name="daftar">Daftar</string>
+    <string name="mi_band_3">Mi Band 3</string>
+    <string name="tidak_diketahui">Tidak Diketahui</string>
+    <string name="belum_ada_perangkat">Belum ada perangkat</string>
+    <string name="tambahkan_perangkat">Tambahkan Perangkat</string>
 </resources>

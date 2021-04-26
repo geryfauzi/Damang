@@ -25,31 +25,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,16 +57,19 @@ import java.util.Set;
 
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
-import unikom.gery.damang.adapter.GBDeviceAdapterv2;
+import unikom.gery.damang.adapter.DeviceAdapter;
 import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
+import unikom.gery.damang.model.User;
+import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
+import unikom.gery.damang.util.SharedPreference;
 
 //TODO: extend AbstractGBActivity, but it requires actionbar that is not available
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GBActivity {
+        implements GBActivity {
 
     public static final int MENU_REFRESH_CODE = 1;
     private static PhoneStateListener fakeStateListener;
@@ -79,10 +79,13 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
+    private CardView cvNoDevice;
+    private User user;
+    private ImageView imgProfile;
+    private SharedPreference sharedPreference;
     private DeviceManager deviceManager;
-    private GBDeviceAdapterv2 mGBDeviceAdapter;
+    private DeviceAdapter mGBDeviceAdapter;
     private RecyclerView deviceListView;
-    private FloatingActionButton fab;
     private boolean isLanguageInvalid = false;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -98,92 +101,47 @@ public class HomeActivity extends AppCompatActivity
                 case DeviceManager.ACTION_DEVICES_CHANGED:
                     refreshPairedDevices();
                     break;
+//                case DeviceService.ACTION_REALTIME_SAMPLES:
+//                    handleRealtimeSample(intent.getSerializableExtra(DeviceService.EXTRA_REALTIME_SAMPLE));
+//                    break;
             }
         }
     };
     private boolean pesterWithPermissions = true;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AbstractGBActivity.init(this, AbstractGBActivity.NO_ACTIONBAR);
 
+        //Change statusbar color
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().setStatusBarColor(Color.parseColor("#FAFAFA"));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        //
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_controlcenterv2);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.activity_home);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.controlcenter_navigation_drawer_open, R.string.controlcenter_navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        //end of material design boilerplate
         deviceManager = ((GBApplication) getApplication()).getDeviceManager();
-
-        deviceListView = findViewById(R.id.deviceListView);
+        imgProfile = findViewById(R.id.imgProfileHome);
+        deviceListView = findViewById(R.id.rvDeviceHome);
+        cvNoDevice = findViewById(R.id.cvNoDevice);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this));
 
-        List<GBDevice> deviceList = deviceManager.getDevices();
-        mGBDeviceAdapter = new GBDeviceAdapterv2(this, deviceList);
-
+        final List<GBDevice> deviceList = deviceManager.getDevices();
+        mGBDeviceAdapter = new DeviceAdapter(this, deviceList);
         deviceListView.setAdapter(this.mGBDeviceAdapter);
-
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchDiscoveryActivity();
-            }
-        });
-
-        showFabIfNeccessary();
-
-        /* uncomment to enable fixed-swipe to reveal more actions
-
-        ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.LEFT , ItemTouchHelper.RIGHT) {
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if(dX>50)
-                    dX = 50;
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-
-            }
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                GB.toast(getBaseContext(), "onMove", Toast.LENGTH_LONG, GB.ERROR);
-
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                GB.toast(getBaseContext(), "onSwiped", Toast.LENGTH_LONG, GB.ERROR);
-
-            }
-
-            @Override
-            public void onChildDrawOver(Canvas c, RecyclerView recyclerView,
-                                        RecyclerView.ViewHolder viewHolder, float dX, float dY,
-                                        int actionState, boolean isCurrentlyActive) {
-            }
-        });
-
-        swipeToDismissTouchHelper.attachToRecyclerView(deviceListView);
-        */
-
         registerForContextMenu(deviceListView);
+        if (deviceList.size() > 0)
+            cvNoDevice.setVisibility(View.INVISIBLE);
 
         IntentFilter filterLocal = new IntentFilter();
         filterLocal.addAction(GBApplication.ACTION_LANGUAGE_CHANGE);
         filterLocal.addAction(GBApplication.ACTION_QUIT);
         filterLocal.addAction(DeviceManager.ACTION_DEVICES_CHANGED);
+//        filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filterLocal);
 
         refreshPairedDevices();
@@ -213,6 +171,25 @@ public class HomeActivity extends AppCompatActivity
         } else {
             GBApplication.deviceService().requestDeviceInfo();
         }
+
+        sharedPreference = new SharedPreference(this);
+        Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
+        NormalReceiver normalReceiver = new NormalReceiver();
+        normalReceiver.setReceiver(this);
+
+        imgProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), Integer.toString(sharedPreference.getHeartRate()), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        cvNoDevice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchDiscoveryActivity();
+            }
+        });
     }
 
     @Override
@@ -231,65 +208,6 @@ public class HomeActivity extends AppCompatActivity
         super.onDestroy();
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == MENU_REFRESH_CODE) {
-            showFabIfNeccessary();
-        }
-    }
-
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivityForResult(settingsIntent, MENU_REFRESH_CODE);
-                return true;
-            case R.id.action_debug:
-                Intent debugIntent = new Intent(this, DebugActivity.class);
-                startActivity(debugIntent);
-                return true;
-            case R.id.action_data_management:
-//                Intent dbIntent = new Intent(this, DataManagementActivity.class);
-//                startActivity(dbIntent);
-                Toast.makeText(getApplicationContext(),"Masih OTW...",Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.action_blacklist:
-//                Intent blIntent = new Intent(this, AppBlacklistActivity.class);
-//                startActivity(blIntent);
-                Toast.makeText(getApplicationContext(),"Masih OTW...",Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.device_action_discover:
-                launchDiscoveryActivity();
-                return true;
-            case R.id.action_quit:
-                GBApplication.quit();
-                return true;
-            case R.id.about:
-                Intent aboutIntent = new Intent(this, AboutActivity.class);
-                startActivity(aboutIntent);
-                return true;
-        }
-
-        return true;
-    }
-
     private void launchDiscoveryActivity() {
         startActivity(new Intent(this, DiscoveryActivity.class));
     }
@@ -298,17 +216,6 @@ public class HomeActivity extends AppCompatActivity
         mGBDeviceAdapter.notifyDataSetChanged();
     }
 
-    private void showFabIfNeccessary() {
-        if (GBApplication.getPrefs().getBoolean("display_add_device_fab", true)) {
-            fab.show();
-        } else {
-            if (deviceManager.getDevices().size() < 1) {
-                fab.show();
-            } else {
-                fab.hide();
-            }
-        }
-    }
 
     @TargetApi(Build.VERSION_CODES.M)
     private void checkAndRequestPermissions() {
@@ -417,4 +324,5 @@ public class HomeActivity extends AppCompatActivity
         }
         AndroidUtils.setLanguage(this, language);
     }
+
 }
