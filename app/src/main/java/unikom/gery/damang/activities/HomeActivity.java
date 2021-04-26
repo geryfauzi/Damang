@@ -48,7 +48,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -62,6 +65,7 @@ import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.service.NormalReceiver;
+import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
@@ -107,6 +111,7 @@ public class HomeActivity extends AppCompatActivity
             }
         }
     };
+    private HeartRateHelper heartRateHelper;
     private boolean pesterWithPermissions = true;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -176,11 +181,12 @@ public class HomeActivity extends AppCompatActivity
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
         NormalReceiver normalReceiver = new NormalReceiver();
         normalReceiver.setReceiver(this);
+        heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
 
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), Integer.toString(sharedPreference.getHeartRate()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), Integer.toString(heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate())), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -190,6 +196,11 @@ public class HomeActivity extends AppCompatActivity
                 launchDiscoveryActivity();
             }
         });
+    }
+
+    private String getTodayDate() {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return format.format(new Date(System.currentTimeMillis()));
     }
 
     @Override
