@@ -89,7 +89,7 @@ public class HeartRateHelper {
 
     public int getCurrentHeartRate(String email, String date) {
         int bpm = 0;
-        Cursor cursor = database.rawQuery("SELECT avg(heart_rate) FROM heart_rate_activity WHERE email = ? AND date_time LIKE ?", new String[]{email, "%" + date + "%"});
+        Cursor cursor = database.rawQuery("SELECT avg(heart_rate) FROM heart_rate_activity WHERE email = ? AND date_time LIKE ? AND mode = ?", new String[]{email, "%" + date + "%", "Normal"});
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             do {
