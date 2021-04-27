@@ -1106,13 +1106,6 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("realtime sample: " + sample);
                         }
-                        String status = "";
-                        if (sample.getHeartRate() < 60)
-                            status = "Rendah";
-                        else if (sample.getHeartRate() >= 60)
-                            status = "Normal";
-                        else if (sample.getHeartRate() > 100)
-                            status = "Tinggi";
 
                         SharedPreference sharedPreference = new SharedPreference(getContext());
                         String mode = sharedPreference.getMode();
@@ -1125,7 +1118,7 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
                         heartRate.setEmail(sharedPreference.getUser().getEmail());
                         heartRate.setHeart_rate(sample.getHeartRate());
                         heartRate.setMode(mode);
-                        heartRate.setStatus(status);
+                        heartRate.setStatus(getStatus(sample.getHeartRate()));
                         heartRate.setDate_time(date);
                         if (mode.equals("Sport")) {
 
@@ -1148,6 +1141,17 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
             };
         }
         return realtimeSamplesSupport;
+    }
+
+    private String getStatus(int heartRate) {
+        String status = "";
+        if (heartRate < 60)
+            status = "Rendah";
+        else if (heartRate >= 60 && heartRate <= 100)
+            status = "Normal";
+        else if (heartRate > 100)
+            status = "Tinggi";
+        return status;
     }
 
     /**
