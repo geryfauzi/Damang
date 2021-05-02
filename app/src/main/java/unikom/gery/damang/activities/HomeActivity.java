@@ -33,6 +33,7 @@ import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -48,7 +49,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -60,8 +66,9 @@ import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.DeviceAdapter;
 import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
-import unikom.gery.damang.model.User;
+import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
+import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
@@ -79,14 +86,15 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    private CardView cvNoDevice;
-    private User user;
+    private CardView cvNoDevice, cvKesehatanTerkini, cvNoDataKesehatan;
+    private TextView txtHeartRate, txtCurrentCondition;
     private ImageView imgProfile;
     private SharedPreference sharedPreference;
     private DeviceManager deviceManager;
     private DeviceAdapter mGBDeviceAdapter;
     private RecyclerView deviceListView;
     private boolean isLanguageInvalid = false;
+    private HeartRateHelper heartRateHelper;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -101,9 +109,13 @@ public class HomeActivity extends AppCompatActivity
                 case DeviceManager.ACTION_DEVICES_CHANGED:
                     refreshPairedDevices();
                     break;
-//                case DeviceService.ACTION_REALTIME_SAMPLES:
-//                    handleRealtimeSample(intent.getSerializableExtra(DeviceService.EXTRA_REALTIME_SAMPLE));
-//                    break;
+                case DeviceService.ACTION_REALTIME_SAMPLES:
+                    try {
+                        checkIfNoData();
+                    } catch (ParseException error) {
+                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                    break;
             }
         }
     };
@@ -127,6 +139,10 @@ public class HomeActivity extends AppCompatActivity
         imgProfile = findViewById(R.id.imgProfileHome);
         deviceListView = findViewById(R.id.rvDeviceHome);
         cvNoDevice = findViewById(R.id.cvNoDevice);
+        cvNoDataKesehatan = findViewById(R.id.cvNoDataKesehatan);
+        txtHeartRate = findViewById(R.id.txtHeartRate);
+        txtCurrentCondition = findViewById(R.id.txtStatusKesehatan);
+        cvKesehatanTerkini = findViewById(R.id.cvKesehatanTerkini);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -141,7 +157,7 @@ public class HomeActivity extends AppCompatActivity
         filterLocal.addAction(GBApplication.ACTION_LANGUAGE_CHANGE);
         filterLocal.addAction(GBApplication.ACTION_QUIT);
         filterLocal.addAction(DeviceManager.ACTION_DEVICES_CHANGED);
-//        filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
+        filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filterLocal);
 
         refreshPairedDevices();
@@ -176,11 +192,17 @@ public class HomeActivity extends AppCompatActivity
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
         NormalReceiver normalReceiver = new NormalReceiver();
         normalReceiver.setReceiver(this);
+        heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
+        try {
+            checkIfNoData();
+        } catch (ParseException error) {
+            Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+        }
 
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), Integer.toString(sharedPreference.getHeartRate()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), Integer.toString(heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate())), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -190,6 +212,66 @@ public class HomeActivity extends AppCompatActivity
                 launchDiscoveryActivity();
             }
         });
+    }
+
+    private String getTodayDate() {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return format.format(new Date(System.currentTimeMillis()));
+    }
+
+    private void checkIfNoData() throws ParseException {
+        if (heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate()) > 0) {
+            cvNoDataKesehatan.setVisibility(View.INVISIBLE);
+            cvKesehatanTerkini.setVisibility(View.VISIBLE);
+            updateCurrentCondition();
+        } else {
+            cvKesehatanTerkini.setVisibility(View.INVISIBLE);
+            cvNoDataKesehatan.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateCurrentCondition() throws ParseException {
+        int hearRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
+        int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
+        String condition = getCurrentCondition(age, hearRate);
+        txtHeartRate.setText(Integer.toString(hearRate));
+        txtCurrentCondition.setText(condition);
+    }
+
+    private int getCurrentAge(String todayDate, String dayOfBirth) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date1 = simpleDateFormat.parse(dayOfBirth);
+        Date date2 = simpleDateFormat.parse(todayDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        int month1 = calendar.get(Calendar.MONTH);
+        int year1 = calendar.get(Calendar.YEAR);
+        calendar.setTime(date2);
+        int month2 = calendar.get(Calendar.MONTH);
+        int year2 = calendar.get(Calendar.YEAR);
+        int monthResult = ((year2 - year1) * 12) + (month2 - month1);
+        return monthResult / 12;
+    }
+
+    private String getCurrentCondition(int age, int heartRate) {
+        String status = "";
+        if (age < 2) {
+            if (heartRate >= 80 && heartRate <= 160)
+                status = "Kesehatan anda baik";
+            else
+                status = "Kesehatan anda kurang baik";
+        } else if (age >= 2 && age <= 10) {
+            if (heartRate >= 70 && heartRate <= 120)
+                status = "Kesehatan anda baik";
+            else
+                status = "Kesehatan anda kurang baik";
+        } else if (age >= 11) {
+            if (heartRate >= 60 && heartRate <= 100)
+                status = "Kesehatan anda baik";
+            else
+                status = "Kesehatan anda kurang baik";
+        }
+        return status;
     }
 
     @Override
