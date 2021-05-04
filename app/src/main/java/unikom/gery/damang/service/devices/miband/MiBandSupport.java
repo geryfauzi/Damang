@@ -1096,11 +1096,6 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
                         sample.setRawKind(MiBandSampleProvider.TYPE_ACTIVITY); // to make it visible in the charts TODO: add a MANUAL kind for that?
 
                         provider.addGBActivitySample(sample);
-
-                        // set the steps only afterwards, since realtime steps are also recorded
-                        // in the regular samples and we must not count them twice
-                        // Note: we know that the DAO sample is never committed again, so we simply
-                        // change the value here in memory.
                         sample.setSteps(getSteps());
 
                         if (LOG.isDebugEnabled()) {
@@ -1113,6 +1108,7 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
                         String date = format.format(new Date(System.currentTimeMillis()));
 
                         //Menyimpan ke database
+                        sharedPreference.setSteps(getSteps());
                         HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         HeartRate heartRate = new HeartRate();
                         heartRate.setEmail(sharedPreference.getUser().getEmail());

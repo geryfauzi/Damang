@@ -63,6 +63,7 @@ import java.util.Set;
 
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
+import unikom.gery.damang.activities.charts.ActivityListingAdapter;
 import unikom.gery.damang.adapter.DeviceAdapter;
 import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
@@ -70,6 +71,7 @@ import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.util.AndroidUtils;
+import unikom.gery.damang.util.DateTimeUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
 import unikom.gery.damang.util.SharedPreference;
@@ -86,8 +88,9 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    private CardView cvNoDevice, cvKesehatanTerkini, cvNoDataKesehatan;
-    private TextView txtHeartRate, txtCurrentCondition;
+    private CardView cvNoDevice;
+    private ImageView btnAddDevice;
+    private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar;
     private ImageView imgProfile;
     private SharedPreference sharedPreference;
     private DeviceManager deviceManager;
@@ -129,7 +132,7 @@ public class HomeActivity extends AppCompatActivity
         //Change statusbar color
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        getWindow().setStatusBarColor(Color.parseColor("#FAFAFA"));
+        getWindow().setStatusBarColor(Color.parseColor("#E5EBFF"));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         //
         super.onCreate(savedInstanceState);
@@ -139,16 +142,19 @@ public class HomeActivity extends AppCompatActivity
         imgProfile = findViewById(R.id.imgProfileHome);
         deviceListView = findViewById(R.id.rvDeviceHome);
         cvNoDevice = findViewById(R.id.cvNoDevice);
-        cvNoDataKesehatan = findViewById(R.id.cvNoDataKesehatan);
+        btnAddDevice = findViewById(R.id.btnAddDevice);
         txtHeartRate = findViewById(R.id.txtHeartRate);
         txtCurrentCondition = findViewById(R.id.txtStatusKesehatan);
-        cvKesehatanTerkini = findViewById(R.id.cvKesehatanTerkini);
+        txtUser = findViewById(R.id.txtUser);
+        txtJumlahLangkah = findViewById(R.id.txtJumlahLangkah);
+        txtKaloriTerbakar = findViewById(R.id.txtKaloriTerbakar);
         deviceListView.setHasFixedSize(true);
-        deviceListView.setLayoutManager(new LinearLayoutManager(this));
+        deviceListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         final List<GBDevice> deviceList = deviceManager.getDevices();
         mGBDeviceAdapter = new DeviceAdapter(this, deviceList);
         deviceListView.setAdapter(this.mGBDeviceAdapter);
+
         registerForContextMenu(deviceListView);
         if (deviceList.size() > 0)
             cvNoDevice.setVisibility(View.INVISIBLE);
@@ -190,6 +196,7 @@ public class HomeActivity extends AppCompatActivity
 
         sharedPreference = new SharedPreference(this);
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
+        txtUser.setText(sharedPreference.getUser().getName());
         NormalReceiver normalReceiver = new NormalReceiver();
         normalReceiver.setReceiver(this);
         heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
@@ -202,11 +209,11 @@ public class HomeActivity extends AppCompatActivity
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), Integer.toString(heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate())), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), Integer.toString(sharedPreference.getSteps()), Toast.LENGTH_SHORT).show();
             }
         });
 
-        cvNoDevice.setOnClickListener(new View.OnClickListener() {
+        btnAddDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 launchDiscoveryActivity();
@@ -221,21 +228,53 @@ public class HomeActivity extends AppCompatActivity
 
     private void checkIfNoData() throws ParseException {
         if (heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate()) > 0) {
-            cvNoDataKesehatan.setVisibility(View.INVISIBLE);
-            cvKesehatanTerkini.setVisibility(View.VISIBLE);
+            txtHeartRate.setVisibility(View.VISIBLE);
             updateCurrentCondition();
         } else {
-            cvKesehatanTerkini.setVisibility(View.INVISIBLE);
-            cvNoDataKesehatan.setVisibility(View.VISIBLE);
+            txtHeartRate.setVisibility(View.INVISIBLE);
+            txtCurrentCondition.setText("Belum ada data detak jantung");
         }
     }
 
     private void updateCurrentCondition() throws ParseException {
         int hearRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
+        int jumlahLangkah = sharedPreference.getSteps();
+        float burnedCalories = getBurnedCalories(jumlahLangkah, sharedPreference.getUser().getWeight());
         String condition = getCurrentCondition(age, hearRate);
-        txtHeartRate.setText(Integer.toString(hearRate));
+        txtHeartRate.setText(hearRate + " bpm");
         txtCurrentCondition.setText(condition);
+        txtJumlahLangkah.setText(jumlahLangkah + " langkah");
+        txtKaloriTerbakar.setText(burnedCalories + " kalori");
+    }
+
+    private float getBurnedCalories(int jumlahLangkah, float beratBadan) {
+        float burnedCalories = 0;
+        if (isBetween(beratBadan, 45, 54))
+            burnedCalories = (28 / 1000) * jumlahLangkah;
+        else if (isBetween(beratBadan, 55, 63))
+            burnedCalories = (33 / 1000) * jumlahLangkah;
+        else if (isBetween(beratBadan, 64, 72))
+            burnedCalories = (38 / 1000) * jumlahLangkah;
+        else if (isBetween(beratBadan, 73, 81))
+            burnedCalories = (40 / 1000) * jumlahLangkah;
+        else if (isBetween(beratBadan, 82, 90))
+            burnedCalories = (45 / 1000) * jumlahLangkah;
+        else if (isBetween(beratBadan, 91, 99))
+            burnedCalories = (50 / 1000) * jumlahLangkah;
+        else if (isBetween(beratBadan, 100, 113))
+            burnedCalories = (55 / 1000) * jumlahLangkah;
+        else if (isBetween(beratBadan, 114, 124))
+            burnedCalories = (62 / 1000) * jumlahLangkah;
+        else if (isBetween(beratBadan, 125, 135))
+            burnedCalories = (68 / 1000) * jumlahLangkah;
+        else if (beratBadan >= 136)
+            burnedCalories = (75 / 1000) * jumlahLangkah;
+        return burnedCalories;
+    }
+
+    private boolean isBetween(float number, int lower, int upper) {
+        return lower <= number && number <= upper;
     }
 
     private int getCurrentAge(String todayDate, String dayOfBirth) throws ParseException {
