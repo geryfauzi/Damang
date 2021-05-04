@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -115,6 +114,7 @@ import unikom.gery.damang.model.MusicSpec;
 import unikom.gery.damang.model.MusicStateSpec;
 import unikom.gery.damang.model.NotificationSpec;
 import unikom.gery.damang.model.NotificationType;
+import unikom.gery.damang.model.RecordedDataTypes;
 import unikom.gery.damang.model.Weather;
 import unikom.gery.damang.model.WeatherSpec;
 import unikom.gery.damang.service.btle.AbstractBTLEDeviceSupport;
@@ -1723,11 +1723,19 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
         return provider.getAllActivitySamples(tsFrom, tsTo);
     }
 
+    private void fetchActivityData() {
+        if (getDevice().isInitialized()) {
+            GBApplication.deviceService().onFetchRecordedData(RecordedDataTypes.TYPE_ACTIVITY);
+        } else {
+            GB.toast(getContext(), "Not Connected", Toast.LENGTH_SHORT, GB.ERROR);
+        }
+    }
+
     private int timeTo() {
         Calendar day = Calendar.getInstance();
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        long time = timestamp.getTime() / 1000L;
-        day.setTimeInMillis(time * 1000L);
+//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//        long time = timestamp.getTime() / 1000L;
+        day.setTimeInMillis(1620147599 * 1000L);
         day.set(Calendar.HOUR_OF_DAY, 23);
         day.set(Calendar.MINUTE, 59);
         day.set(Calendar.SECOND, 59);
@@ -1745,6 +1753,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                 public void doCurrentSample() {
 
                     try (DBHandler handler = GBApplication.acquireDB()) {
+                        fetchActivityData();
                         stepListAdapter = new ActivityListingAdapter(getContext());
                         stepSessionsSummary = get_data(gbDevice, handler, timeFrom(timeTo()), timeTo());
                         DaoSession session = handler.getDaoSession();

@@ -238,7 +238,6 @@ public class HomeActivity extends AppCompatActivity
         int hearRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
         String burnedCalories = String.format("%.2f", getBurnedCalories(sharedPreference.getSteps(), Math.round(sharedPreference.getUser().getWeight())));
-        Toast.makeText(getApplicationContext(), burnedCalories, Toast.LENGTH_SHORT).show();
         String condition = getCurrentCondition(age, hearRate);
         txtHeartRate.setText(hearRate + " bpm");
         txtCurrentCondition.setText(condition);
