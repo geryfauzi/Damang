@@ -1108,7 +1108,6 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
                         String date = format.format(new Date(System.currentTimeMillis()));
 
                         //Menyimpan ke database
-                        sharedPreference.setSteps(getSteps());
                         HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         HeartRate heartRate = new HeartRate();
                         heartRate.setEmail(sharedPreference.getUser().getEmail());
