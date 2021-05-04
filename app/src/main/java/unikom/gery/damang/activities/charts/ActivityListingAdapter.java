@@ -361,7 +361,7 @@ public class ActivityListingAdapter extends AbstractActivityListingAdapter<Activ
     }
 
     @Override
-    protected String getStepTotalLabel(ActivitySession item) {
+    public String getStepTotalLabel(ActivitySession item) {
         return String.valueOf(item.getTotalDaySteps());
     }
 

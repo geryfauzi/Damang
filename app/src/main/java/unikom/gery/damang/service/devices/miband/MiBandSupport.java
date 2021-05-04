@@ -44,11 +44,14 @@ import java.util.UUID;
 
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
+import unikom.gery.damang.activities.charts.ActivityListingAdapter;
+import unikom.gery.damang.activities.charts.StepAnalysis;
 import unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst;
 import unikom.gery.damang.database.DBHandler;
 import unikom.gery.damang.database.DBHelper;
 import unikom.gery.damang.deviceevents.GBDeviceEventBatteryInfo;
 import unikom.gery.damang.deviceevents.GBDeviceEventVersionInfo;
+import unikom.gery.damang.devices.DeviceCoordinator;
 import unikom.gery.damang.devices.SampleProvider;
 import unikom.gery.damang.devices.miband.MiBandConst;
 import unikom.gery.damang.devices.miband.MiBandCoordinator;
@@ -57,6 +60,7 @@ import unikom.gery.damang.devices.miband.MiBandFWHelper;
 import unikom.gery.damang.devices.miband.MiBandSampleProvider;
 import unikom.gery.damang.devices.miband.MiBandService;
 import unikom.gery.damang.devices.miband.VibrationProfile;
+import unikom.gery.damang.entities.AbstractActivitySample;
 import unikom.gery.damang.entities.DaoSession;
 import unikom.gery.damang.entities.Device;
 import unikom.gery.damang.entities.MiBandActivitySample;
@@ -64,6 +68,7 @@ import unikom.gery.damang.entities.User;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.impl.GBDevice.State;
 import unikom.gery.damang.model.ActivitySample;
+import unikom.gery.damang.model.ActivitySession;
 import unikom.gery.damang.model.ActivityUser;
 import unikom.gery.damang.model.Alarm;
 import unikom.gery.damang.model.CalendarEventSpec;
@@ -95,6 +100,7 @@ import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.sqlite.table.HeartRate;
 import unikom.gery.damang.util.AlarmUtils;
 import unikom.gery.damang.util.DateTimeUtils;
+import unikom.gery.damang.util.DeviceHelper;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.NotificationUtils;
 import unikom.gery.damang.util.Prefs;
@@ -141,6 +147,8 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
     private static final byte[] stopSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 0};
     private final GBDeviceEventVersionInfo versionCmd = new GBDeviceEventVersionInfo();
     private final GBDeviceEventBatteryInfo batteryCmd = new GBDeviceEventBatteryInfo();
+    private ActivitySession stepSessionsSummary;
+    private ActivityListingAdapter stepListAdapter;
     private volatile boolean telephoneRinging;
     private volatile boolean isLocatingDevice;
     private volatile boolean isReadingSensorData;
@@ -1077,6 +1085,46 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
         return sample;
     }
 
+    private ActivitySession get_data(GBDevice gbDevice, DBHandler db, int timeFrom, int timeTo) {
+
+        List<ActivitySession> stepSessions;
+        List<? extends ActivitySample> activitySamples = getAllSamples(db, gbDevice, timeFrom, timeTo);
+        StepAnalysis stepAnalysis = new StepAnalysis();
+
+        boolean isEmptySummary = false;
+        if (activitySamples != null) {
+            stepSessions = stepAnalysis.calculateStepSessions(activitySamples);
+            if (stepSessions.toArray().length == 0) {
+                isEmptySummary = true;
+            }
+            stepSessionsSummary = stepAnalysis.calculateSummary(stepSessions, isEmptySummary);
+        }
+        return stepSessionsSummary;
+    }
+
+    SampleProvider<? extends AbstractActivitySample> getProvider(DBHandler db, GBDevice device) {
+        DeviceCoordinator coordinator = DeviceHelper.getInstance().getCoordinator(device);
+        return coordinator.getSampleProvider(device, db.getDaoSession());
+    }
+
+    protected List<? extends ActivitySample> getAllSamples(DBHandler db, GBDevice device, int tsFrom, int tsTo) {
+        SampleProvider<? extends ActivitySample> provider = getProvider(db, device);
+        return provider.getAllActivitySamples(tsFrom, tsTo);
+    }
+
+    private int timeTo() {
+        Calendar day = Calendar.getInstance();
+        day.setTimeInMillis(1620147599 * 1000L);
+        day.set(Calendar.HOUR_OF_DAY, 23);
+        day.set(Calendar.MINUTE, 59);
+        day.set(Calendar.SECOND, 59);
+        return (int) (day.getTimeInMillis() / 1000);
+    }
+
+    private int timeFrom(int timeTo) {
+        return DateTimeUtils.shiftDays(timeTo, -1);
+    }
+
     private RealtimeSamplesSupport getRealtimeSamplesSupport() {
         if (realtimeSamplesSupport == null) {
             realtimeSamplesSupport = new RealtimeSamplesSupport(1000, 1000) {
@@ -1085,7 +1133,8 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
 
                     try (DBHandler handler = GBApplication.acquireDB()) {
                         DaoSession session = handler.getDaoSession();
-
+                        stepListAdapter = new ActivityListingAdapter(getContext());
+                        stepSessionsSummary = get_data(gbDevice, handler, timeFrom(timeTo()), timeTo());
                         Device device = DBHelper.getDevice(getDevice(), session);
                         User user = DBHelper.getUser(session);
                         int ts = (int) (System.currentTimeMillis() / 1000);
@@ -1113,6 +1162,7 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
                         String date = format.format(new Date(System.currentTimeMillis()));
 
                         //Menyimpan ke database
+                        sharedPreference.setSteps(Integer.parseInt(stepListAdapter.getStepTotalLabel(stepSessionsSummary)));
                         HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         HeartRate heartRate = new HeartRate();
                         heartRate.setEmail(sharedPreference.getUser().getEmail());
