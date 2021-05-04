@@ -63,7 +63,6 @@ import java.util.Set;
 
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
-import unikom.gery.damang.activities.charts.ActivityListingAdapter;
 import unikom.gery.damang.adapter.DeviceAdapter;
 import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
@@ -71,7 +70,6 @@ import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.util.AndroidUtils;
-import unikom.gery.damang.util.DateTimeUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
 import unikom.gery.damang.util.SharedPreference;
@@ -239,42 +237,38 @@ public class HomeActivity extends AppCompatActivity
     private void updateCurrentCondition() throws ParseException {
         int hearRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
-        int jumlahLangkah = sharedPreference.getSteps();
-        float burnedCalories = getBurnedCalories(jumlahLangkah, sharedPreference.getUser().getWeight());
+        String burnedCalories = String.format("%.2f", getBurnedCalories(sharedPreference.getSteps(), Math.round(sharedPreference.getUser().getWeight())));
+        Toast.makeText(getApplicationContext(), burnedCalories, Toast.LENGTH_SHORT).show();
         String condition = getCurrentCondition(age, hearRate);
         txtHeartRate.setText(hearRate + " bpm");
         txtCurrentCondition.setText(condition);
-        txtJumlahLangkah.setText(jumlahLangkah + " langkah");
+        txtJumlahLangkah.setText(sharedPreference.getSteps() + " langkah");
         txtKaloriTerbakar.setText(burnedCalories + " kalori");
     }
 
-    private float getBurnedCalories(int jumlahLangkah, float beratBadan) {
-        float burnedCalories = 0;
-        if (isBetween(beratBadan, 45, 54))
-            burnedCalories = (28 / 1000) * jumlahLangkah;
-        else if (isBetween(beratBadan, 55, 63))
-            burnedCalories = (33 / 1000) * jumlahLangkah;
-        else if (isBetween(beratBadan, 64, 72))
-            burnedCalories = (38 / 1000) * jumlahLangkah;
-        else if (isBetween(beratBadan, 73, 81))
-            burnedCalories = (40 / 1000) * jumlahLangkah;
-        else if (isBetween(beratBadan, 82, 90))
-            burnedCalories = (45 / 1000) * jumlahLangkah;
-        else if (isBetween(beratBadan, 91, 99))
-            burnedCalories = (50 / 1000) * jumlahLangkah;
-        else if (isBetween(beratBadan, 100, 113))
-            burnedCalories = (55 / 1000) * jumlahLangkah;
-        else if (isBetween(beratBadan, 114, 124))
-            burnedCalories = (62 / 1000) * jumlahLangkah;
-        else if (isBetween(beratBadan, 125, 135))
-            burnedCalories = (68 / 1000) * jumlahLangkah;
+    private float getBurnedCalories(int jumlahLangkah, int beratBadan) {
+        float calories = 0;
+        if (beratBadan >= 45 && beratBadan <= 54)
+            calories = (float) ((28.0 / 1000) * jumlahLangkah);
+        else if (beratBadan >= 55 && beratBadan <= 63)
+            calories = (float) ((33.0 / 1000) * jumlahLangkah);
+        else if (beratBadan >= 64 && beratBadan <= 72)
+            calories = (float) ((38.0 / 1000) * jumlahLangkah);
+        else if (beratBadan >= 73 && beratBadan <= 81)
+            calories = (float) ((40.0 / 1000) * jumlahLangkah);
+        else if (beratBadan >= 82 && beratBadan <= 90)
+            calories = (float) ((45.0 / 1000) * jumlahLangkah);
+        else if (beratBadan >= 91 && beratBadan <= 99)
+            calories = (float) ((50.0 / 1000) * jumlahLangkah);
+        else if (beratBadan >= 100 && beratBadan <= 113)
+            calories = (float) ((55.0 / 1000) * jumlahLangkah);
+        else if (beratBadan >= 114 && beratBadan <= 124)
+            calories = (float) ((62.0 / 1000) * jumlahLangkah);
+        else if (beratBadan >= 125 && beratBadan <= 135)
+            calories = (float) ((68.0 / 1000) * jumlahLangkah);
         else if (beratBadan >= 136)
-            burnedCalories = (75 / 1000) * jumlahLangkah;
-        return burnedCalories;
-    }
-
-    private boolean isBetween(float number, int lower, int upper) {
-        return lower <= number && number <= upper;
+            calories = (float) ((75.0 / 1000) * jumlahLangkah);
+        return calories;
     }
 
     private int getCurrentAge(String todayDate, String dayOfBirth) throws ParseException {

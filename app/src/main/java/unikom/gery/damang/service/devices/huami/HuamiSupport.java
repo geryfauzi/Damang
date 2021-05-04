@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1722,17 +1723,19 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
         return provider.getAllActivitySamples(tsFrom, tsTo);
     }
 
-    private int timeTo(){
+    private int timeTo() {
         Calendar day = Calendar.getInstance();
-        day.setTimeInMillis(1620147599 * 1000L);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        long time = timestamp.getTime() / 1000L;
+        day.setTimeInMillis(time * 1000L);
         day.set(Calendar.HOUR_OF_DAY, 23);
         day.set(Calendar.MINUTE, 59);
         day.set(Calendar.SECOND, 59);
         return (int) (day.getTimeInMillis() / 1000);
     }
 
-    private int timeFrom(int timeTo){
-        return DateTimeUtils.shiftDays(timeTo,-1);
+    private int timeFrom(int timeTo) {
+        return DateTimeUtils.shiftDays(timeTo, -1);
     }
 
     private RealtimeSamplesSupport getRealtimeSamplesSupport() {
@@ -1743,7 +1746,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
 
                     try (DBHandler handler = GBApplication.acquireDB()) {
                         stepListAdapter = new ActivityListingAdapter(getContext());
-                        stepSessionsSummary = get_data(gbDevice,handler,timeFrom(timeTo()),timeTo());
+                        stepSessionsSummary = get_data(gbDevice, handler, timeFrom(timeTo()), timeTo());
                         DaoSession session = handler.getDaoSession();
 
                         Device device = DBHelper.getDevice(gbDevice, session);
