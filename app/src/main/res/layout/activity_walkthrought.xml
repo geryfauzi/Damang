@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.WelcomeActivity">
+    tools:context=".activities.WalkthroughtActivity">
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
@@ -15,21 +15,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <me.relex.circleindicator.CircleIndicator
+    <LinearLayout
         android:id="@+id/dots"
-        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
         android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvMulai"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="450dp"
+        android:layout_marginEnd="32dp"
+        app:cardBackgroundColor="#00D4C6"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:ci_drawable="@drawable/ic_brightness_1_black_24dp"
-        app:ci_drawable_unselected="@drawable/ic_brightness_1_grey_24dp"
-        app:ci_height="5dp"
-        app:ci_width="5dp"/>
+        app:layout_constraintTop_toTopOf="parent">
 
+        <Button
+            android:id="@+id/btnMulai"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#00D4C6"
+            android:text="@string/mulai"
+            android:textColor="#FFFFFF" />
 
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
