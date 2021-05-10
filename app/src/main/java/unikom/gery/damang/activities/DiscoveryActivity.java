@@ -46,13 +46,15 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
+
+import com.airbnb.lottie.LottieAnimationView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +88,7 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
     private final Handler handler = new Handler();
     private final ArrayList<GBDeviceCandidate> deviceCandidates = new ArrayList<>();
     private ScanCallback newBLEScanCallback = null;
+    private ImageView imgSearchDevice;
     /**
      * Use old BLE scanning
      **/
@@ -94,8 +97,7 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
      * If already bonded devices are to be ignored when scanning
      */
     private boolean ignoreBonded = true;
-    private ProgressBar bluetoothProgress;
-    private ProgressBar bluetoothLEProgress;
+    private LottieAnimationView lottieAnimationView;
     private DeviceCandidateAdapter deviceCandidateAdapter;
     private final BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
@@ -254,7 +256,8 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
             LOG.info("New BLE scanning disabled via settings, using old method");
         }
 
-        setContentView(R.layout.activity_discovery);
+        getSupportActionBar().hide();
+        setContentView(R.layout.activity_scan_device);
         startButton = findViewById(R.id.discovery_start);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,16 +266,10 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
             }
         });
 
-        bluetoothProgress = findViewById(R.id.discovery_progressbar);
-        bluetoothProgress.setProgress(0);
-        bluetoothProgress.setIndeterminate(true);
-        bluetoothProgress.setVisibility(View.GONE);
+        lottieAnimationView = findViewById(R.id.lottieSearch);
+        imgSearchDevice = findViewById(R.id.imgTambahkanPerangkat);
+        lottieAnimationView.setVisibility(View.GONE);
         ListView deviceCandidatesView = findViewById(R.id.discovery_device_candidates_list);
-
-        bluetoothLEProgress = findViewById(R.id.discovery_ble_progressbar);
-        bluetoothLEProgress.setProgress(0);
-        bluetoothLEProgress.setIndeterminate(true);
-        bluetoothLEProgress.setVisibility(View.GONE);
 
         deviceCandidateAdapter = new DeviceCandidateAdapter(this, deviceCandidates);
         deviceCandidatesView.setAdapter(deviceCandidateAdapter);
@@ -466,7 +463,8 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
         handler.sendMessageDelayed(getPostMessage(stopRunnable), SCAN_DURATION);
         if (adapter.startLeScan(leScanCallback)) {
             LOG.info("Old Bluetooth LE scan started successfully");
-            bluetoothLEProgress.setVisibility(View.VISIBLE);
+            lottieAnimationView.setVisibility(View.VISIBLE);
+            lottieAnimationView.playAnimation();
             setIsScanning(Scanning.SCANNING_BLE);
         } else {
             LOG.info("Old Bluetooth LE scan starting failed");
@@ -498,7 +496,8 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
         adapter.getBluetoothLeScanner().startScan(null, getScanSettings(), getScanCallback());
 
         LOG.debug("Bluetooth LE discovery started successfully");
-        bluetoothLEProgress.setVisibility(View.VISIBLE);
+        lottieAnimationView.setVisibility(View.VISIBLE);
+        lottieAnimationView.playAnimation();
         setIsScanning(Scanning.SCANNING_BLE);
     }
 
@@ -545,10 +544,12 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
         handler.sendMessageDelayed(getPostMessage(stopRunnable), SCAN_DURATION);
         if (adapter.startDiscovery()) {
             LOG.debug("Discovery started successfully");
-            bluetoothProgress.setVisibility(View.VISIBLE);
+            lottieAnimationView.setVisibility(View.VISIBLE);
+            lottieAnimationView.playAnimation();
             setIsScanning(what);
         } else {
             LOG.error("Discovery starting failed");
+
             setIsScanning(Scanning.SCANNING_OFF);
         }
     }
@@ -558,6 +559,7 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
             adapter.cancelDiscovery();
             LOG.info("Stopped BT discovery");
         }
+        imgSearchDevice.setVisibility(View.INVISIBLE);
         setIsScanning(Scanning.SCANNING_OFF);
     }
 
@@ -574,9 +576,10 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
 
         if (isScanning == Scanning.SCANNING_OFF) {
             startButton.setText(getString(R.string.discovery_start_scanning));
-            bluetoothProgress.setVisibility(View.GONE);
-            bluetoothLEProgress.setVisibility(View.GONE);
+            imgSearchDevice.setVisibility(View.VISIBLE);
+            lottieAnimationView.setVisibility(View.GONE);
         } else {
+            imgSearchDevice.setVisibility(View.INVISIBLE);
             startButton.setText(getString(R.string.discovery_stop_scanning));
         }
     }
@@ -588,8 +591,7 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
         } else {
             this.adapter = null;
             startButton.setEnabled(false);
-            bluetoothProgress.setVisibility(View.GONE);
-            bluetoothLEProgress.setVisibility(View.GONE);
+            lottieAnimationView.setVisibility(View.GONE);
         }
 
         discoveryFinished();
@@ -722,7 +724,7 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
             SharedPreferences sharedPrefs = GBApplication.getDeviceSpecificSharedPrefs(deviceCandidate.getMacAddress());
 
             String authKey = sharedPrefs.getString("authkey", null);
-            if (authKey == null || authKey.isEmpty() ) {
+            if (authKey == null || authKey.isEmpty()) {
                 toast(DiscoveryActivity.this, getString(R.string.discovery_need_to_enter_authkey), Toast.LENGTH_LONG, GB.WARN);
                 return;
             } else if (authKey.getBytes().length < 34 || !authKey.startsWith("0x")) {

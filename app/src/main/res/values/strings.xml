@@ -1195,7 +1195,6 @@
     <string name="mi_band_3">Mi Band 3</string>
     <string name="tidak_diketahui">Tidak Diketahui</string>
     <string name="belum_ada_perangkat">Belum ada perangkat</string>
-    <string name="tambahkan_perangkat">Tambahkan Perangkat</string>
     <string name="detak_jantung_anda">Detak Jantung Anda</string>
     <string name="kondisi_kesehatan_terkini">Kondisi Kesehatan Terkini</string>
     <string name="kesehatan_anda_kurang_baik">Kesehatan anda kurang baik</string>
@@ -1210,4 +1209,7 @@
     <string name="_72_bpm">72 bpm</string>
     <string name="_0_langkah">0 Langkah</string>
     <string name="_0_kalori">0 Kalori</string>
+    <string name="tambahkan_perangkat">Tambahkan Perangkat</string>
+    <string name="tekan_cari_untuk_memulai_pencarian_perangkat">Tekan cari untuk memulai pencarian perangkat</string>
+    <string name="cari_perangkat">Cari Perangkat</string>
 </resources>
