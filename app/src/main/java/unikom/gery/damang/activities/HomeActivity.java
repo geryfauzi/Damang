@@ -81,7 +81,6 @@ public class HomeActivity extends AppCompatActivity
     public static final int MENU_REFRESH_CODE = 1;
     private static PhoneStateListener fakeStateListener;
 
-    //needed for KK compatibility
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
