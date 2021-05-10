@@ -401,6 +401,8 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
             deviceCandidateAdapter.notifyDataSetChanged();
             return true;
         }
+        if (!deviceCandidateAdapter.isEmpty())
+            lottieAnimationView.setVisibility(View.INVISIBLE);
         return false;
     }
 
@@ -576,8 +578,9 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
 
         if (isScanning == Scanning.SCANNING_OFF) {
             startButton.setText(getString(R.string.discovery_start_scanning));
-            imgSearchDevice.setVisibility(View.VISIBLE);
             lottieAnimationView.setVisibility(View.GONE);
+            if (deviceCandidateAdapter.isEmpty())
+                imgSearchDevice.setVisibility(View.VISIBLE);
         } else {
             imgSearchDevice.setVisibility(View.INVISIBLE);
             startButton.setText(getString(R.string.discovery_stop_scanning));
