@@ -18,6 +18,7 @@ public class SharedPreference {
     private static final String height = "height";
     private static final String photo = "photo";
     //
+    private static final String steps = "steps";
     private static final String heartRate = "heartRate";
     private static final String mode = "mode";
     private final SharedPreferences sharedPreference;
@@ -89,6 +90,16 @@ public class SharedPreference {
     public void setHeartRate(int value) {
         SharedPreferences.Editor editor = sharedPreference.edit();
         editor.putInt(heartRate, value);
+        editor.apply();
+    }
+
+    public int getSteps() {
+        return sharedPreference.getInt(steps, 0);
+    }
+
+    public void setSteps(int value) {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putInt(steps, value);
         editor.apply();
     }
 }

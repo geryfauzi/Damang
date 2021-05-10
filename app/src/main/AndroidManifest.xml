@@ -60,16 +60,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/GadgetbridgeTheme">
-        <service
-            android:name=".service.NormalService"
-            android:process=":remote" />
-        <receiver
-            android:name=".service.NormalReceiver"
-            android:process=":remote" />
-
-        <activity android:name=".activities.RegisterFormActivity"></activity>
-        <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.WelcomeActivity">
+        <activity android:name=".activities.WalkthroughtActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
@@ -78,6 +69,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.NormalService"
+            android:process=":remote" />
+
+        <receiver
+            android:name=".service.NormalReceiver"
+            android:process=":remote" />
+
+        <activity android:name=".activities.RegisterFormActivity" />
+        <activity android:name=".activities.LoginActivity" />
         <activity
             android:name=".activities.HomeActivity"
             android:label="@string/title_activity_controlcenter"

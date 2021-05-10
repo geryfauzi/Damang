@@ -13,8 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
-import java.util.Locale;
 
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
@@ -74,9 +75,11 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         holder.deviceName.setText(getUniqueDeviceName(device));
 
         if (device.isBusy())
-            holder.deviceConnectionStatus.setText(device.getBusyTask());
-        else
-            holder.deviceConnectionStatus.setText(device.getStateString());
+            Glide.with(context).load(R.drawable.bluetooth_connecting).into(holder.deviceConnectionStatus);
+        else if (!device.isConnected())
+            Glide.with(context).load(R.drawable.bluetooth).into(holder.deviceConnectionStatus);
+        else if (device.isConnected())
+            Glide.with(context).load(R.drawable.bluetooth_connected).into(holder.deviceConnectionStatus);
 
         //Battery Area
         short batteryLevel = device.getBatteryLevel();
@@ -84,8 +87,6 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         BatteryState batteryState = device.getBatteryState();
         if (batteryLevel != GBDevice.BATTERY_UNKNOWN) {
             holder.deviceBatteryIcon.setVisibility(View.VISIBLE);
-            holder.deviceBatteryStatus.setVisibility(View.VISIBLE);
-            holder.deviceBatteryStatus.setText(device.getBatteryLevel() + "%");
             if (BatteryState.BATTERY_CHARGING.equals(batteryState) ||
                     BatteryState.BATTERY_CHARGING_FULL.equals(batteryState)) {
                 holder.deviceBatteryIcon.setImageLevel(device.getBatteryLevel() + 100);
@@ -94,8 +95,6 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             }
         } else if (BatteryState.NO_BATTERY.equals(batteryState) && batteryVoltage != GBDevice.BATTERY_UNKNOWN) {
             holder.deviceBatteryIcon.setVisibility(View.VISIBLE);
-            holder.deviceBatteryStatus.setVisibility(View.VISIBLE);
-            holder.deviceBatteryStatus.setText(String.format(Locale.getDefault(), "%.2f", batteryVoltage));
             holder.deviceBatteryIcon.setImageLevel(200);
         }
         //
@@ -149,8 +148,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         CardView cardView;
         TextView deviceName;
         ImageView deviceBatteryIcon;
-        TextView deviceBatteryStatus;
-        TextView deviceConnectionStatus;
+        ImageView deviceConnectionStatus;
         ImageView deviceMoreOption;
 
         ViewHolder(View view) {
@@ -159,8 +157,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             cardView = view.findViewById(R.id.cardViewDevice);
             deviceName = view.findViewById(R.id.textView14);
             deviceBatteryIcon = view.findViewById(R.id.imgDeviceBattery);
-            deviceBatteryStatus = view.findViewById(R.id.txtDeviceBattery);
-            deviceConnectionStatus = view.findViewById(R.id.txtDeviceConnection);
+            deviceConnectionStatus = view.findViewById(R.id.imgDeviceConnection);
             deviceMoreOption = view.findViewById(R.id.imgDeviceMore);
         }
 

@@ -64,6 +64,8 @@ import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.Logging;
 import unikom.gery.damang.R;
 import unikom.gery.damang.activities.SettingsActivity;
+import unikom.gery.damang.activities.charts.ActivityListingAdapter;
+import unikom.gery.damang.activities.charts.StepAnalysis;
 import unikom.gery.damang.database.DBHandler;
 import unikom.gery.damang.database.DBHelper;
 import unikom.gery.damang.deviceevents.GBDeviceEventBatteryInfo;
@@ -91,12 +93,15 @@ import unikom.gery.damang.devices.miband.MiBandConst;
 import unikom.gery.damang.devices.miband.MiBandCoordinator;
 import unikom.gery.damang.devices.miband.MiBandService;
 import unikom.gery.damang.devices.miband.VibrationProfile;
+import unikom.gery.damang.entities.AbstractActivitySample;
 import unikom.gery.damang.entities.DaoSession;
 import unikom.gery.damang.entities.Device;
 import unikom.gery.damang.entities.MiBandActivitySample;
 import unikom.gery.damang.entities.User;
+import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.impl.GBDevice.State;
 import unikom.gery.damang.model.ActivitySample;
+import unikom.gery.damang.model.ActivitySession;
 import unikom.gery.damang.model.ActivityUser;
 import unikom.gery.damang.model.Alarm;
 import unikom.gery.damang.model.CalendarEventSpec;
@@ -109,6 +114,7 @@ import unikom.gery.damang.model.MusicSpec;
 import unikom.gery.damang.model.MusicStateSpec;
 import unikom.gery.damang.model.NotificationSpec;
 import unikom.gery.damang.model.NotificationType;
+import unikom.gery.damang.model.RecordedDataTypes;
 import unikom.gery.damang.model.Weather;
 import unikom.gery.damang.model.WeatherSpec;
 import unikom.gery.damang.service.btle.AbstractBTLEDeviceSupport;
@@ -138,6 +144,7 @@ import unikom.gery.damang.service.serial.GBDeviceProtocol;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.sqlite.table.HeartRate;
 import unikom.gery.damang.util.AlarmUtils;
+import unikom.gery.damang.util.DateTimeUtils;
 import unikom.gery.damang.util.DeviceHelper;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.GBPrefs;
@@ -205,6 +212,8 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
     protected MusicSpec bufferMusicSpec = null;
     protected MusicStateSpec bufferMusicStateSpec = null;
     protected int mActivitySampleSize = 4;
+    private ActivitySession stepSessionsSummary;
+    private ActivityListingAdapter stepListAdapter;
     private Timer buttonActionTimer = null;
     private BluetoothGattCharacteristic characteristicHRControlPoint;
     private BluetoothGattCharacteristic characteristicChunked;
@@ -1687,6 +1696,56 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
         return sample;
     }
 
+    private ActivitySession get_data(GBDevice gbDevice, DBHandler db, int timeFrom, int timeTo) {
+
+        List<ActivitySession> stepSessions;
+        List<? extends ActivitySample> activitySamples = getAllSamples(db, gbDevice, timeFrom, timeTo);
+        StepAnalysis stepAnalysis = new StepAnalysis();
+
+        boolean isEmptySummary = false;
+        if (activitySamples != null) {
+            stepSessions = stepAnalysis.calculateStepSessions(activitySamples);
+            if (stepSessions.toArray().length == 0) {
+                isEmptySummary = true;
+            }
+            stepSessionsSummary = stepAnalysis.calculateSummary(stepSessions, isEmptySummary);
+        }
+        return stepSessionsSummary;
+    }
+
+    SampleProvider<? extends AbstractActivitySample> getProvider(DBHandler db, GBDevice device) {
+        DeviceCoordinator coordinator = DeviceHelper.getInstance().getCoordinator(device);
+        return coordinator.getSampleProvider(device, db.getDaoSession());
+    }
+
+    protected List<? extends ActivitySample> getAllSamples(DBHandler db, GBDevice device, int tsFrom, int tsTo) {
+        SampleProvider<? extends ActivitySample> provider = getProvider(db, device);
+        return provider.getAllActivitySamples(tsFrom, tsTo);
+    }
+
+    private void fetchActivityData() {
+        if (getDevice().isInitialized()) {
+            GBApplication.deviceService().onFetchRecordedData(RecordedDataTypes.TYPE_ACTIVITY);
+        } else {
+            GB.toast(getContext(), "Not Connected", Toast.LENGTH_SHORT, GB.ERROR);
+        }
+    }
+
+    private int timeTo() {
+        Calendar day = Calendar.getInstance();
+//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//        long time = timestamp.getTime() / 1000L;
+        day.setTimeInMillis(1620147599 * 1000L);
+        day.set(Calendar.HOUR_OF_DAY, 23);
+        day.set(Calendar.MINUTE, 59);
+        day.set(Calendar.SECOND, 59);
+        return (int) (day.getTimeInMillis() / 1000);
+    }
+
+    private int timeFrom(int timeTo) {
+        return DateTimeUtils.shiftDays(timeTo, -1);
+    }
+
     private RealtimeSamplesSupport getRealtimeSamplesSupport() {
         if (realtimeSamplesSupport == null) {
             realtimeSamplesSupport = new RealtimeSamplesSupport(1000, 1000) {
@@ -1694,6 +1753,9 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                 public void doCurrentSample() {
 
                     try (DBHandler handler = GBApplication.acquireDB()) {
+                        fetchActivityData();
+                        stepListAdapter = new ActivityListingAdapter(getContext());
+                        stepSessionsSummary = get_data(gbDevice, handler, timeFrom(timeTo()), timeTo());
                         DaoSession session = handler.getDaoSession();
 
                         Device device = DBHelper.getDevice(gbDevice, session);
@@ -1724,6 +1786,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         String date = format.format(new Date(System.currentTimeMillis()));
 
                         //Menyimpan ke database
+                        sharedPreference.setSteps(Integer.parseInt(stepListAdapter.getStepTotalLabel(stepSessionsSummary)));
                         HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         HeartRate heartRate = new HeartRate();
                         heartRate.setEmail(sharedPreference.getUser().getEmail());
