@@ -85,7 +85,7 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    private CardView cvNoDevice;
+    private CardView cvNoDevice, cvHeartRate;
     private ImageView btnAddDevice;
     private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar;
     private ImageView imgProfile;
@@ -139,6 +139,7 @@ public class HomeActivity extends AppCompatActivity
         imgProfile = findViewById(R.id.imgProfileHome);
         deviceListView = findViewById(R.id.rvDeviceHome);
         cvNoDevice = findViewById(R.id.cvNoDevice);
+        cvHeartRate = findViewById(R.id.cardView6);
         btnAddDevice = findViewById(R.id.btnAddDevice);
         txtHeartRate = findViewById(R.id.txtHeartRate);
         txtCurrentCondition = findViewById(R.id.txtStatusKesehatan);
@@ -214,6 +215,13 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 launchDiscoveryActivity();
+            }
+        });
+
+        cvHeartRate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), DailyConditionActivity.class));
             }
         });
     }
@@ -299,8 +307,10 @@ public class HomeActivity extends AppCompatActivity
         } else if (age >= 11) {
             if (heartRate >= 60 && heartRate <= 100)
                 status = "Kesehatan anda baik";
-            else
+            else if ((heartRate >= 54 && heartRate < 60) || (heartRate > 100 && heartRate <= 110))
                 status = "Kesehatan anda kurang baik";
+            else
+                status = "Kesehatan anda tidak baik";
         }
         return status;
     }
