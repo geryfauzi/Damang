@@ -207,7 +207,7 @@ public class HomeActivity extends AppCompatActivity
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), Integer.toString(sharedPreference.getSteps()), Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
             }
         });
 

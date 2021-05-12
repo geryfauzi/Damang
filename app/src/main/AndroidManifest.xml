@@ -60,7 +60,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/GadgetbridgeTheme">
-        <activity android:name=".activities.DetailConditionActivity"></activity>
+        <activity android:name=".activities.ProfileActivity"></activity>
+        <activity android:name=".activities.DetailConditionActivity" />
         <activity android:name=".activities.DailyConditionActivity" />
         <activity android:name=".activities.WalkthroughtActivity">
             <intent-filter>

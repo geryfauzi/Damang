@@ -1216,4 +1216,9 @@
     <string name="_87_bpm">87 bpm</string>
     <string name="tanggal">Tanggal</string>
     <string name="kesehatan_anda_baik">Kesehatan anda baik</string>
+    <string name="pengaturan_akun">Pengaturan Akun</string>
+    <string name="_27_april_2000">27 April 2000</string>
+    <string name="jenis_kelamin">Jenis Kelamin</string>
+    <string name="berat_badan_kilogram">Berat Badan (Kilogram)</string>
+    <string name="simpan_perubahan">Simpan Perubahan</string>
 </resources>

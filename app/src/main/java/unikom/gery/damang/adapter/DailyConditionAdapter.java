@@ -61,11 +61,13 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
                 holder.txtStatus.setTextColor(Color.parseColor("#FF5959"));
             }
             holder.txtStatus.setText(status);
+            Date date = new SimpleDateFormat("yyyy-MM-dd").parse(arrayList.get(position).getDate());
+            String parseDate = new SimpleDateFormat("dd MMMM yyyy").format(date);
+            holder.txtTanggal.setText(parseDate);
         } catch (ParseException e) {
             Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
         }
         holder.txtDetakJantung.setText(arrayList.get(position).getAverageHeartRate() + " bpm");
-        holder.txtTanggal.setText(arrayList.get(position).getDate());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
