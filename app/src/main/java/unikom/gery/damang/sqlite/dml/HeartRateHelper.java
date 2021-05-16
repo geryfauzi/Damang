@@ -7,6 +7,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
 import unikom.gery.damang.sqlite.table.HeartRate;
@@ -100,6 +102,25 @@ public class HeartRateHelper {
         }
         cursor.close();
         return bpm;
+    }
+
+    public ArrayList<unikom.gery.damang.model.HeartRate> getDailyCondition(String email) {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<unikom.gery.damang.model.HeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT DATE(date_time), AVG(heart_rate) FROM heart_rate_activity WHERE email = ? AND mode = ? GROUP BY DATE(date_time) ORDER BY DATE(date_time) DESC", new String[]{email, "Normal"});
+        cursor.moveToFirst();
+        unikom.gery.damang.model.HeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                heartRate = new unikom.gery.damang.model.HeartRate();
+                heartRate.setDate(cursor.getString(cursor.getColumnIndexOrThrow("DATE(date_time)")));
+                heartRate.setAverageHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("AVG(heart_rate)")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
     }
 
 }
