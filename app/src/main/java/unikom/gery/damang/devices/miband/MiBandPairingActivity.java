@@ -24,10 +24,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -37,8 +43,8 @@ import org.slf4j.LoggerFactory;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
 import unikom.gery.damang.activities.AbstractGBActivity;
-import unikom.gery.damang.activities.HomeActivity;
 import unikom.gery.damang.activities.DiscoveryActivity;
+import unikom.gery.damang.activities.HomeActivity;
 import unikom.gery.damang.devices.DeviceCoordinator;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.impl.GBDeviceCandidate;
@@ -61,12 +67,22 @@ public class MiBandPairingActivity extends AbstractGBActivity implements Bonding
     private TextView message;
     private boolean isPairing;
     private GBDeviceCandidate deviceCandidate;
+    private ImageView btnBack;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Hide Action Bar
+        this.getSupportActionBar().hide();
+        //Change statusbar color
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().setStatusBarColor(Color.parseColor("#FFFFFF"));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         setContentView(R.layout.activity_mi_band_pairing);
 
+        btnBack = findViewById(R.id.btnBack);
         message = findViewById(R.id.miband_pair_message);
         this.deviceCandidate = getIntent().getParcelableExtra(DeviceCoordinator.EXTRA_DEVICE_CANDIDATE);
         if (deviceCandidate == null && savedInstanceState != null) {
@@ -100,6 +116,13 @@ public class MiBandPairingActivity extends AbstractGBActivity implements Bonding
             startActivityForResult(userSettingsIntent, REQ_CODE_USER_SETTINGS, null);
             return;
         }
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         // already valid user info available, use that and pair
         startPairing();
@@ -161,16 +184,14 @@ public class MiBandPairingActivity extends AbstractGBActivity implements Bonding
         }
 
         if (success) {
-            // remember the device since we do not necessarily pair... temporary -- we probably need
-            // to query the db for available devices in ControlCenter. But only remember un-bonded
-            // devices, as bonded devices are displayed anyway.
+            //
             String macAddress = deviceCandidate.getMacAddress();
             BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddress);
             if (device != null && device.getBondState() == BluetoothDevice.BOND_NONE) {
                 Prefs prefs = GBApplication.getPrefs();
                 prefs.getPreferences().edit().putString(MiBandConst.PREF_MIBAND_ADDRESS, macAddress).apply();
             }
-            Intent intent = new Intent(this, HomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent intent = new Intent(this, HomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
         finish();

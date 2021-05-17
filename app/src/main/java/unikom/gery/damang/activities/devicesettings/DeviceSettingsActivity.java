@@ -16,13 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package unikom.gery.damang.activities.devicesettings;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,22 +43,27 @@ public class DeviceSettingsActivity extends AbstractGBActivity implements
     private static final Logger LOG = LoggerFactory.getLogger(DeviceSettingsActivity.class);
 
     GBDevice device;
+    private ImageView btnBack;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         device = getIntent().getParcelableExtra(GBDevice.EXTRA_DEVICE);
         super.onCreate(savedInstanceState);
+        //Hide Action Bar
+        this.getSupportActionBar().hide();
+        //Change statusbar color
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().setStatusBarColor(Color.parseColor("#FFFFFF"));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         setContentView(R.layout.activity_device_settings);
         if (savedInstanceState == null) {
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(DeviceSpecificSettingsFragment.FRAGMENT_TAG);
             if (fragment == null) {
                 DeviceCoordinator coordinator = DeviceHelper.getInstance().getCoordinator(device);
                 int[] supportedSettings = coordinator.getSupportedDeviceSpecificSettings(device);
-                if (coordinator.supportsActivityTracking()) {
-                    supportedSettings = ArrayUtils.addAll(supportedSettings, R.xml.devicesettings_chartstabs);
-                }
-                supportedSettings = ArrayUtils.addAll(supportedSettings, R.xml.devicesettings_transliteration);
                 fragment = DeviceSpecificSettingsFragment.newInstance(device.getAddress(), supportedSettings);
             }
             getSupportFragmentManager()
@@ -62,15 +72,20 @@ public class DeviceSettingsActivity extends AbstractGBActivity implements
                     .commit();
 
         }
+
+        btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     @Override
     public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen preferenceScreen) {
         DeviceCoordinator coordinator = DeviceHelper.getInstance().getCoordinator(device);
         int[] supportedSettings = coordinator.getSupportedDeviceSpecificSettings(device);
-        if (coordinator.supportsActivityTracking()) {
-            supportedSettings = ArrayUtils.addAll(supportedSettings, R.xml.devicesettings_chartstabs);
-        }
 
         PreferenceFragmentCompat fragment = DeviceSpecificSettingsFragment.newInstance(device.getAddress(), supportedSettings);
         Bundle args = fragment.getArguments();

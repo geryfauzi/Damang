@@ -77,7 +77,10 @@ public class RegisterFormActivity extends AppCompatActivity implements View.OnCl
         account = GoogleSignIn.getLastSignedInAccount(this);
         email = account.getEmail();
         name = account.getDisplayName();
-        photo = account.getPhotoUrl().toString();
+        if (account.getPhotoUrl() == null)
+            photo = "https://img.icons8.com/bubbles/2x/user-male.png";
+        else
+            photo = account.getPhotoUrl().toString();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Harap Tunggu");

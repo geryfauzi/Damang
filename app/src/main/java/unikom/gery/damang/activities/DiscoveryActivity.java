@@ -35,6 +35,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -88,7 +90,7 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
     private final Handler handler = new Handler();
     private final ArrayList<GBDeviceCandidate> deviceCandidates = new ArrayList<>();
     private ScanCallback newBLEScanCallback = null;
-    private ImageView imgSearchDevice;
+    private ImageView imgSearchDevice, btnBack;
     /**
      * Use old BLE scanning
      **/
@@ -244,6 +246,7 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
         return newBLEScanCallback;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -256,7 +259,13 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
             LOG.info("New BLE scanning disabled via settings, using old method");
         }
 
-        getSupportActionBar().hide();
+        //Hide Action Bar
+        this.getSupportActionBar().hide();
+        //Change statusbar color
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().setStatusBarColor(Color.parseColor("#FFFFFF"));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         setContentView(R.layout.activity_scan_device);
         startButton = findViewById(R.id.discovery_start);
         startButton.setOnClickListener(new View.OnClickListener() {
@@ -268,6 +277,7 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
 
         lottieAnimationView = findViewById(R.id.lottieSearch);
         imgSearchDevice = findViewById(R.id.imgTambahkanPerangkat);
+        btnBack = findViewById(R.id.btnBack);
         lottieAnimationView.setVisibility(View.GONE);
         ListView deviceCandidatesView = findViewById(R.id.discovery_device_candidates_list);
 
@@ -275,6 +285,13 @@ public class DiscoveryActivity extends AbstractGBActivity implements AdapterView
         deviceCandidatesView.setAdapter(deviceCandidateAdapter);
         deviceCandidatesView.setOnItemClickListener(this);
         deviceCandidatesView.setOnItemLongClickListener(this);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         registerBroadcastReceivers();
 
