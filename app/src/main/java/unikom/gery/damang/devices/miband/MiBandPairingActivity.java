@@ -110,13 +110,6 @@ public class MiBandPairingActivity extends AbstractGBActivity implements Bonding
                 editor.apply();
             }
         }
-
-        if (!MiBandCoordinator.hasValidUserInfo()) {
-            Intent userSettingsIntent = new Intent(this, MiBandPreferencesActivity.class);
-            startActivityForResult(userSettingsIntent, REQ_CODE_USER_SETTINGS, null);
-            return;
-        }
-
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
