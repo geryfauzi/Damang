@@ -362,7 +362,7 @@
     <string name="pairing_already_bonded">"Sudah pairing dengan %1$s (%2$s), menghubungkan…"</string>
     <string name="message_cannot_pair_no_mac">Gagal pairing, Mac Address tidak ditemukan.</string>
     <string name="preferences_category_device_specific_settings">Device specific settings</string>
-    <string name="preferences_miband_settings">Mi Band / Amazfit settings</string>
+    <string name="preferences_miband_settings">Pengaturan Alat</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="other">Other</string>
@@ -748,7 +748,7 @@
     <string name="mi2_dnd_scheduled">Sesuai Jadwal</string>
     <string name="maximum_duration">Durasi</string>
     <string name="discovery_attempting_to_pair">Mencoba pairing dengan %1$s</string>
-    <string name="discovery_bonding_failed_immediately">Pairing dengan %1$s gagal.</string>
+    <string name="discovery_bonding_failed_immediately">Pairing dengan perangkat gagal.</string>
     <string name="discovery_trying_to_connect_to">Mencoba menghubungkan dengan: %1$s</string>
     <string name="discovery_enable_bluetooth">Aktifkan bluetooth untuk mencari perangkat.</string>
     <string name="discovery_successfully_bonded">Terpairing dengan %1$s.</string>
@@ -1222,4 +1222,8 @@
     <string name="berat_badan_kilogram">Berat Badan (Kilogram)</string>
     <string name="simpan_perubahan">Simpan Perubahan</string>
     <string name="pengaturan_umum">Pengaturan Umum</string>
+    <string name="menu_lainnya">Menu Lainnya</string>
+    <string name="rumah_sakit_terdekat">Rumah Sakit Terdekat</string>
+    <string name="artikel_kesehatan">Artikel Kesehatan</string>
+    <string name="pengaturan_alat">Pengaturan Alat</string>
 </resources>

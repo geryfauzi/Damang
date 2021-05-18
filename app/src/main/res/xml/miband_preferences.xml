@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--TODO: this is actually "about your miband" and possibly refers to a single device (if the owner has multiple mibands, it may be that they are worn on different arms -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    >
     <PreferenceCategory
         android:key="pref_category_miband_personal"
         android:title="@string/activity_prefs_about_you">
