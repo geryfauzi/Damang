@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
+import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
 import unikom.gery.damang.sqlite.table.HeartRate;
@@ -115,6 +116,25 @@ public class HeartRateHelper {
                 heartRate = new unikom.gery.damang.model.HeartRate();
                 heartRate.setDate(cursor.getString(cursor.getColumnIndexOrThrow("DATE(date_time)")));
                 heartRate.setAverageHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("AVG(heart_rate)")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public ArrayList<DetailHeartRate> getDetailDailyCondition(String email, String date) {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<DetailHeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT strftime(?,date_time) AS hour, heart_rate FROM heart_rate_activity WHERE DATE(date_time) = ? AND email = ? AND mode = ?", new String[]{"%H:%M", date, email, "Normal"});
+        cursor.moveToFirst();
+        DetailHeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                heartRate = new DetailHeartRate();
+                heartRate.setHour(cursor.getString(cursor.getColumnIndexOrThrow("hour")));
+                heartRate.setHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate")));
                 arrayList.add(heartRate);
                 cursor.moveToNext();
             } while (!cursor.isAfterLast());

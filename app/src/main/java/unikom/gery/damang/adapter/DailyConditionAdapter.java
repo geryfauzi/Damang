@@ -45,7 +45,7 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         SharedPreference sharedPreference = new SharedPreference(context);
         try {
             int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
@@ -73,6 +73,7 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
             public void onClick(View view) {
                 Intent intent = new Intent(context, DetailConditionActivity.class);
                 intent.putExtra("date", arrayList.get(position).getDate());
+                intent.putExtra("parseDate", holder.txtTanggal.getText().toString());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }
