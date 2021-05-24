@@ -18,10 +18,15 @@
 package unikom.gery.damang.devices.miband;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.HashSet;
@@ -48,12 +53,12 @@ import static unikom.gery.damang.devices.miband.MiBandConst.PREF_MI2_INACTIVITY_
 import static unikom.gery.damang.devices.miband.MiBandConst.PREF_MI2_INACTIVITY_WARNINGS_START;
 import static unikom.gery.damang.devices.miband.MiBandConst.PREF_MI2_INACTIVITY_WARNINGS_THRESHOLD;
 import static unikom.gery.damang.devices.miband.MiBandConst.PREF_MIBAND_ADDRESS;
-import static unikom.gery.damang.devices.miband.MiBandConst.PREF_MIBAND_USE_HR_FOR_SLEEP_DETECTION;
 import static unikom.gery.damang.devices.miband.MiBandConst.PREF_USER_ALIAS;
 import static unikom.gery.damang.devices.miband.MiBandConst.VIBRATION_COUNT;
 import static unikom.gery.damang.devices.miband.MiBandConst.getNotificationPrefKey;
 
 public class MiBandPreferencesActivity extends AbstractSettingsActivity {
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,24 +68,6 @@ public class MiBandPreferencesActivity extends AbstractSettingsActivity {
         addTryListeners();
 
         Prefs prefs = GBApplication.getPrefs();
-
-        final Preference enableHeartrateSleepSupport = findPreference(PREF_MIBAND_USE_HR_FOR_SLEEP_DETECTION);
-        enableHeartrateSleepSupport.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newVal) {
-                GBApplication.deviceService().onEnableHeartRateSleepSupport(Boolean.TRUE.equals(newVal));
-                return true;
-            }
-        });
-
-        final Preference heartrateMeasurementInterval = findPreference("heartrate_measurement_interval");
-        heartrateMeasurementInterval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newVal) {
-                GBApplication.deviceService().onSetHeartRateMeasurementInterval(Integer.parseInt((String) newVal));
-                return true;
-            }
-        });
 
         final Preference goalNotification = findPreference(PREF_MI2_GOAL_NOTIFICATION);
         goalNotification.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -213,7 +200,7 @@ public class MiBandPreferencesActivity extends AbstractSettingsActivity {
 
     /**
      * delayed execution so that the preferences are applied first
-      */
+     */
     private void invokeLater(Runnable runnable) {
         getListView().post(runnable);
     }

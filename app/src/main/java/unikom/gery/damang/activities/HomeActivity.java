@@ -65,6 +65,7 @@ import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.DeviceAdapter;
 import unikom.gery.damang.devices.DeviceManager;
+import unikom.gery.damang.devices.miband.MiBandPreferencesActivity;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
@@ -85,7 +86,7 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    private CardView cvNoDevice, cvHeartRate;
+    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat;
     private ImageView btnAddDevice;
     private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar;
     private ImageView imgProfile;
@@ -140,6 +141,9 @@ public class HomeActivity extends AppCompatActivity
         deviceListView = findViewById(R.id.rvDeviceHome);
         cvNoDevice = findViewById(R.id.cvNoDevice);
         cvHeartRate = findViewById(R.id.cardView6);
+        cvArtikel = findViewById(R.id.cvArtikelKesehatan);
+        cvRumahSakit = findViewById(R.id.cvRumahSakit);
+        cvPengaturanAlat = findViewById(R.id.cvPengaturanAlat);
         btnAddDevice = findViewById(R.id.btnAddDevice);
         txtHeartRate = findViewById(R.id.txtHeartRate);
         txtCurrentCondition = findViewById(R.id.txtStatusKesehatan);
@@ -222,6 +226,14 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), DailyConditionActivity.class));
+            }
+        });
+
+        cvPengaturanAlat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), MiBandPreferencesActivity.class);
+                startActivity(intent);
             }
         });
     }

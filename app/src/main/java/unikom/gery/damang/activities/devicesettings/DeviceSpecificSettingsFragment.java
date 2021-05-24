@@ -47,10 +47,10 @@ import unikom.gery.damang.util.XTimePreferenceFragment;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_ALTITUDE_CALIBRATE;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_AMPM_ENABLED;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_ANTILOST_ENABLED;
-import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_AUTOREMOVE_NOTIFICATIONS;
-import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_BT_CONNECTED_ADVERTISEMENT;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_AUTOLIGHT;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_AUTOREMOVE_MESSAGE;
+import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_AUTOREMOVE_NOTIFICATIONS;
+import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_BT_CONNECTED_ADVERTISEMENT;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_BUTTON_1_FUNCTION_DOUBLE;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_BUTTON_1_FUNCTION_LONG;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_BUTTON_1_FUNCTION_SHORT;
@@ -72,8 +72,6 @@ import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPrefere
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_HYDRATION_PERIOD;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_HYDRATION_SWITCH;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_KEY_VIBRATION;
-import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_LANGUAGE;
-import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_LEFUN_INTERFACE_LANGUAGE;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_LIFTWRIST_NOSHED;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_LONGSIT_PERIOD;
 import static unikom.gery.damang.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_LONGSIT_SWITCH;
@@ -122,9 +120,15 @@ import static unikom.gery.damang.devices.miband.MiBandConst.PREF_SWIPE_UNLOCK;
 
 public class DeviceSpecificSettingsFragment extends PreferenceFragmentCompat {
 
+    static final String FRAGMENT_TAG = "DEVICE_SPECIFIC_SETTINGS_FRAGMENT";
     private static final Logger LOG = LoggerFactory.getLogger(DeviceSpecificSettingsFragment.class);
 
-    static final String FRAGMENT_TAG = "DEVICE_SPECIFIC_SETTINGS_FRAGMENT";
+    static DeviceSpecificSettingsFragment newInstance(String settingsFileSuffix, @NonNull int[] supportedSettings) {
+        DeviceSpecificSettingsFragment fragment = new DeviceSpecificSettingsFragment();
+        fragment.setSettingsFileSuffix(settingsFileSuffix, supportedSettings);
+
+        return fragment;
+    }
 
     private void setSettingsFileSuffix(String settingsFileSuffix, @NonNull int[] supportedSettings) {
         Bundle args = new Bundle();
@@ -132,7 +136,6 @@ public class DeviceSpecificSettingsFragment extends PreferenceFragmentCompat {
         args.putIntArray("supportedSettings", supportedSettings);
         setArguments(args);
     }
-
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -365,7 +368,6 @@ public class DeviceSpecificSettingsFragment extends PreferenceFragmentCompat {
         addPreferenceHandlerFor(PREF_DISPLAY_ITEMS_SORTABLE);
         addPreferenceHandlerFor(PREF_SHORTCUTS);
         addPreferenceHandlerFor(PREF_SHORTCUTS_SORTABLE);
-        addPreferenceHandlerFor(PREF_LANGUAGE);
         addPreferenceHandlerFor(PREF_EXPOSE_HR_THIRDPARTY);
         addPreferenceHandlerFor(PREF_BT_CONNECTED_ADVERTISEMENT);
         addPreferenceHandlerFor(PREF_WEARLOCATION);
@@ -400,7 +402,6 @@ public class DeviceSpecificSettingsFragment extends PreferenceFragmentCompat {
         addPreferenceHandlerFor(PREF_HYDRATION_SWITCH);
         addPreferenceHandlerFor(PREF_HYDRATION_PERIOD);
         addPreferenceHandlerFor(PREF_AMPM_ENABLED);
-        addPreferenceHandlerFor(PREF_LEFUN_INTERFACE_LANGUAGE);
         addPreferenceHandlerFor(PREF_SOUNDS);
 
         addPreferenceHandlerFor(PREF_HYBRID_HR_DRAW_WIDGET_CIRCLES);
@@ -531,7 +532,7 @@ public class DeviceSpecificSettingsFragment extends PreferenceFragmentCompat {
         if (deviceActionsFellSleepBroadcast != null) {
             deviceActionsFellSleepBroadcast.setEnabled(deviceActionsFellSleepSelectionBroadcast);
         }
-        
+
         String deviceActionsWokeUpSelection = prefs.getString(PREF_DEVICE_ACTION_WOKE_UP_SELECTION, PREF_DEVICE_ACTION_SELECTION_OFF);
         final Preference deviceActionsWokeUp = findPreference(PREF_DEVICE_ACTION_WOKE_UP_SELECTION);
         final Preference deviceActionsWokeUpBroadcast = findPreference(PREF_DEVICE_ACTION_WOKE_UP_BROADCAST);
@@ -549,7 +550,7 @@ public class DeviceSpecificSettingsFragment extends PreferenceFragmentCompat {
         if (deviceActionsWokeUpBroadcast != null) {
             deviceActionsWokeUpBroadcast.setEnabled(deviceActionsWokeUpSelectionBroadcast);
         }
-        
+
         String deviceActionsStartNonWearSelection = prefs.getString(PREF_DEVICE_ACTION_START_NON_WEAR_SELECTION, PREF_DEVICE_ACTION_SELECTION_OFF);
         final Preference deviceActionsStartNonWear = findPreference(PREF_DEVICE_ACTION_START_NON_WEAR_SELECTION);
         final Preference deviceActionsStartNonWearBroadcast = findPreference(PREF_DEVICE_ACTION_START_NON_WEAR_BROADCAST);
@@ -567,13 +568,6 @@ public class DeviceSpecificSettingsFragment extends PreferenceFragmentCompat {
         if (deviceActionsStartNonWearBroadcast != null) {
             deviceActionsStartNonWearBroadcast.setEnabled(deviceActionsStartNonWearSelectionBroadcast);
         }
-    }
-
-    static DeviceSpecificSettingsFragment newInstance(String settingsFileSuffix, @NonNull int[] supportedSettings) {
-        DeviceSpecificSettingsFragment fragment = new DeviceSpecificSettingsFragment();
-        fragment.setSettingsFileSuffix(settingsFileSuffix, supportedSettings);
-
-        return fragment;
     }
 
     @Override
