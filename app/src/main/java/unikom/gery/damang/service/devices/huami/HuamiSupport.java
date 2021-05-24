@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1731,15 +1732,19 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
         }
     }
 
-    private int timeTo() {
+    private int timeTo() throws ParseException {
         Calendar day = Calendar.getInstance();
-//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//        long time = timestamp.getTime() / 1000L;
-        day.setTimeInMillis(1620147599 * 1000L);
+        day.setTimeInMillis(getTimeStamp() * 1000L);
         day.set(Calendar.HOUR_OF_DAY, 23);
         day.set(Calendar.MINUTE, 59);
         day.set(Calendar.SECOND, 59);
         return (int) (day.getTimeInMillis() / 1000);
+    }
+
+    private long getTimeStamp() throws ParseException {
+        DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        String today = sdf.format(new java.sql.Date(System.currentTimeMillis()));
+        return new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").parse(today + " 23:59:59").getTime() / 1000;
     }
 
     private int timeFrom(int timeTo) {

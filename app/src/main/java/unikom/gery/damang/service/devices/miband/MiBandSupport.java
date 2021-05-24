@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,6 +81,7 @@ import unikom.gery.damang.model.MusicSpec;
 import unikom.gery.damang.model.MusicStateSpec;
 import unikom.gery.damang.model.NotificationSpec;
 import unikom.gery.damang.model.NotificationType;
+import unikom.gery.damang.model.RecordedDataTypes;
 import unikom.gery.damang.model.WeatherSpec;
 import unikom.gery.damang.service.btle.AbstractBTLEDeviceSupport;
 import unikom.gery.damang.service.btle.BLETypeConversions;
@@ -1112,13 +1114,27 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
         return provider.getAllActivitySamples(tsFrom, tsTo);
     }
 
-    private int timeTo() {
+    private void fetchActivityData() {
+        if (getDevice().isInitialized()) {
+            GBApplication.deviceService().onFetchRecordedData(RecordedDataTypes.TYPE_ACTIVITY);
+        } else {
+            GB.toast(getContext(), "Not Connected", Toast.LENGTH_SHORT, GB.ERROR);
+        }
+    }
+
+    private int timeTo() throws ParseException {
         Calendar day = Calendar.getInstance();
-        day.setTimeInMillis(1620147599 * 1000L);
+        day.setTimeInMillis(getTimeStamp() * 1000L);
         day.set(Calendar.HOUR_OF_DAY, 23);
         day.set(Calendar.MINUTE, 59);
         day.set(Calendar.SECOND, 59);
         return (int) (day.getTimeInMillis() / 1000);
+    }
+
+    private long getTimeStamp() throws ParseException {
+        DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        String today = sdf.format(new java.sql.Date(System.currentTimeMillis()));
+        return new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").parse(today + " 23:59:59").getTime() / 1000;
     }
 
     private int timeFrom(int timeTo) {
@@ -1132,6 +1148,7 @@ public class MiBandSupport extends AbstractBTLEDeviceSupport {
                 public void doCurrentSample() {
 
                     try (DBHandler handler = GBApplication.acquireDB()) {
+                        fetchActivityData();
                         DaoSession session = handler.getDaoSession();
                         stepListAdapter = new ActivityListingAdapter(getContext());
                         stepSessionsSummary = get_data(gbDevice, handler, timeFrom(timeTo()), timeTo());
