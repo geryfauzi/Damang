@@ -1229,4 +1229,6 @@
     <string name="terendah">Terendah</string>
     <string name="tertinggi">Tertinggi</string>
     <string name="rata_rata">Rata - rata</string>
+    <string name="detail_laporan">Detail Laporan</string>
+    <string name="hasil_analisis">Hasil Analisis</string>
 </resources>

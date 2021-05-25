@@ -19,6 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package unikom.gery.damang.service.devices.huami;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
@@ -27,8 +31,11 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import net.e175.klaus.solarpositioning.DeltaT;
@@ -1769,16 +1776,9 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         MiBand2SampleProvider provider = new MiBand2SampleProvider(gbDevice, session);
                         MiBandActivitySample sample = createActivitySample(device, user, ts, provider);
                         sample.setHeartRate(getHeartrateBpm());
-//                        sample.setSteps(getSteps());
                         sample.setRawIntensity(ActivitySample.NOT_MEASURED);
-                        sample.setRawKind(HuamiConst.TYPE_ACTIVITY); // to make it visible in the charts TODO: add a MANUAL kind for that?
-
+                        sample.setRawKind(HuamiConst.TYPE_ACTIVITY);
                         provider.addGBActivitySample(sample);
-
-                        // set the steps only afterwards, since realtime steps are also recorded
-                        // in the regular samples and we must not count them twice
-                        // Note: we know that the DAO sample is never committed again, so we simply
-                        // change the value here in memory.
                         sample.setSteps(getSteps());
 
                         if (LOG.isDebugEnabled()) {
@@ -1789,6 +1789,9 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         String mode = sharedPreference.getMode();
                         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                         String date = format.format(new Date(System.currentTimeMillis()));
+                        int currentHeartRate = sample.getHeartRate();
+                        int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
+                        String status = getCurrentCondition(age, currentHeartRate);
 
                         //Menyimpan ke database
                         sharedPreference.setSteps(Integer.parseInt(stepListAdapter.getStepTotalLabel(stepSessionsSummary)));
@@ -1804,8 +1807,11 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         } else if (mode.equals("Sleep")) {
 
                         } else if (mode.equals("Normal")) {
-                            if (sample.getHeartRate() > 0)
+                            if (sample.getHeartRate() > 0) {
                                 heartRateHelper.insertHeartRateNormalMode(heartRate);
+                                if (!status.equals("Normal"))
+                                    createNotificationNormalMode(status);
+                            }
                         }
                         //
                         Intent intent = new Intent(DeviceService.ACTION_REALTIME_SAMPLES)
@@ -1819,6 +1825,70 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
             };
         }
         return realtimeSamplesSupport;
+    }
+
+    private void createNotificationNormalMode(String status) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel("notif", "notifikasi", importance);
+            @SuppressLint("WrongConstant") Notification.Builder notificationBuilder = new Notification.Builder(getContext(), "notif").setSmallIcon(R.drawable.notif_warning)
+                    .setContentTitle("Detak Jantung " + status + "!")
+                    .setContentText("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi detak jantung yang " + status + "pada jantung anda. Apakah anda baik - baik saja ?"));
+            NotificationManager notificationManager = getContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+            notificationManager.notify(0, notificationBuilder.build());
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "notif")
+                    .setSmallIcon(R.drawable.notif_warning)
+                    .setContentTitle("Detak Jantung " + status + "!")
+                    .setContentText("Sistem damang mendeteksi detak jantung yang " + status + "pada jantung anda. Apakah anda baik - baik saja ?")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getContext());
+            notificationManagerCompat.notify(0, builder.build());
+        }
+    }
+
+    private String getTodayDate() {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return format.format(new Date(System.currentTimeMillis()));
+    }
+
+    private int getCurrentAge(String todayDate, String dayOfBirth) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date1 = simpleDateFormat.parse(dayOfBirth);
+        Date date2 = simpleDateFormat.parse(todayDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        int month1 = calendar.get(Calendar.MONTH);
+        int year1 = calendar.get(Calendar.YEAR);
+        calendar.setTime(date2);
+        int month2 = calendar.get(Calendar.MONTH);
+        int year2 = calendar.get(Calendar.YEAR);
+        int monthResult = ((year2 - year1) * 12) + (month2 - month1);
+        return monthResult / 12;
+    }
+
+    private String getCurrentCondition(int age, int heartRate) {
+        String status = "Normal";
+        if (age < 2) {
+            if (heartRate < 80)
+                status = "Rendah";
+            else if (heartRate > 160)
+                status = "Tinggi";
+        } else if (age >= 2 && age <= 10) {
+            if (heartRate < 70)
+                status = "Rendah";
+            else if (heartRate > 120)
+                status = "Tinggi";
+        } else if (age >= 11) {
+            if (heartRate < 54)
+                status = "Rendah";
+            else if (heartRate > 110)
+                status = "Tinggi";
+        }
+        return status;
     }
 
     private String getStatus(int heartRate) {

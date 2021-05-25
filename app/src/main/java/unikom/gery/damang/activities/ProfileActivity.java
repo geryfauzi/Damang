@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,9 +33,9 @@ import unikom.gery.damang.util.SharedPreference;
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private CircleImageView imgProfile;
-    private EditText etName, etEmail, etWeight, etHeight;
-    private TextView etTanggalLahir;
-    private CardView btnTanggalLahir;
+    private EditText etName, etWeight, etHeight;
+    private TextView etTanggalLahir, etEmail;
+    private CardView btnTanggalLahir, cvEmail;
     private Spinner spinnerKelamin;
     private Button btnSimpan;
     private SharedPreference sharedPreference;
@@ -66,6 +67,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         btnTanggalLahir = findViewById(R.id.btnTanggalLahir);
         btnSimpan = findViewById(R.id.btnSimpan);
         btnBack = findViewById(R.id.btnBack);
+        cvEmail = findViewById(R.id.cardView10);
         sharedPreference = new SharedPreference(getApplicationContext());
         calendar = Calendar.getInstance();
         //
@@ -73,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         btnTanggalLahir.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         spinnerKelamin.setOnItemSelectedListener(this);
+        cvEmail.setOnClickListener(this);
         spinnerInitiation();
         setContentToView();
     }
@@ -119,6 +122,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             pickDate();
         } else if (view == btnBack)
             finish();
+        else if (view == cvEmail)
+            Toast.makeText(getApplicationContext(), "Email tidak bisa diganti karena terhubung ke akun Google", Toast.LENGTH_SHORT).show();
     }
 
     @Override
