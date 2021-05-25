@@ -1200,7 +1200,7 @@
     <string name="belum_ada_data_kesehatan">Belum ada data kesehatan</string>
     <string name="sentuh_menu_ini_untuk_menambahkan_perangkat_anda_ke_sistem">Sentuh menu ini untuk menambahkan perangkat anda ke sistem</string>
     <string name="silahkan_hubungkan_sistem_dengan_wearable_device_anda_untuk_mendapat_data_kesehatan">Silahkan hubungkan sistem dengan wearable device anda untuk mendapat data kesehatan</string>
-    <string name="belum_ada_data_olahraga">Belum ada data /n olahraga</string>
+    <string name="belum_ada_data_olahraga">Belum ada data olahraga</string>
     <string name="mulah_berolahraga_untuk_mendapat_data_riwayat_olahraga">Mulah berolahraga dengan sistem Damang untuk mendapat data riwayat olahraga anda!</string>
     <string name="belum_ada_data_kualitas_tidur">Belum ada data tidur</string>
     <string name="mulai_tidur_dengan_didampingi_sistem_damang_untuk_melihat_kualitas_tidur_anda">Mulai tidur dengan didampingi oleh sistem Damang untuk melihat kualitas tidur anda</string>
@@ -1231,4 +1231,13 @@
     <string name="rata_rata">Rata - rata</string>
     <string name="detail_laporan">Detail Laporan</string>
     <string name="hasil_analisis">Hasil Analisis</string>
+    <string name="olahraga">Olahraga</string>
+    <string name="riwayat_olahraga">Riwayat Olahraga</string>
+    <string name="lihat_semua">Lihat Semua</string>
+    <string name="jogging">Jogging</string>
+    <string name="cardio_lantai">Cardio Lantai</string>
+    <string name="lainnya">Lainnya</string>
+    <string name="_177">177</string>
+    <string name="_389_kalori_terbakar">389 kalori terbakar</string>
+    <string name="mulai_berolahraga">Mulai Berolahraga</string>
 </resources>

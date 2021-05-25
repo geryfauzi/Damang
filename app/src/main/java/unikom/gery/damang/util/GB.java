@@ -146,7 +146,7 @@ public class GB {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
         builder.setTicker(text)
                 .setContentText(text)
-                .setSmallIcon(R.drawable.ic_notification_disconnected)
+                .setSmallIcon(R.drawable.ic_bluetooth_disconnect)
                 .setContentIntent(getContentIntent(context))
                 .setColor(context.getResources().getColor(R.color.accent))
                 .setOngoing(true);
@@ -154,7 +154,7 @@ public class GB {
             Intent deviceCommunicationServiceIntent = new Intent(context, DeviceCommunicationService.class);
             deviceCommunicationServiceIntent.setAction(DeviceService.ACTION_CONNECT);
             PendingIntent reconnectPendingIntent = PendingIntent.getService(context, 2, deviceCommunicationServiceIntent, PendingIntent.FLAG_ONE_SHOT);
-            builder.addAction(R.drawable.ic_notification, context.getString(R.string.controlcenter_connect), reconnectPendingIntent);
+            builder.addAction(R.drawable.ic_bt_connected, context.getString(R.string.controlcenter_connect), reconnectPendingIntent);
         }
         if (GBApplication.isRunningLollipopOrLater()) {
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);

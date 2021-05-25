@@ -86,7 +86,7 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat;
+    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga;
     private ImageView btnAddDevice;
     private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar;
     private ImageView imgProfile;
@@ -144,6 +144,7 @@ public class HomeActivity extends AppCompatActivity
         cvArtikel = findViewById(R.id.cvArtikelKesehatan);
         cvRumahSakit = findViewById(R.id.cvRumahSakit);
         cvPengaturanAlat = findViewById(R.id.cvPengaturanAlat);
+        cvOlahraga = findViewById(R.id.cvOlahraga);
         btnAddDevice = findViewById(R.id.btnAddDevice);
         txtHeartRate = findViewById(R.id.txtHeartRate);
         txtCurrentCondition = findViewById(R.id.txtStatusKesehatan);
@@ -234,6 +235,13 @@ public class HomeActivity extends AppCompatActivity
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), MiBandPreferencesActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        cvOlahraga.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), SportActivity.class));
             }
         });
     }
