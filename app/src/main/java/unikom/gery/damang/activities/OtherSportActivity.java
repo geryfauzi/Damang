@@ -1,7 +1,10 @@
 package unikom.gery.damang.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
@@ -18,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.airbnb.lottie.LottieAnimationView;
 
@@ -26,9 +30,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Random;
 
 import unikom.gery.damang.R;
+import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SportReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
@@ -47,6 +53,19 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
     private SharedPreference sharedPreference;
     private HeartRateHelper heartRateHelper;
     private int age, tns;
+    private String id = "";
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            switch (Objects.requireNonNull(action)) {
+                case DeviceService.ACTION_REALTIME_SAMPLES:
+                    updateView();
+                    break;
+            }
+        }
+    };
+    private long duration;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -82,6 +101,10 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         cvSelesai.setVisibility(View.INVISIBLE);
         imgSportStarted.setVisibility(View.INVISIBLE);
 
+        IntentFilter filterLocal = new IntentFilter();
+        filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filterLocal);
+
         chronometer.setFormat("Time: %s");
         chronometer.setBase(SystemClock.elapsedRealtime());
         try {
@@ -93,7 +116,7 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         txtTNS.setText(Integer.toString(tns));
     }
 
-    private void saveToDB(String id) throws ParseException {
+    private void saveToDB(String id) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String date = format.format(new Date(System.currentTimeMillis()));
         Sport sport = new Sport();
@@ -130,7 +153,45 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         return monthResult / 12;
     }
 
-    private void generateSportID() throws ParseException {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void startSportMode() {
+        ComponentName sportMode = new ComponentName(this, SportReceiver.class);
+        PackageManager packageManager = this.getPackageManager();
+        packageManager.setComponentEnabledSetting(sportMode,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+        SportReceiver sportReceiver = new SportReceiver();
+        sportReceiver.setReceiver(this);
+    }
+
+    private void pauseNormalMode() {
+        ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
+        PackageManager packageManager = this.getPackageManager();
+        packageManager.setComponentEnabledSetting(normalMode,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void startNormalMode() {
+        ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
+        PackageManager packageManager = this.getPackageManager();
+        packageManager.setComponentEnabledSetting(normalMode,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+        NormalReceiver normalReceiver = new NormalReceiver();
+        normalReceiver.setReceiver(this);
+    }
+
+    private void pauseSportMode() {
+        ComponentName sportMode = new ComponentName(this, SportReceiver.class);
+        PackageManager packageManager = this.getPackageManager();
+        packageManager.setComponentEnabledSetting(sportMode,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    private void generateSportID() {
         if (sharedPreference.getSportId().equals("null")) {
             String charId = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             StringBuilder newID = new StringBuilder();
@@ -139,27 +200,17 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
                 int index = (int) (random.nextFloat() * charId.length());
                 newID.append(charId.charAt(index));
             }
+            id = newID.toString();
             sharedPreference.setSportId(newID.toString());
             saveToDB(newID.toString());
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void startSportMode() throws ParseException {
+    private void start() {
         if (sharedPreference.getMode().equals("Normal")) {
-            //Start Sport Mode
-            ComponentName sportMode = new ComponentName(this, SportReceiver.class);
-            PackageManager packageManager = this.getPackageManager();
-            packageManager.setComponentEnabledSetting(sportMode,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
-            SportReceiver sportReceiver = new SportReceiver();
-            sportReceiver.setReceiver(this);
-            //Pause Normal Mode
-            ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
-            packageManager.setComponentEnabledSetting(normalMode,
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP);
+            startSportMode();
+            pauseNormalMode();
             sharedPreference.setMode("Sport");
         }
         generateSportID();
@@ -172,28 +223,46 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
     }
 
+    private void updateDB() {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String date = format.format(new Date(System.currentTimeMillis()));
+        Sport sport = new Sport();
+        sport.setId(id);
+        sport.setEnd_time(date);
+        sport.setDuration((int) duration);
+        sport.setTns_status(txtTNSStatus.getText().toString());
+        sport.setAverage_heart_rate(heartRateHelper.getAverageSportHearRate(id, sharedPreference.getUser().getEmail()));
+        sport.setCalories_burned(calculateBurnedCalories(heartRateHelper.getAverageSportHearRate(id, sharedPreference.getUser().getEmail())));
+        heartRateHelper.updateSportData(sport);
+    }
+
+    private int calculateBurnedCalories(int heartRate) {
+        int burnedCalories;
+        if (sharedPreference.getUser().getGender().equals("Laki - Laki"))
+            burnedCalories = (int) Math.round(((-55.0969 + (0.6309 * heartRate) + (0.1988 * sharedPreference.getUser().getWeight()) + (0.2017 * age)) / 4.184) * duration);
+        else
+            burnedCalories = (int) Math.round(((-20.4022 + (0.4472 * heartRate) - (0.1263 * sharedPreference.getUser().getWeight()) + (0.074 * age)) / 4.184) * duration);
+        return burnedCalories;
+    }
+
+    private void updateView() {
+        int heartRate = heartRateHelper.getLatesHeartRateSportMode(id, sharedPreference.getUser().getEmail());
+        txtDetakJantung.setText(String.valueOf(heartRate));
+        if (heartRate >= tns && txtTNSStatus.getText().toString().equals("Belum"))
+            txtTNSStatus.setText("Iya");
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void stop() {
-        //Start Normal Mode
-        ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
-        PackageManager packageManager = this.getPackageManager();
-        packageManager.setComponentEnabledSetting(normalMode,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
-        NormalReceiver normalReceiver = new NormalReceiver();
-        normalReceiver.setReceiver(this);
-        //Pause Sport Mode
-        ComponentName sportMode = new ComponentName(this, SportReceiver.class);
-        packageManager.setComponentEnabledSetting(sportMode,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
+        startNormalMode();
+        pauseSportMode();
         sharedPreference.setMode("Normal");
         sharedPreference.setSportId("null");
         chronometer.stop();
-        long menit = SystemClock.elapsedRealtime() - chronometer.getBase();
+        duration = SystemClock.elapsedRealtime() - chronometer.getBase();
+        duration = Math.round(duration / 60000);
         chronometer.setBase(SystemClock.elapsedRealtime());
         pauseOffset = 0;
-        Toast.makeText(getApplicationContext(), Long.toString(menit), Toast.LENGTH_SHORT).show();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -201,15 +270,11 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         if (view == btnMulai) {
             if (btnMulai.getText().equals("Mulai")) {
-                try {
-                    startSportMode();
-                    btnMulai.setText("Jeda");
-                    cvSelesai.setVisibility(View.VISIBLE);
-                    imgSportStarted.setVisibility(View.VISIBLE);
-                    imgSportPaused.setVisibility(View.INVISIBLE);
-                } catch (ParseException e) {
-                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
-                }
+                start();
+                btnMulai.setText("Jeda");
+                cvSelesai.setVisibility(View.VISIBLE);
+                imgSportStarted.setVisibility(View.VISIBLE);
+                imgSportPaused.setVisibility(View.INVISIBLE);
             } else {
                 pause();
                 btnMulai.setText("Mulai");
@@ -219,12 +284,14 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
             }
         } else if (view == btnSelesai) {
             stop();
-            btnMulai.setText("Mulai");
-            cvSelesai.setVisibility(View.INVISIBLE);
-            imgSportStarted.setVisibility(View.INVISIBLE);
-            imgSportPaused.setVisibility(View.VISIBLE);
+            updateDB();
+            Intent intent = new Intent(getApplicationContext(), OtherSportDetailActivity.class);
+            intent.putExtra("id", id);
+            startActivity(intent);
+            finish();
         } else if (view == btnBack) {
             stop();
+            updateDB();
             startActivity(new Intent(getApplicationContext(), SportActivity.class));
             finish();
         }
@@ -234,6 +301,7 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onBackPressed() {
         stop();
+        updateDB();
         startActivity(new Intent(getApplicationContext(), SportActivity.class));
         finish();
     }

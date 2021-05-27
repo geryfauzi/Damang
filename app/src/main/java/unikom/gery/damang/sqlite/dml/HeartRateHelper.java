@@ -25,6 +25,11 @@ public class HeartRateHelper {
     static String ID_SLEEP = "id_sleep";
     static String DATE_TIME = "date_time";
     static String HEART_RATE = "heart_rate";
+    static String END_TIME = "end_time";
+    static String DURATION = "duration";
+    static String TNS_STATUS = "tns_status";
+    static String AVERAGE_HEART_RATE = "average_heart_rate";
+    static String CALORIES_BURNED = "calories_burned";
     static String MODE = "mode";
     static String STATUS = "status";
     static String LATITUDE = "latitude";
@@ -106,6 +111,17 @@ public class HeartRateHelper {
         return database.insert(TABLE_SPORT, null, args);
     }
 
+    public int updateSportData(Sport sport) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(END_TIME, sport.getEnd_time());
+        args.put(DURATION, sport.getDuration());
+        args.put(TNS_STATUS, sport.getTns_status());
+        args.put(AVERAGE_HEART_RATE, sport.getAverage_heart_rate());
+        args.put(CALORIES_BURNED, sport.getCalories_burned());
+        return database.update(TABLE_SPORT, args, _ID + "= '" + sport.getId() + "'", null);
+    }
+
     public long insertUser(User user) {
         ContentValues args = new ContentValues();
         database = dbHelper.getWritableDatabase();
@@ -123,6 +139,36 @@ public class HeartRateHelper {
         database = dbHelper.getWritableDatabase();
         int bpm = 0;
         Cursor cursor = database.rawQuery("SELECT avg(heart_rate) FROM heart_rate_activity WHERE email = ? AND date_time LIKE ? AND mode = ?", new String[]{email, "%" + date + "%", "Normal"});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                bpm = cursor.getInt(cursor.getColumnIndexOrThrow("avg(heart_rate)"));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return bpm;
+    }
+
+    public int getLatesHeartRateSportMode(String id, String email) {
+        database = dbHelper.getWritableDatabase();
+        int bpm = 0;
+        Cursor cursor = database.rawQuery("SELECT heart_rate FROM heart_rate_activity WHERE email = ? AND id_sport = ? ORDER BY date_time DESC LIMIT 1", new String[]{email, id});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                bpm = cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate"));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return bpm;
+    }
+
+    public int getAverageSportHearRate(String id, String email) {
+        database = dbHelper.getWritableDatabase();
+        int bpm = 0;
+        Cursor cursor = database.rawQuery("SELECT avg(heart_rate) FROM heart_rate_activity WHERE email = ? AND id_sport = ? ", new String[]{email, id});
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             do {

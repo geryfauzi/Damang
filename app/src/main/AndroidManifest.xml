@@ -60,7 +60,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/GadgetbridgeTheme">
-        <activity android:name=".activities.OtherSportActivity"></activity>
+        <activity android:name=".activities.OtherSportDetailActivity"></activity>
+        <activity android:name=".activities.OtherSportActivity" />
         <activity android:name=".activities.SportActivity" />
         <activity android:name=".activities.ProfileActivity" />
         <activity android:name=".activities.DetailConditionActivity" />
@@ -82,7 +83,6 @@
         <receiver
             android:name=".service.NormalReceiver"
             android:process=":remote" />
-
         <receiver
             android:name=".service.SportReceiver"
             android:process=":remote" />
