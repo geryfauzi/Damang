@@ -201,6 +201,7 @@ public class HomeActivity extends AppCompatActivity
 
         sharedPreference = new SharedPreference(this);
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
+        sharedPreference.setSportId("null");
         txtUser.setText(sharedPreference.getUser().getName());
         if (!sharedPreference.getMode().equals("Normal")) {
             //Start Normal Mode

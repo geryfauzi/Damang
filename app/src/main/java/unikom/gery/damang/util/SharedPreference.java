@@ -21,6 +21,7 @@ public class SharedPreference {
     private static final String steps = "steps";
     private static final String heartRate = "heartRate";
     private static final String mode = "mode";
+    private static final String sportId = "sportId";
     private final SharedPreferences sharedPreference;
 
 
@@ -79,6 +80,16 @@ public class SharedPreference {
     public void setMode(String value) {
         SharedPreferences.Editor editor = sharedPreference.edit();
         editor.putString(mode, value);
+        editor.apply();
+    }
+
+    public String getSportId() {
+        return sharedPreference.getString(sportId, "null");
+    }
+
+    public void setSportId(String value) {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putString(sportId, value);
         editor.apply();
     }
 

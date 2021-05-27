@@ -1803,10 +1803,11 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         heartRate.setMode(mode);
                         heartRate.setStatus(getStatus(sample.getHeartRate()));
                         heartRate.setDate_time(date);
-
+                        //
                         if (mode.equals("Sport")) {
                             if (sample.getHeartRate() > 0) {
-                                heartRateHelper.insertHeartRateNormalMode(heartRate);
+                                heartRate.setId_sport(sharedPreference.getSportId());
+                                heartRateHelper.insertHeartRateSportMode(heartRate);
                             }
                         } else if (mode.equals("Sleep")) {
 

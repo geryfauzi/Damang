@@ -13,11 +13,14 @@ import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
 import unikom.gery.damang.sqlite.table.HeartRate;
+import unikom.gery.damang.sqlite.table.Sport;
 import unikom.gery.damang.util.SharedPreference;
 
 public class HeartRateHelper {
     static String TABLE_HEART_RATE = "heart_rate_activity";
+    static String TABLE_SPORT = "sport_activity";
     static String EMAIL = "email";
+    static String _ID = "_id";
     static String ID_SPORT = "id_sport";
     static String ID_SLEEP = "id_sleep";
     static String DATE_TIME = "date_time";
@@ -33,6 +36,9 @@ public class HeartRateHelper {
     static String WEIGHT = "weight";
     static String HEIGHT = "height";
     static String PHOTO = "photo";
+    static String START_TIME = "start_time";
+    static String TNS_TARGET = "tns_target";
+    static String TYPE = "type";
     private static DBHelper dbHelper;
     private static HeartRateHelper INSTANCE;
     private static SQLiteDatabase database;
@@ -75,6 +81,29 @@ public class HeartRateHelper {
         args.put(STATUS, heartRate.getStatus());
         sharedPreference.setHeartRate(heartRate.getHeart_rate());
         return database.insert(TABLE_HEART_RATE, null, args);
+    }
+
+    public long insertHeartRateSportMode(HeartRate heartRate) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(EMAIL, heartRate.getEmail());
+        args.put(ID_SPORT, heartRate.getId_sport());
+        args.put(DATE_TIME, heartRate.getDate_time());
+        args.put(HEART_RATE, heartRate.getHeart_rate());
+        args.put(MODE, heartRate.getMode());
+        args.put(STATUS, heartRate.getStatus());
+        sharedPreference.setHeartRate(heartRate.getHeart_rate());
+        return database.insert(TABLE_HEART_RATE, null, args);
+    }
+
+    public long insertSportData(Sport sport) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(_ID, sport.getId());
+        args.put(START_TIME, sport.getStart_time());
+        args.put(TNS_TARGET, sport.getTns_target());
+        args.put(TYPE, sport.getType());
+        return database.insert(TABLE_SPORT, null, args);
     }
 
     public long insertUser(User user) {
