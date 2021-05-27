@@ -180,6 +180,47 @@ public class HeartRateHelper {
         return bpm;
     }
 
+    public Sport getOtherSportDetail(String id) {
+        database = dbHelper.getWritableDatabase();
+        Sport sport = new Sport();
+        Cursor cursor = database.rawQuery("SELECT DATE(start_time), time(start_time), time(end_time), duration, tns_target, tns_status, average_heart_rate, calories_burned FROM sport_activity WHERE _id = ? ", new String[]{id});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                sport.setId(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sport.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("time(start_time)")));
+                sport.setEnd_time(cursor.getString(cursor.getColumnIndexOrThrow("time(end_time)")));
+                sport.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow("duration")));
+                sport.setTns_target(cursor.getInt(cursor.getColumnIndexOrThrow("tns_target")));
+                sport.setTns_status(cursor.getString(cursor.getColumnIndexOrThrow("tns_status")));
+                sport.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
+                sport.setCalories_burned(cursor.getInt(cursor.getColumnIndexOrThrow("calories_burned")));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return sport;
+    }
+
+    public ArrayList<DetailHeartRate> getSportDetailHeartRate(String email, String id) {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<DetailHeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT strftime(?,date_time) AS hour, heart_rate FROM heart_rate_activity WHERE email = ? AND id_sport = ? ", new String[]{"%H:%M", email, id});
+        cursor.moveToFirst();
+        DetailHeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                heartRate = new DetailHeartRate();
+                heartRate.setHour(cursor.getString(cursor.getColumnIndexOrThrow("hour")));
+                heartRate.setHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
     public ArrayList<unikom.gery.damang.model.HeartRate> getDailyCondition(String email) {
         database = dbHelper.getWritableDatabase();
         ArrayList<unikom.gery.damang.model.HeartRate> arrayList = new ArrayList<>();

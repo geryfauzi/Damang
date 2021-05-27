@@ -1253,4 +1253,17 @@
     <string name="belum">Belum</string>
     <string name="tns_tercapai">TNS Tercapai</string>
     <string name="selesai">Selesai</string>
+    <string name="hasil_olaraga">Hasil Olaraga</string>
+    <string name="detak_jantung">Detak Jantung</string>
+    <string name="target_tns">Target TNS</string>
+    <string name="_1_juni_2021">1 Juni 2021</string>
+    <string name="waktu_mulai">Waktu Mulai</string>
+    <string name="_07_15">07.15</string>
+    <string name="waktu_selesai">Waktu Selesai</string>
+    <string name="_08_00">08.00</string>
+    <string name="_177_bpm">177 bpm</string>
+    <string name="_96_bpm">96 bpm</string>
+    <string name="_185_bpm">185 bpm</string>
+    <string name="kalori_terbakar">Kalori Terbakar</string>
+    <string name="_500_kalori">500 kalori</string>
 </resources>

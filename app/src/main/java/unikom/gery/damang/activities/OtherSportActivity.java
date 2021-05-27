@@ -1,5 +1,9 @@
 package unikom.gery.damang.activities;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -21,6 +25,8 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -105,7 +111,6 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filterLocal);
 
-        chronometer.setFormat("Time: %s");
         chronometer.setBase(SystemClock.elapsedRealtime());
         try {
             age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
@@ -248,8 +253,34 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
     private void updateView() {
         int heartRate = heartRateHelper.getLatesHeartRateSportMode(id, sharedPreference.getUser().getEmail());
         txtDetakJantung.setText(String.valueOf(heartRate));
-        if (heartRate >= tns && txtTNSStatus.getText().toString().equals("Belum"))
+        if (heartRate >= tns && txtTNSStatus.getText().toString().equals("Belum")) {
             txtTNSStatus.setText("Iya");
+            createNotificationNormalMode();
+            Toast.makeText(getApplicationContext(), "Selamat ! Anda telah mencapai TNS Anda !", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void createNotificationNormalMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel("sport_notif", "sport_notifikasi", importance);
+            @SuppressLint("WrongConstant") Notification.Builder notificationBuilder = new Notification.Builder(getApplicationContext(), "sport_notif").setSmallIcon(R.drawable.ic_tns)
+                    .setContentTitle("Anda Mencapai TNS !")
+                    .setContentText("Selamat, anda telah mencapai TNS anda ! Pertahankan fase ini selama minimal 10 menit untuk mendapat hasil maksimal!")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setStyle(new Notification.BigTextStyle().bigText("Selamat, anda telah mencapai TNS anda ! Pertahankan fase ini selama minimal 10 menit untuk mendapat hasil maksimal!"));
+            NotificationManager notificationManager = getApplicationContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+            notificationManager.notify(0, notificationBuilder.build());
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "sport_notif")
+                    .setSmallIcon(R.drawable.ic_tns)
+                    .setContentTitle("Anda Mencapai TNS !")
+                    .setContentText("Selamat, anda telah mencapai TNS anda ! Pertahankan fase ini selama minimal 10 menit untuk mendapat hasil maksimal!")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+            notificationManagerCompat.notify(0, builder.build());
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

@@ -224,7 +224,7 @@
                             android:layout_height="19dp"
                             android:layout_gravity="start"
                             android:contentDescription="@string/candidate_item_device_image"
-                            app:srcCompat="@drawable/ic_heartrate" />
+                            app:srcCompat="@drawable/ic_heartrate_sport" />
 
                         <TextView
                             android:id="@+id/line_layout_hr_label"
