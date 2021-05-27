@@ -1,5 +1,6 @@
 package unikom.gery.damang.activities;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import unikom.gery.damang.R;
@@ -19,6 +21,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
     private ImageView btnBack;
     private TextView btnViewAll;
     private ConstraintLayout cvNoData;
+    private CardView btnOtherSport;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -35,9 +38,11 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
 
         btnBack = findViewById(R.id.btnBack);
         btnViewAll = findViewById(R.id.btnViewAll);
+        btnOtherSport = findViewById(R.id.btnSportOther);
         cvNoData = findViewById(R.id.cvNoData);
 
         btnBack.setOnClickListener(this);
+        btnOtherSport.setOnClickListener(this);
         btnViewAll.setVisibility(View.INVISIBLE);
     }
 
@@ -45,5 +50,9 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         if (view == btnBack)
             finish();
+        else if (view == btnOtherSport) {
+            startActivity(new Intent(getApplicationContext(), OtherSportActivity.class));
+            finish();
+        }
     }
 }

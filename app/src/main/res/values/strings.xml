@@ -1244,4 +1244,13 @@
     <string name="mingguan">Mingguan</string>
     <string name="bulanan">Bulanan</string>
     <string name="berdasarkan_dari_hasil_analisis_data_detak_jantung_anda_kesehatan_anda_sekarang_baik_baik_saja_detak_jantung_anda_berada_di_angka_normal_untuk_usia_anda">Berdasarkan dari hasil analisis data detak jantung anda, kesehatan anda sekarang baik - baik saja. Detak jantung anda berada di angka normal untuk usia anda. Pada detak jantung anda pun tidak terjadi peningkatan / penurunan yang signifikan dalam waktu yang dekat. Kesehatan jantung anda dalam kondisi baik - baik saja. Anda bisa melakukan aktivitas seperti biasa, berolahraga, atau melakukan aktivitas lainnya.</string>
+    <string name="mode_olahraga">Mode Olahraga</string>
+    <string name="durasi">Durasi</string>
+    <string name="_167">167</string>
+    <string name="_170">170</string>
+    <string name="target_tns_anda">Target TNS Anda</string>
+    <string name="detak_jantung_bpm">Detak Jantung</string>
+    <string name="belum">Belum</string>
+    <string name="tns_tercapai">TNS Tercapai</string>
+    <string name="selesai">Selesai</string>
 </resources>

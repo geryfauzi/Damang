@@ -21,6 +21,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -69,6 +70,7 @@ import unikom.gery.damang.devices.miband.MiBandPreferencesActivity;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
+import unikom.gery.damang.service.SportReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
@@ -200,6 +202,20 @@ public class HomeActivity extends AppCompatActivity
         sharedPreference = new SharedPreference(this);
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
         txtUser.setText(sharedPreference.getUser().getName());
+        if (!sharedPreference.getMode().equals("Normal")) {
+            //Start Normal Mode
+            ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
+            PackageManager packageManager = this.getPackageManager();
+            packageManager.setComponentEnabledSetting(normalMode,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
+            //Pause Sport Mode
+            ComponentName sportMode = new ComponentName(this, SportReceiver.class);
+            packageManager.setComponentEnabledSetting(sportMode,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+            sharedPreference.setMode("Normal");
+        }
         NormalReceiver normalReceiver = new NormalReceiver();
         normalReceiver.setReceiver(this);
         heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());

@@ -1786,24 +1786,28 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         }
 
                         SharedPreference sharedPreference = new SharedPreference(getContext());
+                        HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         String mode = sharedPreference.getMode();
                         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                         String date = format.format(new Date(System.currentTimeMillis()));
-                        int currentHeartRate = sample.getHeartRate();
                         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
-                        String status = getCurrentCondition(age, currentHeartRate);
-
+                        int currentHeartRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
+                        String status = "Normal";
+                        if (currentHeartRate > 0)
+                            status = getCurrentCondition(age, currentHeartRate);
                         //Menyimpan ke database
                         sharedPreference.setSteps(Integer.parseInt(stepListAdapter.getStepTotalLabel(stepSessionsSummary)));
-                        HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         HeartRate heartRate = new HeartRate();
                         heartRate.setEmail(sharedPreference.getUser().getEmail());
                         heartRate.setHeart_rate(sample.getHeartRate());
                         heartRate.setMode(mode);
                         heartRate.setStatus(getStatus(sample.getHeartRate()));
                         heartRate.setDate_time(date);
-                        if (mode.equals("Sport")) {
 
+                        if (mode.equals("Sport")) {
+                            if (sample.getHeartRate() > 0) {
+                                heartRateHelper.insertHeartRateNormalMode(heartRate);
+                            }
                         } else if (mode.equals("Sleep")) {
 
                         } else if (mode.equals("Normal")) {
