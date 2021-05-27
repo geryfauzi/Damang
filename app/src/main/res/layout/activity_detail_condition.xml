@@ -15,10 +15,10 @@
             android:layout_width="match_parent"
             android:layout_height="130dp"
             android:background="@color/primary_light"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:orientation="horizontal" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/btnBack"
@@ -170,16 +170,33 @@
             app:layout_constraintTop_toBottomOf="@+id/cardView14" />
 
         <TextView
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:id="@+id/textView26"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:text="@string/hasil_analisis"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/heartRateChart" />
+
+        <TextView
+            android:id="@+id/txtHasilAnalisis"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/berdasarkan_dari_hasil_analisis_data_detak_jantung_anda_kesehatan_anda_sekarang_baik_baik_saja_detak_jantung_anda_berada_di_angka_normal_untuk_usia_anda"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView26" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
