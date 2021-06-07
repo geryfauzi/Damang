@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,8 +33,9 @@ public class DetailConditionActivity extends AppCompatActivity {
     private SharedPreference sharedPreference;
     private HeartRateHelper heartRateHelper;
     private ArrayList<DetailHeartRate> arrayList;
-    private TextView txtTanggal, txtTerendah, txtRataRata, txtTertinggi;
+    private TextView txtTerendah, txtRataRata, txtTertinggi;
     private LineChart lineChart;
+    private ImageView btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +49,20 @@ public class DetailConditionActivity extends AppCompatActivity {
         heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
         arrayList = heartRateHelper.getDetailDailyCondition(sharedPreference.getUser().getEmail(), date);
 
-        txtTanggal = findViewById(R.id.txtTanggal);
         txtTerendah = findViewById(R.id.txtTerendah);
         txtRataRata = findViewById(R.id.txtRataRata);
         txtTertinggi = findViewById(R.id.txtTertinggi);
         lineChart = findViewById(R.id.heartRateChart);
+        btnBack = findViewById(R.id.btnBack);
 
         setToview();
         setBarChart(arrayList);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
     }
 
@@ -123,7 +132,6 @@ public class DetailConditionActivity extends AppCompatActivity {
     }
 
     private void setToview() {
-        txtTanggal.setText(parseDate);
         txtTertinggi.setText(nilaiTertinggi(arrayList) + "");
         txtRataRata.setText(hitungRataRata(arrayList) + "");
         txtTerendah.setText(nilaiTerkecil(arrayList) + "");

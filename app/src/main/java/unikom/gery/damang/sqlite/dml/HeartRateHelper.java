@@ -13,15 +13,23 @@ import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
 import unikom.gery.damang.sqlite.table.HeartRate;
+import unikom.gery.damang.sqlite.table.Sport;
 import unikom.gery.damang.util.SharedPreference;
 
 public class HeartRateHelper {
     static String TABLE_HEART_RATE = "heart_rate_activity";
+    static String TABLE_SPORT = "sport_activity";
     static String EMAIL = "email";
+    static String _ID = "_id";
     static String ID_SPORT = "id_sport";
     static String ID_SLEEP = "id_sleep";
     static String DATE_TIME = "date_time";
     static String HEART_RATE = "heart_rate";
+    static String END_TIME = "end_time";
+    static String DURATION = "duration";
+    static String TNS_STATUS = "tns_status";
+    static String AVERAGE_HEART_RATE = "average_heart_rate";
+    static String CALORIES_BURNED = "calories_burned";
     static String MODE = "mode";
     static String STATUS = "status";
     static String LATITUDE = "latitude";
@@ -33,6 +41,9 @@ public class HeartRateHelper {
     static String WEIGHT = "weight";
     static String HEIGHT = "height";
     static String PHOTO = "photo";
+    static String START_TIME = "start_time";
+    static String TNS_TARGET = "tns_target";
+    static String TYPE = "type";
     private static DBHelper dbHelper;
     private static HeartRateHelper INSTANCE;
     private static SQLiteDatabase database;
@@ -77,6 +88,40 @@ public class HeartRateHelper {
         return database.insert(TABLE_HEART_RATE, null, args);
     }
 
+    public long insertHeartRateSportMode(HeartRate heartRate) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(EMAIL, heartRate.getEmail());
+        args.put(ID_SPORT, heartRate.getId_sport());
+        args.put(DATE_TIME, heartRate.getDate_time());
+        args.put(HEART_RATE, heartRate.getHeart_rate());
+        args.put(MODE, heartRate.getMode());
+        args.put(STATUS, heartRate.getStatus());
+        sharedPreference.setHeartRate(heartRate.getHeart_rate());
+        return database.insert(TABLE_HEART_RATE, null, args);
+    }
+
+    public long insertSportData(Sport sport) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(_ID, sport.getId());
+        args.put(START_TIME, sport.getStart_time());
+        args.put(TNS_TARGET, sport.getTns_target());
+        args.put(TYPE, sport.getType());
+        return database.insert(TABLE_SPORT, null, args);
+    }
+
+    public int updateSportData(Sport sport) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(END_TIME, sport.getEnd_time());
+        args.put(DURATION, sport.getDuration());
+        args.put(TNS_STATUS, sport.getTns_status());
+        args.put(AVERAGE_HEART_RATE, sport.getAverage_heart_rate());
+        args.put(CALORIES_BURNED, sport.getCalories_burned());
+        return database.update(TABLE_SPORT, args, _ID + "= '" + sport.getId() + "'", null);
+    }
+
     public long insertUser(User user) {
         ContentValues args = new ContentValues();
         database = dbHelper.getWritableDatabase();
@@ -103,6 +148,77 @@ public class HeartRateHelper {
         }
         cursor.close();
         return bpm;
+    }
+
+    public int getLatesHeartRateSportMode(String id, String email) {
+        database = dbHelper.getWritableDatabase();
+        int bpm = 0;
+        Cursor cursor = database.rawQuery("SELECT heart_rate FROM heart_rate_activity WHERE email = ? AND id_sport = ? ORDER BY date_time DESC LIMIT 1", new String[]{email, id});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                bpm = cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate"));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return bpm;
+    }
+
+    public int getAverageSportHearRate(String id, String email) {
+        database = dbHelper.getWritableDatabase();
+        int bpm = 0;
+        Cursor cursor = database.rawQuery("SELECT avg(heart_rate) FROM heart_rate_activity WHERE email = ? AND id_sport = ? ", new String[]{email, id});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                bpm = cursor.getInt(cursor.getColumnIndexOrThrow("avg(heart_rate)"));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return bpm;
+    }
+
+    public Sport getOtherSportDetail(String id) {
+        database = dbHelper.getWritableDatabase();
+        Sport sport = new Sport();
+        Cursor cursor = database.rawQuery("SELECT DATE(start_time), time(start_time), time(end_time), duration, tns_target, tns_status, average_heart_rate, calories_burned FROM sport_activity WHERE _id = ? ", new String[]{id});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                sport.setId(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sport.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("time(start_time)")));
+                sport.setEnd_time(cursor.getString(cursor.getColumnIndexOrThrow("time(end_time)")));
+                sport.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow("duration")));
+                sport.setTns_target(cursor.getInt(cursor.getColumnIndexOrThrow("tns_target")));
+                sport.setTns_status(cursor.getString(cursor.getColumnIndexOrThrow("tns_status")));
+                sport.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
+                sport.setCalories_burned(cursor.getInt(cursor.getColumnIndexOrThrow("calories_burned")));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return sport;
+    }
+
+    public ArrayList<DetailHeartRate> getSportDetailHeartRate(String email, String id) {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<DetailHeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT strftime(?,date_time) AS hour, heart_rate FROM heart_rate_activity WHERE email = ? AND id_sport = ? ", new String[]{"%H:%M", email, id});
+        cursor.moveToFirst();
+        DetailHeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                heartRate = new DetailHeartRate();
+                heartRate.setHour(cursor.getString(cursor.getColumnIndexOrThrow("hour")));
+                heartRate.setHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
     }
 
     public ArrayList<unikom.gery.damang.model.HeartRate> getDailyCondition(String email) {

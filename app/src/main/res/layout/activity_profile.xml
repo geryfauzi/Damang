@@ -114,6 +114,9 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView10"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -125,14 +128,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView18">
 
-                <EditText
+                <TextView
                     android:id="@+id/etEmail"
+                    android:textSize="17sp"
+                    android:gravity="center_vertical"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:background="#F1F3FD"
-                    android:inputType="textEmailAddress"
+                    android:inputType="none"
                     android:text="@string/geryakbarfauzi_gmail_com"
                     android:textColor="#002851" />
 
@@ -305,12 +310,12 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="#5374FF"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -320,20 +325,18 @@
 
                 <Button
                     android:id="@+id/btnSimpan"
-                    android:background="#5374FF"
-                    android:textColor="@android:color/white"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/simpan_perubahan"/>
+                    android:background="#5374FF"
+                    android:text="@string/simpan_perubahan"
+                    android:textColor="@android:color/white" />
 
             </androidx.cardview.widget.CardView>
-
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,6 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package unikom.gery.damang.service.devices.huami;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
@@ -27,8 +31,11 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import net.e175.klaus.solarpositioning.DeltaT;
@@ -42,6 +49,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1731,15 +1739,19 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
         }
     }
 
-    private int timeTo() {
+    private int timeTo() throws ParseException {
         Calendar day = Calendar.getInstance();
-//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//        long time = timestamp.getTime() / 1000L;
-        day.setTimeInMillis(1620147599 * 1000L);
+        day.setTimeInMillis(getTimeStamp() * 1000L);
         day.set(Calendar.HOUR_OF_DAY, 23);
         day.set(Calendar.MINUTE, 59);
         day.set(Calendar.SECOND, 59);
         return (int) (day.getTimeInMillis() / 1000);
+    }
+
+    private long getTimeStamp() throws ParseException {
+        DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        String today = sdf.format(new java.sql.Date(System.currentTimeMillis()));
+        return new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").parse(today + " 23:59:59").getTime() / 1000;
     }
 
     private int timeFrom(int timeTo) {
@@ -1764,16 +1776,9 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         MiBand2SampleProvider provider = new MiBand2SampleProvider(gbDevice, session);
                         MiBandActivitySample sample = createActivitySample(device, user, ts, provider);
                         sample.setHeartRate(getHeartrateBpm());
-//                        sample.setSteps(getSteps());
                         sample.setRawIntensity(ActivitySample.NOT_MEASURED);
-                        sample.setRawKind(HuamiConst.TYPE_ACTIVITY); // to make it visible in the charts TODO: add a MANUAL kind for that?
-
+                        sample.setRawKind(HuamiConst.TYPE_ACTIVITY);
                         provider.addGBActivitySample(sample);
-
-                        // set the steps only afterwards, since realtime steps are also recorded
-                        // in the regular samples and we must not count them twice
-                        // Note: we know that the DAO sample is never committed again, so we simply
-                        // change the value here in memory.
                         sample.setSteps(getSteps());
 
                         if (LOG.isDebugEnabled()) {
@@ -1781,26 +1786,37 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         }
 
                         SharedPreference sharedPreference = new SharedPreference(getContext());
+                        HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         String mode = sharedPreference.getMode();
                         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                         String date = format.format(new Date(System.currentTimeMillis()));
-
+                        int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
+                        int currentHeartRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
+                        String status = "Normal";
+                        if (currentHeartRate > 0)
+                            status = getCurrentCondition(age, currentHeartRate);
                         //Menyimpan ke database
                         sharedPreference.setSteps(Integer.parseInt(stepListAdapter.getStepTotalLabel(stepSessionsSummary)));
-                        HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         HeartRate heartRate = new HeartRate();
                         heartRate.setEmail(sharedPreference.getUser().getEmail());
                         heartRate.setHeart_rate(sample.getHeartRate());
                         heartRate.setMode(mode);
                         heartRate.setStatus(getStatus(sample.getHeartRate()));
                         heartRate.setDate_time(date);
+                        //
                         if (mode.equals("Sport")) {
-
+                            if (sample.getHeartRate() > 0) {
+                                heartRate.setId_sport(sharedPreference.getSportId());
+                                heartRateHelper.insertHeartRateSportMode(heartRate);
+                            }
                         } else if (mode.equals("Sleep")) {
 
                         } else if (mode.equals("Normal")) {
-                            if (sample.getHeartRate() > 0)
+                            if (sample.getHeartRate() > 0) {
                                 heartRateHelper.insertHeartRateNormalMode(heartRate);
+                                if (!status.equals("Normal"))
+                                    createNotificationNormalMode(status);
+                            }
                         }
                         //
                         Intent intent = new Intent(DeviceService.ACTION_REALTIME_SAMPLES)
@@ -1814,6 +1830,70 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
             };
         }
         return realtimeSamplesSupport;
+    }
+
+    private void createNotificationNormalMode(String status) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel("notif", "notifikasi", importance);
+            @SuppressLint("WrongConstant") Notification.Builder notificationBuilder = new Notification.Builder(getContext(), "notif").setSmallIcon(R.drawable.notif_warning)
+                    .setContentTitle("Detak Jantung " + status + "!")
+                    .setContentText("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi detak jantung yang " + status + "pada jantung anda. Apakah anda baik - baik saja ?"));
+            NotificationManager notificationManager = getContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+            notificationManager.notify(0, notificationBuilder.build());
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "notif")
+                    .setSmallIcon(R.drawable.notif_warning)
+                    .setContentTitle("Detak Jantung " + status + "!")
+                    .setContentText("Sistem damang mendeteksi detak jantung yang " + status + "pada jantung anda. Apakah anda baik - baik saja ?")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getContext());
+            notificationManagerCompat.notify(0, builder.build());
+        }
+    }
+
+    private String getTodayDate() {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return format.format(new Date(System.currentTimeMillis()));
+    }
+
+    private int getCurrentAge(String todayDate, String dayOfBirth) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date1 = simpleDateFormat.parse(dayOfBirth);
+        Date date2 = simpleDateFormat.parse(todayDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        int month1 = calendar.get(Calendar.MONTH);
+        int year1 = calendar.get(Calendar.YEAR);
+        calendar.setTime(date2);
+        int month2 = calendar.get(Calendar.MONTH);
+        int year2 = calendar.get(Calendar.YEAR);
+        int monthResult = ((year2 - year1) * 12) + (month2 - month1);
+        return monthResult / 12;
+    }
+
+    private String getCurrentCondition(int age, int heartRate) {
+        String status = "Normal";
+        if (age < 2) {
+            if (heartRate < 80)
+                status = "Rendah";
+            else if (heartRate > 160)
+                status = "Tinggi";
+        } else if (age >= 2 && age <= 10) {
+            if (heartRate < 70)
+                status = "Rendah";
+            else if (heartRate > 120)
+                status = "Tinggi";
+        } else if (age >= 11) {
+            if (heartRate < 54)
+                status = "Rendah";
+            else if (heartRate > 110)
+                status = "Tinggi";
+        }
+        return status;
     }
 
     private String getStatus(int heartRate) {

@@ -54,13 +54,16 @@
         android:name=".GBApplication"
         android:allowBackup="false"
         android:fullBackupContent="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/app_logo"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:requestLegacyExternalStorage="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/app_logo"
         android:theme="@style/GadgetbridgeTheme">
-        <activity android:name=".activities.ProfileActivity"></activity>
+        <activity android:name=".activities.OtherSportDetailActivity"></activity>
+        <activity android:name=".activities.OtherSportActivity" />
+        <activity android:name=".activities.SportActivity" />
+        <activity android:name=".activities.ProfileActivity" />
         <activity android:name=".activities.DetailConditionActivity" />
         <activity android:name=".activities.DailyConditionActivity" />
         <activity android:name=".activities.WalkthroughtActivity">
@@ -79,6 +82,9 @@
 
         <receiver
             android:name=".service.NormalReceiver"
+            android:process=":remote" />
+        <receiver
+            android:name=".service.SportReceiver"
             android:process=":remote" />
 
         <activity android:name=".activities.RegisterFormActivity" />
@@ -101,10 +107,10 @@
             android:label="@string/activity_prefs_charts"
             android:parentActivityName=".activities.charts.ChartsPreferencesActivity" />
         <activity
-            android:theme="@style/PreferenceTheme"
             android:name=".devices.miband.MiBandPreferencesActivity"
             android:label="@string/preferences_miband_settings"
-            android:parentActivityName=".activities.SettingsActivity" />
+            android:parentActivityName=".activities.SettingsActivity"
+            android:theme="@style/PreferenceTheme" />
         <activity
             android:name=".devices.zetime.ZeTimePreferenceActivity"
             android:label="@string/zetime_title_settings"

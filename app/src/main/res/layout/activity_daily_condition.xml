@@ -17,6 +17,9 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:id="@+id/btnBack"
             android:layout_width="20dp"
             android:layout_height="match_parent"
@@ -27,6 +30,9 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:id="@+id/btnFilter"
             android:layout_marginEnd="16dp"
             android:layout_width="25dp"
