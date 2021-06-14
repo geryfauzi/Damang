@@ -39,7 +39,7 @@ import unikom.gery.damang.response.CheckUser;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.util.SharedPreference;
 
-public class RegisterFormActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private GoogleSignInAccount account;
     private String email, name, photo, gender;
