@@ -1793,6 +1793,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
                         int currentHeartRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
                         String status = "Normal";
+                        int bodyCapacity = maxBodyCapacity(age);
                         if (currentHeartRate > 0)
                             status = getCurrentCondition(age, currentHeartRate);
                         //Menyimpan ke database
@@ -1808,6 +1809,8 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                             if (sample.getHeartRate() > 0) {
                                 heartRate.setId_sport(sharedPreference.getSportId());
                                 heartRateHelper.insertHeartRateSportMode(heartRate);
+                                if (sample.getHeartRate() >= bodyCapacity)
+                                    createSportNotification();
                             }
                         } else if (mode.equals("Sleep")) {
 
@@ -1840,7 +1843,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                     .setContentTitle("Detak Jantung " + status + "!")
                     .setContentText("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi detak jantung yang " + status + "pada jantung anda. Apakah anda baik - baik saja ?"));
+                    .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?"));
             NotificationManager notificationManager = getContext().getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(notificationChannel);
             notificationManager.notify(0, notificationBuilder.build());
@@ -1848,11 +1851,38 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "notif")
                     .setSmallIcon(R.drawable.notif_warning)
                     .setContentTitle("Detak Jantung " + status + "!")
-                    .setContentText("Sistem damang mendeteksi detak jantung yang " + status + "pada jantung anda. Apakah anda baik - baik saja ?")
+                    .setContentText("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getContext());
             notificationManagerCompat.notify(0, builder.build());
         }
+    }
+
+    private void createSportNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel("notif", "notifikasi", importance);
+            @SuppressLint("WrongConstant") Notification.Builder notificationBuilder = new Notification.Builder(getContext(), "notif").setSmallIcon(R.drawable.notif_warning)
+                    .setContentTitle("Anda sudah melewati batas!")
+                    .setContentText("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!"));
+            NotificationManager notificationManager = getContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+            notificationManager.notify(0, notificationBuilder.build());
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "notif")
+                    .setSmallIcon(R.drawable.notif_warning)
+                    .setContentTitle("Anda sudah melewati batas!")
+                    .setContentText("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getContext());
+            notificationManagerCompat.notify(0, builder.build());
+        }
+    }
+
+    private int maxBodyCapacity(int age) {
+        return 220 - age;
     }
 
     private String getTodayDate() {

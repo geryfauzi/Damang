@@ -18,19 +18,30 @@ public class HeartRate implements Parcelable {
     };
     private int averageHeartRate;
     private String date;
+    private int currentHeartRate;
 
     public HeartRate() {
 
     }
 
-    public HeartRate(int averageHeartRate, String date) {
+    public HeartRate(int averageHeartRate, String date, int currentHeartRate) {
         this.averageHeartRate = averageHeartRate;
         this.date = date;
+        this.currentHeartRate = currentHeartRate;
     }
 
     protected HeartRate(Parcel in) {
         this.averageHeartRate = in.readInt();
         this.date = in.readString();
+        this.currentHeartRate = in.readInt();
+    }
+
+    public int getCurrentHeartRate() {
+        return currentHeartRate;
+    }
+
+    public void setCurrentHeartRate(int currentHeartRate) {
+        this.currentHeartRate = currentHeartRate;
     }
 
     public int getAverageHeartRate() {
@@ -58,10 +69,12 @@ public class HeartRate implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.averageHeartRate);
         dest.writeString(this.date);
+        dest.writeInt(this.currentHeartRate);
     }
 
     public void readFromParcel(Parcel source) {
         this.averageHeartRate = source.readInt();
         this.date = source.readString();
+        this.currentHeartRate = source.readInt();
     }
 }

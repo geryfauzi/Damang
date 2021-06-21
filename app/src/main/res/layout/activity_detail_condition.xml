@@ -190,7 +190,6 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/berdasarkan_dari_hasil_analisis_data_detak_jantung_anda_kesehatan_anda_sekarang_baik_baik_saja_detak_jantung_anda_berada_di_angka_normal_untuk_usia_anda"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"

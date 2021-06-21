@@ -68,6 +68,7 @@ import unikom.gery.damang.adapter.DeviceAdapter;
 import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.devices.miband.MiBandPreferencesActivity;
 import unikom.gery.damang.impl.GBDevice;
+import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SportReceiver;
@@ -88,6 +89,7 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
+    private ArrayList<DetailHeartRate> arrayList;
     private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga;
     private ImageView btnAddDevice;
     private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar;
@@ -279,11 +281,18 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void updateCurrentCondition() throws ParseException {
-        int hearRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
+        //Get Data From Database
+        arrayList = heartRateHelper.getDetailDailyCondition(sharedPreference.getUser().getEmail(), getTodayDate());
+        int currentHeartRate = arrayList.get(arrayList.size() - 1).getHeartRate();
+        int averageHearRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
+        //Processing Data
         String burnedCalories = String.format("%.2f", getBurnedCalories(sharedPreference.getSteps(), Math.round(sharedPreference.getUser().getWeight())));
-        String condition = getCurrentCondition(age, hearRate);
-        txtHeartRate.setText(hearRate + " bpm");
+        String averageHeartStatus = getCurrentHeartRateStatus(age, averageHearRate);
+        String currentHeartStatus = getCurrentHeartRateStatus(age, currentHeartRate);
+        String condition = getCurrentCondition(averageHeartStatus, currentHeartStatus);
+        //Set to View
+        txtHeartRate.setText(averageHearRate + " bpm");
         txtCurrentCondition.setText(condition);
         txtJumlahLangkah.setText(sharedPreference.getSteps() + " langkah");
         txtKaloriTerbakar.setText(burnedCalories + " kalori");
@@ -329,26 +338,53 @@ public class HomeActivity extends AppCompatActivity
         return monthResult / 12;
     }
 
-    private String getCurrentCondition(int age, int heartRate) {
+    private String getCurrentHeartRateStatus(int age, int heartRate) {
         String status = "";
         if (age < 2) {
             if (heartRate >= 80 && heartRate <= 160)
-                status = "Kesehatan anda baik";
+                status = "Normal";
+            else if (heartRate > 160)
+                status = "Tinggi";
             else
-                status = "Kesehatan anda kurang baik";
-        } else if (age >= 2 && age <= 10) {
+                status = "Rendah";
+        } else if (age <= 10) {
             if (heartRate >= 70 && heartRate <= 120)
-                status = "Kesehatan anda baik";
+                status = "Normal";
+            else if (heartRate > 120)
+                status = "Tinggi";
             else
-                status = "Kesehatan anda kurang baik";
-        } else if (age >= 11) {
-            if (heartRate >= 60 && heartRate <= 100)
-                status = "Kesehatan anda baik";
-            else if ((heartRate >= 54 && heartRate < 60) || (heartRate > 100 && heartRate <= 110))
-                status = "Kesehatan anda kurang baik";
+                status = "Rendah";
+        } else {
+            if (heartRate >= 54 && heartRate <= 110)
+                status = "Normal";
+            else if (heartRate > 110)
+                status = "Tinggi";
             else
-                status = "Kesehatan anda tidak baik";
+                status = "Rendah";
         }
+        return status;
+    }
+
+    private String getCurrentCondition(String average, String current) {
+        String status = "";
+        if (average.equals("Normal") && current.equals("Normal"))
+            status = "Kesehatan anda baik";
+        else if (average.equals("Normal") && current.equals("Tinggi"))
+            status = "Kesehatan anda baik";
+        else if (average.equals("Normal") && current.equals("Rendah"))
+            status = "Kesehatan anda baik";
+        else if (average.equals("Tinggi") && current.equals("Tinggi"))
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Tinggi") && current.equals("Normal"))
+            status = "Kesehatan anda kurang baik";
+        else if (average.equals("Tinggi") && current.equals("Rendah"))
+            status = "Kesehatan anda kurang baik";
+        else if (average.equals("Rendah") && current.equals("Normal"))
+            status = "Kesehatan anda kurang baik";
+        else if (average.equals("Rendah") && current.equals("Rendah"))
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Rendah") && current.equals("Tinggi"))
+            status = "Kesehatan anda tidak baik";
         return status;
     }
 
