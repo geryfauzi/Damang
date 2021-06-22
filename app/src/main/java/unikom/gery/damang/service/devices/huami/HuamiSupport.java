@@ -1795,14 +1795,14 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         String status = "Normal";
                         int bodyCapacity = maxBodyCapacity(age);
                         if (currentHeartRate > 0)
-                            status = getCurrentCondition(age, currentHeartRate);
+                            status = getCurrentHeartRateStatus(age, currentHeartRate);
                         //Menyimpan ke database
                         sharedPreference.setSteps(Integer.parseInt(stepListAdapter.getStepTotalLabel(stepSessionsSummary)));
                         HeartRate heartRate = new HeartRate();
                         heartRate.setEmail(sharedPreference.getUser().getEmail());
                         heartRate.setHeart_rate(sample.getHeartRate());
                         heartRate.setMode(mode);
-                        heartRate.setStatus(getStatus(sample.getHeartRate()));
+                        heartRate.setStatus(status);
                         heartRate.setDate_time(date);
                         //
                         if (mode.equals("Sport")) {
@@ -1905,35 +1905,30 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
         return monthResult / 12;
     }
 
-    private String getCurrentCondition(int age, int heartRate) {
-        String status = "Normal";
+    private String getCurrentHeartRateStatus(int age, int heartRate) {
+        String status = "";
         if (age < 2) {
-            if (heartRate < 80)
-                status = "Rendah";
+            if (heartRate >= 80 && heartRate <= 160)
+                status = "Normal";
             else if (heartRate > 160)
                 status = "Tinggi";
-        } else if (age >= 2 && age <= 10) {
-            if (heartRate < 70)
+            else
                 status = "Rendah";
-            else if (heartRate > 120)
-                status = "Tinggi";
-        } else if (age >= 11) {
-            if (heartRate < 54)
-                status = "Rendah";
+        } else if (age <= 10) {
+            if (heartRate >= 70 && heartRate <= 110)
+                status = "Normal";
             else if (heartRate > 110)
                 status = "Tinggi";
+            else
+                status = "Rendah";
+        } else {
+            if (heartRate >= 54 && heartRate <= 120)
+                status = "Normal";
+            else if (heartRate > 120)
+                status = "Tinggi";
+            else
+                status = "Rendah";
         }
-        return status;
-    }
-
-    private String getStatus(int heartRate) {
-        String status = "";
-        if (heartRate < 60)
-            status = "Rendah";
-        else if (heartRate >= 60 && heartRate <= 100)
-            status = "Normal";
-        else if (heartRate > 100)
-            status = "Tinggi";
         return status;
     }
 

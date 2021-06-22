@@ -120,16 +120,16 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
             else
                 status = "Rendah";
         } else if (age <= 10) {
-            if (heartRate >= 70 && heartRate <= 120)
+            if (heartRate >= 70 && heartRate <= 110)
                 status = "Normal";
-            else if (heartRate > 120)
+            else if (heartRate > 110)
                 status = "Tinggi";
             else
                 status = "Rendah";
         } else {
-            if (heartRate >= 54 && heartRate <= 110)
+            if (heartRate >= 54 && heartRate <= 120)
                 status = "Normal";
-            else if (heartRate > 110)
+            else if (heartRate > 120)
                 status = "Tinggi";
             else
                 status = "Rendah";

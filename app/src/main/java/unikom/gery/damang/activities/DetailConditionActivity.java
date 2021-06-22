@@ -164,9 +164,18 @@ public class DetailConditionActivity extends AppCompatActivity {
                     " dan santai dulu sejenak sampai detak jantung anda mulai normal kembali.");
         } else if (status.equals("Kesehatan anda tidak baik")) {
             txtHasilAnalisis.append("Hasil kesehatan anda ini mungkin diakibatkan karena anda sedang" +
-                    " pusing berat, stress berat, demam, atau karena lelah berlebihan." +
+                    " pusing berat, stress berat, demam, banyak pikiran atau karena lelah berlebihan." +
                     " Damang sangat menyarankan anda untuk beristirahat, dan segera menemui dokter" +
                     " apabila tubuh anda merasa tidak nyaman.");
+        } else if (status.equals("Kesehatan anda baik") && averageStatus.equals("Tinggi")) {
+            txtHasilAnalisis.append(" Namun, perlu diperhatikan kalau rata - rata detak jantung anda " +
+                    "termasuk tinggi. Hal ini mungkin diakibatkan karena anda sedang pusing, atau stress, atau depresi," +
+                    " atau hal lainnya yang dapat meningkatkan adrenalin. Damang menyarankan untuk merilekskan pikiran" +
+                    " anda sejenak apabila kegiatan anda sekarang tidak terlalu penting");
+        } else if (status.equals("Kesehatan anda baik") && averageStatus.equals("Rendah")) {
+            txtHasilAnalisis.append(" Namun, perlu diperhatikan kalau rata - rata detak jantung anda rendah." +
+                    " Hal ini mungkin diakibatkan karena anda sedang kelelahan, mengantuk, dan kurang kosentrasi." +
+                    " Damang menyarankan untuk beristirahat sejenak.");
         }
         if (isIncreased && isDecreased)
             txtHasilAnalisis.append(" Apalagi hal ini diperparah dengan detak jantung anda yang tidak" +
@@ -331,9 +340,9 @@ public class DetailConditionActivity extends AppCompatActivity {
             else
                 status = "Rendah";
         } else {
-            if (heartRate >= 54 && heartRate <= 110)
+            if (heartRate >= 54 && heartRate <= 120)
                 status = "Normal";
-            else if (heartRate > 110)
+            else if (heartRate > 120)
                 status = "Tinggi";
             else
                 status = "Rendah";
