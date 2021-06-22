@@ -232,6 +232,7 @@ public class HeartRateHelper {
                 Cursor cLastHeartRate = database.rawQuery("SELECT date_time, heart_rate FROM heart_rate_activity WHERE email = ? AND mode = ? AND DATE(date_time) = ? ORDER BY date_time DESC LIMIT 1", new String[]{email, "Normal", cursor.getString(cursor.getColumnIndexOrThrow("DATE(date_time)"))});
                 cLastHeartRate.moveToFirst();
                 heartRate = new unikom.gery.damang.model.HeartRate();
+                heartRate.setArrayList(getDetailDailyCondition(email, cursor.getString(cursor.getColumnIndexOrThrow("DATE(date_time)"))));
                 heartRate.setDate(cursor.getString(cursor.getColumnIndexOrThrow("DATE(date_time)")));
                 heartRate.setAverageHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("AVG(heart_rate)")));
                 heartRate.setCurrentHeartRate(cLastHeartRate.getInt(cLastHeartRate.getColumnIndexOrThrow("heart_rate")));

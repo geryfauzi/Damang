@@ -147,11 +147,13 @@ public class DetailConditionActivity extends AppCompatActivity {
     private void updateAnalyst() {
         averageStatus = getCurrentHeartRateStatus(age, averageHeartRate);
         currentStatus = getCurrentHeartRateStatus(age, currentHeartRate);
-        String status = getCurrentCondition(averageStatus, currentStatus);
+        boolean isIncreased = isSuddenlyIncrease(arrayList);
+        boolean isDecreased = isSuddenlyDecrease(arrayList);
+        String status = getCurrentCondition(averageStatus, currentStatus, isIncreased, isDecreased);
 
-        txtHasilAnalisis.append("Berdasarkan dari hasil analisis data detak jantung,");
+        txtHasilAnalisis.append("Berdasarkan dari hasil analisis data detak jantung, ");
         txtHasilAnalisis.append(status + ".");
-        txtHasilAnalisis.append("Rata - rata detak jantung anda berada di angka " + averageStatus + ",");
+        txtHasilAnalisis.append(" Rata - rata detak jantung anda berada di angka " + averageStatus + ",");
         txtHasilAnalisis.append(" dan detak jantung anda yang terkini berada di angka " + currentStatus);
         txtHasilAnalisis.append(" untuk usia anda.");
         if (status.equals("Kesehatan anda kurang baik")) {
@@ -166,27 +168,128 @@ public class DetailConditionActivity extends AppCompatActivity {
                     " Damang sangat menyarankan anda untuk beristirahat, dan segera menemui dokter" +
                     " apabila tubuh anda merasa tidak nyaman.");
         }
+        if (isIncreased && isDecreased)
+            txtHasilAnalisis.append(" Apalagi hal ini diperparah dengan detak jantung anda yang tidak" +
+                    " beraturan. Yang terkadang naik secara tiba - tiba, dan terkadang turun juga secara tiba - tiba.");
+        else if (isIncreased)
+            txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan bahwa detak jantung anda mengalami peningkatan" +
+                    " secara tiba - tiba. Hal ini mungkin dikarenakan anda sedang banyak pikiran, atau sedang cemas" +
+                    " atau disebabkan hal lain yang dapat meningkatkan adrenalin. Damang menyarankan untuk merilekskan pikiran" +
+                    " anda.");
+        else if (isDecreased)
+            txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan bahwa detak jantung anda mengalami penuruan secara" +
+                    " tiba - tiba. Hal ini mungkin dikarenakan anda sedang kelelahan. Damang menyarankan untuk beristirahat sejenak.");
     }
 
-    private String getCurrentCondition(String average, String current) {
-        String status = "";
-        if (average.equals("Normal") && current.equals("Normal"))
+    private boolean isSuddenlyIncrease(ArrayList<DetailHeartRate> list) {
+        boolean status = false;
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) {
+                if ((list.get(i).getHeartRate() - list.get(i - 1).getHeartRate()) >= 40) {
+                    status = true;
+                    break;
+                }
+            }
+        }
+        return status;
+    }
+
+    private boolean isSuddenlyDecrease(ArrayList<DetailHeartRate> list) {
+        boolean status = false;
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) {
+                list.size();
+                if ((list.get(i - 1).getHeartRate() - list.get(i).getHeartRate()) >= 40) {
+                    status = true;
+                    break;
+                }
+            }
+        }
+        return status;
+    }
+
+    private String getCurrentCondition(String average, String current, boolean isIncreased, boolean isDecreased) {
+        String status = "Kesehatan anda baik";
+        //Fuzzy Logic Dengan Rata - Rata Normal dan terkini normal
+        if (average.equals("Normal") && current.equals("Normal") && !isIncreased && !isDecreased)
             status = "Kesehatan anda baik";
-        else if (average.equals("Normal") && current.equals("Tinggi"))
+        else if (average.equals("Normal") && current.equals("Normal") && isIncreased && !isDecreased)
             status = "Kesehatan anda baik";
-        else if (average.equals("Normal") && current.equals("Rendah"))
+        else if (average.equals("Normal") && current.equals("Normal") && !isIncreased && isDecreased)
             status = "Kesehatan anda baik";
-        else if (average.equals("Tinggi") && current.equals("Tinggi"))
+        else if (average.equals("Normal") && current.equals("Normal") && isIncreased && isDecreased)
+            status = "Kesehatan anda baik";
+            //Fuzzy Logic Dengan Rata - Rata Normal dan terkini Tinggi
+        else if (average.equals("Normal") && current.equals("Tinggi") && !isIncreased && !isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Normal") && current.equals("Tinggi") && isIncreased && !isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Normal") && current.equals("Tinggi") && !isIncreased && isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Normal") && current.equals("Tinggi") && isIncreased && isDecreased)
+            status = "Kesehatan anda kurang baik";
+            //Fuzzy Logic Dengan Rata - Rata Normal dan terkini Rendah
+        else if (average.equals("Normal") && current.equals("Rendah") && !isIncreased && !isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Normal") && current.equals("Rendah") && isIncreased && !isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Normal") && current.equals("Rendah") && !isIncreased && isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Normal") && current.equals("Rendah") && isIncreased && isDecreased)
+            status = "Kesehatan anda kurang baik";
+            //Fuzzy Login dengan Rata - rata Tinggi dan terkini Normal
+        else if (average.equals("Tinggi") && current.equals("Normal") && !isIncreased && !isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Tinggi") && current.equals("Normal") && isIncreased && !isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Tinggi") && current.equals("Normal") && !isIncreased && isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Tinggi") && current.equals("Normal") && isIncreased && isDecreased)
+            status = "Kesehatan anda kurang baik";
+            //Fuzzy Login dengan Rata - rata Tinggi dan terkini Tinggi
+        else if (average.equals("Tinggi") && current.equals("Tinggi") && !isIncreased && !isDecreased)
+            status = "Kesehatan anda kurang baik";
+        else if (average.equals("Tinggi") && current.equals("Tinggi") && isIncreased && !isDecreased)
             status = "Kesehatan anda tidak baik";
-        else if (average.equals("Tinggi") && current.equals("Normal"))
+        else if (average.equals("Tinggi") && current.equals("Tinggi") && !isIncreased && isDecreased)
             status = "Kesehatan anda kurang baik";
-        else if (average.equals("Tinggi") && current.equals("Rendah"))
-            status = "Kesehatan anda kurang baik";
-        else if (average.equals("Rendah") && current.equals("Normal"))
-            status = "Kesehatan anda kurang baik";
-        else if (average.equals("Rendah") && current.equals("Rendah"))
+        else if (average.equals("Tinggi") && current.equals("Tinggi") && isIncreased && isDecreased)
             status = "Kesehatan anda tidak baik";
-        else if (average.equals("Rendah") && current.equals("Tinggi"))
+            //Fuzzy Login dengan Rata - rata Tinggi dan terkini Rendah
+        else if (average.equals("Tinggi") && current.equals("Rendah") && !isIncreased && !isDecreased)
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Tinggi") && current.equals("Rendah") && isIncreased && !isDecreased)
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Tinggi") && current.equals("Rendah") && !isIncreased && isDecreased)
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Tinggi") && current.equals("Rendah") && isIncreased && isDecreased)
+            status = "Kesehatan anda tidak baik";
+            //Fuzzy Login dengan Rata - rata Rendah dan terkini Normal
+        else if (average.equals("Rendah") && current.equals("Normal") && !isIncreased && !isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Rendah") && current.equals("Normal") && isIncreased && !isDecreased)
+            status = "Kesehatan anda baik";
+        else if (average.equals("Rendah") && current.equals("Normal") && !isIncreased && isDecreased)
+            status = "Kesehatan anda kurang baik";
+        else if (average.equals("Rendah") && current.equals("Normal") && isIncreased && isDecreased)
+            status = "Kesehatan anda tidak baik";
+            //Fuzzy Login dengan Rata - rata Rendah dan terkini Tinggi
+        else if (average.equals("Rendah") && current.equals("Tinggi") && !isIncreased && !isDecreased)
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Rendah") && current.equals("Tinggi") && isIncreased && !isDecreased)
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Rendah") && current.equals("Tinggi") && !isIncreased && isDecreased)
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Rendah") && current.equals("Tinggi") && isIncreased && isDecreased)
+            status = "Kesehatan anda tidak baik";
+            //Fuzzy Login dengan Rata - rata Rendah dan terkini Rendah
+        else if (average.equals("Rendah") && current.equals("Rendah") && !isIncreased && !isDecreased)
+            status = "Kesehatan anda kurang baik";
+        else if (average.equals("Rendah") && current.equals("Rendah") && isIncreased && !isDecreased)
+            status = "Kesehatan anda kurang baik";
+        else if (average.equals("Rendah") && current.equals("Rendah") && !isIncreased && isDecreased)
+            status = "Kesehatan anda tidak baik";
+        else if (average.equals("Rendah") && current.equals("Rendah") && isIncreased && isDecreased)
             status = "Kesehatan anda tidak baik";
         return status;
     }
@@ -221,9 +324,9 @@ public class DetailConditionActivity extends AppCompatActivity {
             else
                 status = "Rendah";
         } else if (age <= 10) {
-            if (heartRate >= 70 && heartRate <= 120)
+            if (heartRate >= 70 && heartRate <= 110)
                 status = "Normal";
-            else if (heartRate > 120)
+            else if (heartRate > 110)
                 status = "Tinggi";
             else
                 status = "Rendah";
