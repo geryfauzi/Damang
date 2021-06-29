@@ -229,9 +229,13 @@ public class HeartRateHelper {
         unikom.gery.damang.model.HeartRate heartRate;
         if (cursor.getCount() > 0) {
             do {
+                Cursor cLastHeartRate = database.rawQuery("SELECT date_time, heart_rate FROM heart_rate_activity WHERE email = ? AND mode = ? AND DATE(date_time) = ? ORDER BY date_time DESC LIMIT 1", new String[]{email, "Normal", cursor.getString(cursor.getColumnIndexOrThrow("DATE(date_time)"))});
+                cLastHeartRate.moveToFirst();
                 heartRate = new unikom.gery.damang.model.HeartRate();
+                heartRate.setArrayList(getDetailDailyCondition(email, cursor.getString(cursor.getColumnIndexOrThrow("DATE(date_time)"))));
                 heartRate.setDate(cursor.getString(cursor.getColumnIndexOrThrow("DATE(date_time)")));
                 heartRate.setAverageHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("AVG(heart_rate)")));
+                heartRate.setCurrentHeartRate(cLastHeartRate.getInt(cLastHeartRate.getColumnIndexOrThrow("heart_rate")));
                 arrayList.add(heartRate);
                 cursor.moveToNext();
             } while (!cursor.isAfterLast());
@@ -252,6 +256,26 @@ public class HeartRateHelper {
                 heartRate.setHour(cursor.getString(cursor.getColumnIndexOrThrow("hour")));
                 heartRate.setHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate")));
                 arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public ArrayList<Sport> getSportData() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<Sport> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT _id, average_heart_rate, type, DATE(start_time) FROM sport_activity ORDER BY DATE(start_time) DESC", new String[]{});
+        cursor.moveToFirst();
+        Sport sport;
+        if (cursor.getCount() > 0) {
+            do {
+                sport = new Sport();
+                sport.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sport.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
+                sport.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                arrayList.add(sport);
                 cursor.moveToNext();
             } while (!cursor.isAfterLast());
         }

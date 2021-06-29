@@ -108,7 +108,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     setUserLogin(response);
                 } else {
                     Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getApplicationContext(), RegisterFormActivity.class));
+                    startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
                 }
             }
 

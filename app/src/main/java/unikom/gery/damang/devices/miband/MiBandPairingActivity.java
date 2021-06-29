@@ -151,13 +151,14 @@ public class MiBandPairingActivity extends AbstractGBActivity implements Bonding
     private void startPairing() {
         isPairing = true;
         message.setText(getString(R.string.pairing, deviceCandidate));
+        BondingUtil.attemptToFirstConnect(getCurrentTarget());
 
-        if (!BondingUtil.shouldUseBonding()) {
-            BondingUtil.attemptToFirstConnect(getCurrentTarget());
-            return;
-        }
-
-        BondingUtil.tryBondThenComplete(this, deviceCandidate);
+//        if (!BondingUtil.shouldUseBonding()) {
+//            BondingUtil.attemptToFirstConnect(getCurrentTarget());
+//            return;
+//        }
+//
+//        BondingUtil.tryBondThenComplete(this, deviceCandidate);
     }
 
 

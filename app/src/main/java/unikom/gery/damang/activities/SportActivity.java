@@ -13,8 +13,13 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 import unikom.gery.damang.R;
+import unikom.gery.damang.sqlite.dml.HeartRateHelper;
+import unikom.gery.damang.sqlite.table.Sport;
 
 public class SportActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -22,6 +27,9 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
     private TextView btnViewAll;
     private ConstraintLayout cvNoData;
     private CardView btnOtherSport;
+    private RecyclerView rvSport;
+    private ArrayList<Sport> arrayList;
+    private HeartRateHelper heartRateHelper;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -36,14 +44,29 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
         getSupportActionBar().hide();
         setContentView(R.layout.activity_sport);
 
+        rvSport = findViewById(R.id.rvSportData);
         btnBack = findViewById(R.id.btnBack);
         btnViewAll = findViewById(R.id.btnViewAll);
         btnOtherSport = findViewById(R.id.btnSportOther);
         cvNoData = findViewById(R.id.cvNoData);
+        heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
+        arrayList = heartRateHelper.getSportData();
 
         btnBack.setOnClickListener(this);
         btnOtherSport.setOnClickListener(this);
-        btnViewAll.setVisibility(View.INVISIBLE);
+        setView();
+    }
+
+    private void setView() {
+        if (arrayList.size() > 0) {
+            btnViewAll.setVisibility(View.VISIBLE);
+            cvNoData.setVisibility(View.GONE);
+            rvSport.setVisibility(View.VISIBLE);
+        } else {
+            btnViewAll.setVisibility(View.INVISIBLE);
+            rvSport.setVisibility(View.GONE);
+            cvNoData.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

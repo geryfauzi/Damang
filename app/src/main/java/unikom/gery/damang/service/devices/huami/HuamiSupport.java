@@ -1793,21 +1793,24 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
                         int currentHeartRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
                         String status = "Normal";
+                        int bodyCapacity = maxBodyCapacity(age);
                         if (currentHeartRate > 0)
-                            status = getCurrentCondition(age, currentHeartRate);
+                            status = getCurrentHeartRateStatus(age, currentHeartRate);
                         //Menyimpan ke database
                         sharedPreference.setSteps(Integer.parseInt(stepListAdapter.getStepTotalLabel(stepSessionsSummary)));
                         HeartRate heartRate = new HeartRate();
                         heartRate.setEmail(sharedPreference.getUser().getEmail());
                         heartRate.setHeart_rate(sample.getHeartRate());
                         heartRate.setMode(mode);
-                        heartRate.setStatus(getStatus(sample.getHeartRate()));
+                        heartRate.setStatus(status);
                         heartRate.setDate_time(date);
                         //
                         if (mode.equals("Sport")) {
                             if (sample.getHeartRate() > 0) {
                                 heartRate.setId_sport(sharedPreference.getSportId());
                                 heartRateHelper.insertHeartRateSportMode(heartRate);
+                                if (sample.getHeartRate() >= bodyCapacity)
+                                    createSportNotification();
                             }
                         } else if (mode.equals("Sleep")) {
 
@@ -1840,7 +1843,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                     .setContentTitle("Detak Jantung " + status + "!")
                     .setContentText("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi detak jantung yang " + status + "pada jantung anda. Apakah anda baik - baik saja ?"));
+                    .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?"));
             NotificationManager notificationManager = getContext().getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(notificationChannel);
             notificationManager.notify(0, notificationBuilder.build());
@@ -1848,11 +1851,38 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "notif")
                     .setSmallIcon(R.drawable.notif_warning)
                     .setContentTitle("Detak Jantung " + status + "!")
-                    .setContentText("Sistem damang mendeteksi detak jantung yang " + status + "pada jantung anda. Apakah anda baik - baik saja ?")
+                    .setContentText("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getContext());
             notificationManagerCompat.notify(0, builder.build());
         }
+    }
+
+    private void createSportNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel("notif", "notifikasi", importance);
+            @SuppressLint("WrongConstant") Notification.Builder notificationBuilder = new Notification.Builder(getContext(), "notif").setSmallIcon(R.drawable.notif_warning)
+                    .setContentTitle("Anda sudah melewati batas!")
+                    .setContentText("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!"));
+            NotificationManager notificationManager = getContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+            notificationManager.notify(0, notificationBuilder.build());
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "notif")
+                    .setSmallIcon(R.drawable.notif_warning)
+                    .setContentTitle("Anda sudah melewati batas!")
+                    .setContentText("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getContext());
+            notificationManagerCompat.notify(0, builder.build());
+        }
+    }
+
+    private int maxBodyCapacity(int age) {
+        return 220 - age;
     }
 
     private String getTodayDate() {
@@ -1875,35 +1905,30 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
         return monthResult / 12;
     }
 
-    private String getCurrentCondition(int age, int heartRate) {
-        String status = "Normal";
+    private String getCurrentHeartRateStatus(int age, int heartRate) {
+        String status = "";
         if (age < 2) {
-            if (heartRate < 80)
-                status = "Rendah";
+            if (heartRate >= 80 && heartRate <= 160)
+                status = "Normal";
             else if (heartRate > 160)
                 status = "Tinggi";
-        } else if (age >= 2 && age <= 10) {
-            if (heartRate < 70)
+            else
                 status = "Rendah";
-            else if (heartRate > 120)
-                status = "Tinggi";
-        } else if (age >= 11) {
-            if (heartRate < 54)
-                status = "Rendah";
+        } else if (age <= 10) {
+            if (heartRate >= 70 && heartRate <= 110)
+                status = "Normal";
             else if (heartRate > 110)
                 status = "Tinggi";
+            else
+                status = "Rendah";
+        } else {
+            if (heartRate >= 54 && heartRate <= 120)
+                status = "Normal";
+            else if (heartRate > 120)
+                status = "Tinggi";
+            else
+                status = "Rendah";
         }
-        return status;
-    }
-
-    private String getStatus(int heartRate) {
-        String status = "";
-        if (heartRate < 60)
-            status = "Rendah";
-        else if (heartRate >= 60 && heartRate <= 100)
-            status = "Normal";
-        else if (heartRate > 100)
-            status = "Tinggi";
         return status;
     }
 
