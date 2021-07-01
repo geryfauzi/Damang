@@ -14,8 +14,8 @@ tasks.withType(Test) {
 android {
     compileOptions {
         // for KitKat
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     compileSdkVersion 29
     buildToolsVersion '29.0.3'
@@ -84,6 +84,7 @@ dependencies {
         exclude group: "com.google.android", module: "android"
     }
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
+    implementation 'com.google.android.gms:play-services-drive:17.0.0'
     implementation "org.slf4j:slf4j-api:1.7.24"
     implementation "com.github.PhilJay:MPAndroidChart:v3.1.0"
     implementation "com.github.pfichtner:durationformatter:0.1.1"

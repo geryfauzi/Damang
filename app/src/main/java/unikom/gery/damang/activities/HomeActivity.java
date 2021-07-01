@@ -62,6 +62,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+import cyanogenmod.providers.CMSettings;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.DeviceAdapter;
@@ -93,7 +94,7 @@ public class HomeActivity extends AppCompatActivity
     private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga;
     private ImageView btnAddDevice;
     private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar;
-    private ImageView imgProfile;
+    private ImageView imgProfile, btnSettings;
     private SharedPreference sharedPreference;
     private DeviceManager deviceManager;
     private DeviceAdapter mGBDeviceAdapter;
@@ -150,6 +151,7 @@ public class HomeActivity extends AppCompatActivity
         cvPengaturanAlat = findViewById(R.id.cvPengaturanAlat);
         cvOlahraga = findViewById(R.id.cvOlahraga);
         btnAddDevice = findViewById(R.id.btnAddDevice);
+        btnSettings = findViewById(R.id.imageView6);
         txtHeartRate = findViewById(R.id.txtHeartRate);
         txtCurrentCondition = findViewById(R.id.txtStatusKesehatan);
         txtUser = findViewById(R.id.txtUser);
@@ -261,6 +263,13 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), SportActivity.class));
+            }
+        });
+
+        btnSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), SystemSettingsActivity.class));
             }
         });
     }
