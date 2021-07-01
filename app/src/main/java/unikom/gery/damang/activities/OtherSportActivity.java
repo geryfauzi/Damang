@@ -1,12 +1,14 @@
 package unikom.gery.damang.activities;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -296,6 +298,39 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         pauseOffset = 0;
     }
 
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Apakah anda yakin ingin menghentikan olahraga ?");
+        builder.setTitle("Perhatian!");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Iya", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (heartRateHelper.checkHeartRateSportMode(id, sharedPreference.getUser().getEmail())) {
+                    stop();
+                    updateDB();
+                    startActivity(new Intent(getApplicationContext(), SportActivity.class));
+                    finish();
+                } else {
+                    stop();
+                    heartRateHelper.deleteSportData(id);
+                    startActivity(new Intent(getApplicationContext(), SportActivity.class));
+                    finish();
+                }
+
+            }
+        });
+        builder.setNegativeButton("Batal", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onClick(View view) {
@@ -314,26 +349,33 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
                 imgSportPaused.setVisibility(View.VISIBLE);
             }
         } else if (view == btnSelesai) {
-            stop();
-            updateDB();
-            Intent intent = new Intent(getApplicationContext(), OtherSportDetailActivity.class);
-            intent.putExtra("id", id);
-            startActivity(intent);
-            finish();
+            if (!heartRateHelper.checkHeartRateSportMode(id, sharedPreference.getUser().getEmail()))
+                showAlertDialog();
+            else {
+                stop();
+                updateDB();
+                Intent intent = new Intent(getApplicationContext(), OtherSportDetailActivity.class);
+                intent.putExtra("id", id);
+                startActivity(intent);
+                finish();
+            }
+
         } else if (view == btnBack) {
-            stop();
-            updateDB();
-            startActivity(new Intent(getApplicationContext(), SportActivity.class));
-            finish();
+            if (id.equals("")) {
+                startActivity(new Intent(getApplicationContext(), SportActivity.class));
+                finish();
+            } else
+                showAlertDialog();
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBackPressed() {
-        stop();
-        updateDB();
-        startActivity(new Intent(getApplicationContext(), SportActivity.class));
-        finish();
+        if (id.equals("")) {
+            startActivity(new Intent(getApplicationContext(), SportActivity.class));
+            finish();
+        } else
+            showAlertDialog();
     }
 }

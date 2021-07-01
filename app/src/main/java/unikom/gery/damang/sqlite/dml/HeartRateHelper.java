@@ -122,6 +122,11 @@ public class HeartRateHelper {
         return database.update(TABLE_SPORT, args, _ID + "= '" + sport.getId() + "'", null);
     }
 
+    public int deleteSportData(String id) {
+        database = dbHelper.getWritableDatabase();
+        return database.delete(TABLE_SPORT, _ID + " = '" + id + "'", null);
+    }
+
     public long insertUser(User user) {
         ContentValues args = new ContentValues();
         database = dbHelper.getWritableDatabase();
@@ -163,6 +168,19 @@ public class HeartRateHelper {
         }
         cursor.close();
         return bpm;
+    }
+
+    public boolean checkHeartRateSportMode(String id, String email) {
+        database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.rawQuery("SELECT heart_rate FROM heart_rate_activity WHERE email = ? AND id_sport = ? ORDER BY date_time DESC", new String[]{email, id});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            cursor.close();
+            return true;
+        } else {
+            cursor.close();
+            return false;
+        }
     }
 
     public int getAverageSportHearRate(String id, String email) {
