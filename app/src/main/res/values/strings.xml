@@ -1266,4 +1266,10 @@
     <string name="_185_bpm">185 bpm</string>
     <string name="kalori_terbakar">Kalori Terbakar</string>
     <string name="_500_kalori">500 kalori</string>
+    <string name="pengaturan_sistem">Pengaturan Sistem</string>
+    <string name="tentang_damang">Tentang Damang</string>
+    <string name="cadangkan_dan_pulihkan">Cadangkan dan Pulihkan</string>
+    <string name="pilih_aktivitas">Pilih Aktivitas</string>
+    <string name="cadangkan">Cadangkan</string>
+    <string name="pulihkan">Pulihkan</string>
 </resources>
