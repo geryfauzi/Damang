@@ -29,8 +29,6 @@ import unikom.gery.damang.R;
 
 public class JoggingSportActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
-    LocationManager locationManager;
-    String provider;
     Marker marker;
     private GoogleMap mMap;
 
@@ -47,27 +45,18 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         getSupportActionBar().hide();
         setContentView(R.layout.activity_jogging_sport);
         //
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        provider = locationManager.getBestProvider(new Criteria(), true);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
-    private double getLatitude() {
-        @SuppressLint("MissingPermission") Location location = locationManager.getLastKnownLocation(provider);
-        return location.getLatitude();
-    }
-
-    private double getLongitude() {
-        @SuppressLint("MissingPermission") Location location = locationManager.getLastKnownLocation(provider);
-        return location.getLongitude();
-    }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng myPosition = new LatLng(getLatitude(), getLongitude());
+        LocationManager lManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        String newProvider = lManager.getBestProvider(new Criteria(),true);
+        @SuppressLint("MissingPermission") Location location = lManager.getLastKnownLocation(newProvider);
+        LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
         mMap.addMarker(new MarkerOptions().position(myPosition).title("Lokasi Anda"));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition,17));
     }
@@ -79,9 +68,16 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         finish();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onLocationChanged(Location location) {
-
+        mMap.clear();
+        LocationManager lManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        String newProvider = lManager.getBestProvider(new Criteria(),true);
+        location = lManager.getLastKnownLocation(newProvider);
+        LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(myPosition).title("Lokasi Anda"));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition,20));
     }
 
     @Override
