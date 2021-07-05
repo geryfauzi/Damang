@@ -1,9 +1,14 @@
 package unikom.gery.damang.activities;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -14,6 +19,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -25,13 +31,16 @@ import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.sqlite.table.Sport;
+import unikom.gery.damang.util.GB;
+
+import static unikom.gery.damang.util.GB.toast;
 
 public class SportActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView btnBack;
     private TextView btnViewAll;
     private ConstraintLayout cvNoData;
-    private CardView btnOtherSport;
+    private CardView btnOtherSport, btnJogging;
     private RecyclerView rvSport;
     private ArrayList<Sport> arrayList;
     private HeartRateHelper heartRateHelper;
@@ -56,6 +65,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
         btnBack = findViewById(R.id.btnBack);
         btnViewAll = findViewById(R.id.btnViewAll);
         btnOtherSport = findViewById(R.id.btnSportOther);
+        btnJogging = findViewById(R.id.btnJogging);
         cvNoData = findViewById(R.id.cvNoData);
         heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
         arrayList = heartRateHelper.getSportData();
@@ -64,6 +74,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
 
         btnBack.setOnClickListener(this);
         btnOtherSport.setOnClickListener(this);
+        btnJogging.setOnClickListener(this);
         setView();
     }
 
@@ -76,6 +87,23 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
             btnViewAll.setVisibility(View.INVISIBLE);
             rvSport.setVisibility(View.GONE);
             cvNoData.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void checkGPS() {
+        LocationManager lManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try {
+            if (lManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || lManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                startActivity(new Intent(getApplicationContext(), JoggingSportActivity.class));
+                finish();
+            } else {
+                toast(SportActivity.this, "Harap nyalakan GPS untuk menggunakan fitur ini", Toast.LENGTH_SHORT, GB.ERROR);
+                SportActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                toast(SportActivity.this, "Harap nyalakan GPS untuk menggunakan fitur ini", Toast.LENGTH_SHORT, GB.ERROR);
+                return;
+            }
+        } catch (Exception error) {
+
         }
     }
 
@@ -104,6 +132,26 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
                 finish();
             } else
                 Toast.makeText(getApplicationContext(), "Harap hubungkan dahulu sistem dengan perangkat wearable device", Toast.LENGTH_SHORT).show();
+        } else if (view == btnJogging) {
+            if (!checkDevice()) {
+                checkPermission();
+                checkGPS();
+            } else
+                Toast.makeText(getApplicationContext(), "Harap hubungkan dahulu sistem dengan perangkat wearable device", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void checkPermission() {
+        List<String> wantedPermissions = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(getApplicationContext(), "Harap berikan izin lokasi untuk menggunakan fitur ini", Toast.LENGTH_SHORT).show();
+            wantedPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+            return;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(getApplicationContext(), "Harap berikan izin lokasi untuk menggunakan fitur ini", Toast.LENGTH_SHORT).show();
+            wantedPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+            return;
         }
     }
 }
