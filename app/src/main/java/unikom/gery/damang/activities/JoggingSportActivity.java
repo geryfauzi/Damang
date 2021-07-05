@@ -16,21 +16,20 @@ import android.view.WindowManager;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import unikom.gery.damang.R;
 
 public class JoggingSportActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
-    Marker marker;
     private GoogleMap mMap;
+    private LocationManager locationManager;
+    private String provider;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -48,17 +47,32 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        getLocation();
     }
 
+    @SuppressLint("MissingPermission")
+    private void getLocation() {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(new Criteria(), true);
+        Location location = locationManager.getLastKnownLocation(provider);
+        if (location == null) {
+            locationManager.requestLocationUpdates(provider, 1000, 0, this);
+            getLocation();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LocationManager lManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        String newProvider = lManager.getBestProvider(new Criteria(),true);
-        @SuppressLint("MissingPermission") Location location = lManager.getLastKnownLocation(newProvider);
+        Location location = locationManager.getLastKnownLocation(provider);
+        if (location == null) {
+            locationManager.requestLocationUpdates(provider, 1000, 0, this);
+            getLocation();
+        }
         LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
         mMap.addMarker(new MarkerOptions().position(myPosition).title("Lokasi Anda"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition,17));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 17));
     }
 
     @Override
@@ -72,12 +86,12 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onLocationChanged(Location location) {
         mMap.clear();
-        LocationManager lManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        String newProvider = lManager.getBestProvider(new Criteria(),true);
-        location = lManager.getLastKnownLocation(newProvider);
+        //
+        locationManager.removeUpdates(this);
+        //
         LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
         mMap.addMarker(new MarkerOptions().position(myPosition).title("Lokasi Anda"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition,20));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 20));
     }
 
     @Override
