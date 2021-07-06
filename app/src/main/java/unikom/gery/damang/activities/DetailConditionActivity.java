@@ -182,12 +182,16 @@ public class DetailConditionActivity extends AppCompatActivity {
                     " beraturan. Yang terkadang naik secara tiba - tiba, dan terkadang turun juga secara tiba - tiba.");
         else if (isIncreased)
             txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan bahwa detak jantung anda mengalami peningkatan" +
-                    " secara tiba - tiba. Hal ini mungkin dikarenakan anda sedang banyak pikiran, atau sedang cemas" +
-                    " atau disebabkan hal lain yang dapat meningkatkan adrenalin. Damang menyarankan untuk merilekskan pikiran" +
+                    " secara tiba - tiba. Hal ini mungkin dikarenakan anda sedang banyak pikiran, atau pusing, atau sedang stres, atau sedang cemas" +
+                    ". Damang menyarankan untuk merilekskan pikiran" +
                     " anda.");
         else if (isDecreased)
             txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan bahwa detak jantung anda mengalami penuruan secara" +
                     " tiba - tiba. Hal ini mungkin dikarenakan anda sedang kelelahan. Damang menyarankan untuk beristirahat sejenak.");
+        if (currentStatus.equals("Tinggi"))
+            txtHasilAnalisis.append(" Perlu diperhatikan kalau data detak jantung anda yang terkini berada di angka" +
+                    " tinggi, itu mungkin karena anda sedang banyak pikiran, sedikit, atau sedikit stress. Damang menyarankan" +
+                    " untuk merilekskan pikiran anda hingga detak jantung anda yang terkini berada di angka normal.");
     }
 
     private boolean isSuddenlyIncrease(ArrayList<DetailHeartRate> list) {
