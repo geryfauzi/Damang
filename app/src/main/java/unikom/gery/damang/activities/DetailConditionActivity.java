@@ -177,9 +177,14 @@ public class DetailConditionActivity extends AppCompatActivity {
                     " Hal ini mungkin diakibatkan karena anda sedang kelelahan, mengantuk, dan kurang kosentrasi." +
                     " Damang menyarankan untuk beristirahat sejenak.");
         }
-        if (isIncreased && isDecreased)
+        if (isIncreased && isDecreased && !status.equals("Kesehatan anda baik"))
             txtHasilAnalisis.append(" Apalagi hal ini diperparah dengan detak jantung anda yang tidak" +
                     " beraturan. Yang terkadang naik secara tiba - tiba, dan terkadang turun juga secara tiba - tiba.");
+        if (isIncreased && isDecreased && status.equals("Kesehatan anda baik"))
+            txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan kalau data detak jantung anda mengalami" +
+                    " peningkatan dan penurunan drastis disaat bersamaan. Itu mungkin dikarenakan anda sedang" +
+                    " mengalami kecapean, atau banyak pikiran, atau sedang psuing, atau sedang stress." +
+                    " Damang menyarankan untuk istirahat dan merilekskan pikiran anda sejenak");
         else if (isIncreased)
             txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan bahwa detak jantung anda mengalami peningkatan" +
                     " secara tiba - tiba. Hal ini mungkin dikarenakan anda sedang banyak pikiran, atau pusing, atau sedang stres, atau sedang cemas" +
