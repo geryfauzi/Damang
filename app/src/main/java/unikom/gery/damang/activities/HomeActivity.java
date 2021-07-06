@@ -62,7 +62,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
-import cyanogenmod.providers.CMSettings;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.DeviceAdapter;
@@ -413,10 +412,10 @@ public class HomeActivity extends AppCompatActivity
         else if (average.equals("Normal") && current.equals("Normal") && !isIncreased && isDecreased)
             status = "Kesehatan anda baik";
         else if (average.equals("Normal") && current.equals("Normal") && isIncreased && isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
             //Fuzzy Logic Dengan Rata - Rata Normal dan terkini Tinggi
         else if (average.equals("Normal") && current.equals("Tinggi") && !isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Tinggi") && isIncreased && !isDecreased)
             status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Tinggi") && !isIncreased && isDecreased)
@@ -425,11 +424,11 @@ public class HomeActivity extends AppCompatActivity
             status = "Kesehatan anda kurang baik";
             //Fuzzy Logic Dengan Rata - Rata Normal dan terkini Rendah
         else if (average.equals("Normal") && current.equals("Rendah") && !isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Rendah") && isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Rendah") && !isIncreased && isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Rendah") && isIncreased && isDecreased)
             status = "Kesehatan anda kurang baik";
             //Fuzzy Login dengan Rata - rata Tinggi dan terkini Normal
@@ -461,7 +460,7 @@ public class HomeActivity extends AppCompatActivity
             status = "Kesehatan anda tidak baik";
             //Fuzzy Login dengan Rata - rata Rendah dan terkini Normal
         else if (average.equals("Rendah") && current.equals("Normal") && !isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Rendah") && current.equals("Normal") && isIncreased && !isDecreased)
             status = "Kesehatan anda baik*";
         else if (average.equals("Rendah") && current.equals("Normal") && !isIncreased && isDecreased)

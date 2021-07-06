@@ -183,7 +183,7 @@ public class DetailConditionActivity extends AppCompatActivity {
         if (isIncreased && isDecreased && status.equals("Kesehatan anda baik"))
             txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan kalau data detak jantung anda mengalami" +
                     " peningkatan dan penurunan drastis disaat bersamaan. Itu mungkin dikarenakan anda sedang" +
-                    " mengalami kecapean, atau banyak pikiran, atau sedang psuing, atau sedang stress." +
+                    " mengalami kecapean, atau banyak pikiran, atau sedang pusing, atau sedang stress." +
                     " Damang menyarankan untuk istirahat dan merilekskan pikiran anda sejenak");
         else if (isIncreased)
             txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan bahwa detak jantung anda mengalami peningkatan" +
