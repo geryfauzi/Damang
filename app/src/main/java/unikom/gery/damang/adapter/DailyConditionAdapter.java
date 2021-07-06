@@ -30,7 +30,6 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
 
     private ArrayList<HeartRate> arrayList;
     private Context context;
-    private ViewGroup viewGroup;
 
     public DailyConditionAdapter(ArrayList<HeartRate> arrayList, Context context) {
         this.arrayList = arrayList;
@@ -40,7 +39,6 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        this.viewGroup = parent;
         View view = LayoutInflater.from(context).inflate(R.layout.adapter_daily_condition, parent, false);
         return new ViewHolder(view);
     }

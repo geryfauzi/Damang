@@ -284,7 +284,7 @@ public class HeartRateHelper {
     public ArrayList<Sport> getSportData() {
         database = dbHelper.getWritableDatabase();
         ArrayList<Sport> arrayList = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT _id, average_heart_rate, type, DATE(start_time) FROM sport_activity ORDER BY DATE(start_time) DESC", new String[]{});
+        Cursor cursor = database.rawQuery("SELECT _id, average_heart_rate, type, DATE(start_time) FROM sport_activity ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
         cursor.moveToFirst();
         Sport sport;
         if (cursor.getCount() > 0) {
@@ -293,6 +293,7 @@ public class HeartRateHelper {
                 sport.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
                 sport.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
                 sport.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sport.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
                 arrayList.add(sport);
                 cursor.moveToNext();
             } while (!cursor.isAfterLast());

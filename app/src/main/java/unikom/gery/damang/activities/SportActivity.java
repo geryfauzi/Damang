@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
+import unikom.gery.damang.adapter.SportAdapter;
 import unikom.gery.damang.devices.DeviceManager;
 import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
@@ -47,6 +49,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
     private DeviceManager deviceManager;
     private List<GBDevice> deviceList;
     private GBDevice device;
+    private SportAdapter sportAdapter;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -88,6 +91,10 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
             rvSport.setVisibility(View.GONE);
             cvNoData.setVisibility(View.VISIBLE);
         }
+        sportAdapter = new SportAdapter(arrayList, getApplicationContext());
+        rvSport.setHasFixedSize(true);
+        rvSport.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        rvSport.setAdapter(sportAdapter);
     }
 
     private void checkGPS() {

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:clickable="true"
-    android:foreground="?attr/selectableItemBackground"
-    android:focusable="true"
+    android:id="@+id/cardViewSport"
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:layout_marginStart="16dp"
