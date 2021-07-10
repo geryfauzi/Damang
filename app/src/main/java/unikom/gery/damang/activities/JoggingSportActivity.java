@@ -205,9 +205,12 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(getApplicationContext(), SportActivity.class));
-        finish();
+        if (id.equals("")) {
+            sharedPreference.resetLatitudeLongitude();
+            startActivity(new Intent(getApplicationContext(), SportActivity.class));
+            finish();
+        } else
+            showAlertDialog();
     }
 
     @SuppressLint("MissingPermission")
@@ -466,6 +469,7 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
 
         } else if (view == btnBack) {
             if (id.equals("")) {
+                sharedPreference.resetLatitudeLongitude();
                 startActivity(new Intent(getApplicationContext(), SportActivity.class));
                 finish();
             } else
