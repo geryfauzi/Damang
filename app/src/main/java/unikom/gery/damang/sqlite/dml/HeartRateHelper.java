@@ -44,6 +44,7 @@ public class HeartRateHelper {
     static String START_TIME = "start_time";
     static String TNS_TARGET = "tns_target";
     static String TYPE = "type";
+    static String DISTANCE = "distance";
     private static DBHelper dbHelper;
     private static HeartRateHelper INSTANCE;
     private static SQLiteDatabase database;
@@ -119,6 +120,8 @@ public class HeartRateHelper {
         args.put(TNS_STATUS, sport.getTns_status());
         args.put(AVERAGE_HEART_RATE, sport.getAverage_heart_rate());
         args.put(CALORIES_BURNED, sport.getCalories_burned());
+        if (sport.getDistance() != 0.0f)
+            args.put(DISTANCE, sport.getDistance());
         return database.update(TABLE_SPORT, args, _ID + "= '" + sport.getId() + "'", null);
     }
 

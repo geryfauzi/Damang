@@ -1808,6 +1808,10 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         if (mode.equals("Sport")) {
                             if (sample.getHeartRate() > 0) {
                                 heartRate.setId_sport(sharedPreference.getSportId());
+                                if (!sharedPreference.getLatitude().equals("null")) {
+                                    heartRate.setLatitude(sharedPreference.getLatitude());
+                                    heartRate.setLongitude(sharedPreference.getLongitude());
+                                }
                                 heartRateHelper.insertHeartRateSportMode(heartRate);
                                 if (sample.getHeartRate() >= bodyCapacity)
                                     createSportNotification();
