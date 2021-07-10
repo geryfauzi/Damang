@@ -98,6 +98,10 @@ public class HeartRateHelper {
         args.put(HEART_RATE, heartRate.getHeart_rate());
         args.put(MODE, heartRate.getMode());
         args.put(STATUS, heartRate.getStatus());
+        if (!heartRate.getLatitude().isEmpty() || heartRate.getLatitude() != null) {
+            args.put(LATITUDE, heartRate.getLatitude());
+            args.put(LONGITUDE, heartRate.getLongitude());
+        }
         sharedPreference.setHeartRate(heartRate.getHeart_rate());
         return database.insert(TABLE_HEART_RATE, null, args);
     }

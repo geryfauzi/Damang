@@ -125,8 +125,9 @@ public class SharedPreference {
 
     public void resetLatitudeLongitude() {
         SharedPreferences.Editor editor = sharedPreference.edit();
-        editor.putString(latitude, "null");
-        editor.putString(longitude, "null");
+        String value = "null";
+        editor.putString(latitude, value);
+        editor.putString(longitude, value);
         editor.apply();
     }
 

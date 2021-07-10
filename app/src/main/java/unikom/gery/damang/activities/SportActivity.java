@@ -140,7 +140,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
             } else
                 Toast.makeText(getApplicationContext(), "Harap hubungkan dahulu sistem dengan perangkat wearable device", Toast.LENGTH_SHORT).show();
         } else if (view == btnJogging) {
-            if (!checkDevice()) {
+            if (checkDevice()) {
                 checkPermission();
                 checkGPS();
             } else
