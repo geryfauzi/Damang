@@ -177,17 +177,26 @@ public class DetailConditionActivity extends AppCompatActivity {
                     " Hal ini mungkin diakibatkan karena anda sedang kelelahan, mengantuk, dan kurang kosentrasi." +
                     " Damang menyarankan untuk beristirahat sejenak.");
         }
-        if (isIncreased && isDecreased)
+        if (isIncreased && isDecreased && !status.equals("Kesehatan anda baik"))
             txtHasilAnalisis.append(" Apalagi hal ini diperparah dengan detak jantung anda yang tidak" +
                     " beraturan. Yang terkadang naik secara tiba - tiba, dan terkadang turun juga secara tiba - tiba.");
+        if (isIncreased && isDecreased && status.equals("Kesehatan anda baik"))
+            txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan kalau data detak jantung anda mengalami" +
+                    " peningkatan dan penurunan drastis disaat bersamaan. Itu mungkin dikarenakan anda sedang" +
+                    " mengalami kecapean, atau banyak pikiran, atau sedang pusing, atau sedang stress." +
+                    " Damang menyarankan untuk istirahat dan merilekskan pikiran anda sejenak");
         else if (isIncreased)
             txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan bahwa detak jantung anda mengalami peningkatan" +
-                    " secara tiba - tiba. Hal ini mungkin dikarenakan anda sedang banyak pikiran, atau sedang cemas" +
-                    " atau disebabkan hal lain yang dapat meningkatkan adrenalin. Damang menyarankan untuk merilekskan pikiran" +
+                    " secara tiba - tiba. Hal ini mungkin dikarenakan anda sedang banyak pikiran, atau pusing, atau sedang stres, atau sedang cemas" +
+                    ". Damang menyarankan untuk merilekskan pikiran" +
                     " anda.");
         else if (isDecreased)
             txtHasilAnalisis.append(" Akan tetapi, perlu diperhatikan bahwa detak jantung anda mengalami penuruan secara" +
                     " tiba - tiba. Hal ini mungkin dikarenakan anda sedang kelelahan. Damang menyarankan untuk beristirahat sejenak.");
+        if (currentStatus.equals("Tinggi"))
+            txtHasilAnalisis.append(" Perlu diperhatikan kalau data detak jantung anda yang terkini berada di angka" +
+                    " tinggi, itu mungkin karena anda sedang banyak pikiran, sedikit, atau sedikit stress. Damang menyarankan" +
+                    " untuk merilekskan pikiran anda hingga detak jantung anda yang terkini berada di angka normal.");
     }
 
     private boolean isSuddenlyIncrease(ArrayList<DetailHeartRate> list) {

@@ -1272,4 +1272,5 @@
     <string name="pilih_aktivitas">Pilih Aktivitas</string>
     <string name="cadangkan">Cadangkan</string>
     <string name="pulihkan">Pulihkan</string>
+    <string name="jarak_km">Jarak (km)</string>
 </resources>

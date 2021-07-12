@@ -44,6 +44,7 @@ public class HeartRateHelper {
     static String START_TIME = "start_time";
     static String TNS_TARGET = "tns_target";
     static String TYPE = "type";
+    static String DISTANCE = "distance";
     private static DBHelper dbHelper;
     private static HeartRateHelper INSTANCE;
     private static SQLiteDatabase database;
@@ -97,6 +98,10 @@ public class HeartRateHelper {
         args.put(HEART_RATE, heartRate.getHeart_rate());
         args.put(MODE, heartRate.getMode());
         args.put(STATUS, heartRate.getStatus());
+        if (!heartRate.getLatitude().isEmpty() || heartRate.getLatitude() != null) {
+            args.put(LATITUDE, heartRate.getLatitude());
+            args.put(LONGITUDE, heartRate.getLongitude());
+        }
         sharedPreference.setHeartRate(heartRate.getHeart_rate());
         return database.insert(TABLE_HEART_RATE, null, args);
     }
@@ -119,6 +124,8 @@ public class HeartRateHelper {
         args.put(TNS_STATUS, sport.getTns_status());
         args.put(AVERAGE_HEART_RATE, sport.getAverage_heart_rate());
         args.put(CALORIES_BURNED, sport.getCalories_burned());
+        if (sport.getDistance() != 0.0f)
+            args.put(DISTANCE, sport.getDistance());
         return database.update(TABLE_SPORT, args, _ID + "= '" + sport.getId() + "'", null);
     }
 
@@ -284,7 +291,7 @@ public class HeartRateHelper {
     public ArrayList<Sport> getSportData() {
         database = dbHelper.getWritableDatabase();
         ArrayList<Sport> arrayList = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT _id, average_heart_rate, type, DATE(start_time) FROM sport_activity ORDER BY DATE(start_time) DESC", new String[]{});
+        Cursor cursor = database.rawQuery("SELECT _id, average_heart_rate, type, DATE(start_time) FROM sport_activity ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
         cursor.moveToFirst();
         Sport sport;
         if (cursor.getCount() > 0) {
@@ -293,6 +300,7 @@ public class HeartRateHelper {
                 sport.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
                 sport.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
                 sport.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sport.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
                 arrayList.add(sport);
                 cursor.moveToNext();
             } while (!cursor.isAfterLast());

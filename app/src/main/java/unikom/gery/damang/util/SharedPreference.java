@@ -22,6 +22,8 @@ public class SharedPreference {
     private static final String heartRate = "heartRate";
     private static final String mode = "mode";
     private static final String sportId = "sportId";
+    private static final String latitude = "latitude";
+    private static final String longitude = "longitude";
     private final SharedPreferences sharedPreference;
 
 
@@ -112,5 +114,28 @@ public class SharedPreference {
         SharedPreferences.Editor editor = sharedPreference.edit();
         editor.putInt(steps, value);
         editor.apply();
+    }
+
+    public void setLatitudeLongitude(double mLatitude, double mLongitude) {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putString(latitude, String.valueOf(mLatitude));
+        editor.putString(longitude, String.valueOf(mLongitude));
+        editor.apply();
+    }
+
+    public void resetLatitudeLongitude() {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        String value = "null";
+        editor.putString(latitude, value);
+        editor.putString(longitude, value);
+        editor.apply();
+    }
+
+    public String getLatitude() {
+        return sharedPreference.getString(latitude, "null");
+    }
+
+    public String getLongitude() {
+        return sharedPreference.getString(longitude, "null");
     }
 }

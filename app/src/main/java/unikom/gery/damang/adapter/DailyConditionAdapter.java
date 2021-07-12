@@ -30,7 +30,6 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
 
     private ArrayList<HeartRate> arrayList;
     private Context context;
-    private ViewGroup viewGroup;
 
     public DailyConditionAdapter(ArrayList<HeartRate> arrayList, Context context) {
         this.arrayList = arrayList;
@@ -40,7 +39,6 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        this.viewGroup = parent;
         View view = LayoutInflater.from(context).inflate(R.layout.adapter_daily_condition, parent, false);
         return new ViewHolder(view);
     }
@@ -55,7 +53,7 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
             boolean isIncreased = isSuddenlyIncrease(arrayList.get(position).getArrayList());
             boolean isDecreased = isSuddenlyDecrease(arrayList.get(position).getArrayList());
             String status = getCurrentCondition(averageStatus, currentStatus, isIncreased, isDecreased);
-            if (status.equals("Kesehatan anda baik")) {
+            if (status.equals("Kesehatan anda baik") || status.equals("Kesehatan anda baik*")) {
                 holder.cvStatus.setCardBackgroundColor(Color.parseColor("#BDF5BC"));
                 holder.txtStatus.setTextColor(Color.parseColor("#19C118"));
             } else if (status.equals("Kesehatan anda kurang baik")) {
@@ -174,32 +172,32 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
         else if (average.equals("Normal") && current.equals("Normal") && !isIncreased && isDecreased)
             status = "Kesehatan anda baik";
         else if (average.equals("Normal") && current.equals("Normal") && isIncreased && isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
             //Fuzzy Logic Dengan Rata - Rata Normal dan terkini Tinggi
         else if (average.equals("Normal") && current.equals("Tinggi") && !isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Tinggi") && isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Tinggi") && !isIncreased && isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Tinggi") && isIncreased && isDecreased)
             status = "Kesehatan anda kurang baik";
             //Fuzzy Logic Dengan Rata - Rata Normal dan terkini Rendah
         else if (average.equals("Normal") && current.equals("Rendah") && !isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Rendah") && isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Rendah") && !isIncreased && isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Normal") && current.equals("Rendah") && isIncreased && isDecreased)
             status = "Kesehatan anda kurang baik";
             //Fuzzy Login dengan Rata - rata Tinggi dan terkini Normal
         else if (average.equals("Tinggi") && current.equals("Normal") && !isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Tinggi") && current.equals("Normal") && isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Tinggi") && current.equals("Normal") && !isIncreased && isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Tinggi") && current.equals("Normal") && isIncreased && isDecreased)
             status = "Kesehatan anda kurang baik";
             //Fuzzy Login dengan Rata - rata Tinggi dan terkini Tinggi
@@ -222,9 +220,9 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
             status = "Kesehatan anda tidak baik";
             //Fuzzy Login dengan Rata - rata Rendah dan terkini Normal
         else if (average.equals("Rendah") && current.equals("Normal") && !isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Rendah") && current.equals("Normal") && isIncreased && !isDecreased)
-            status = "Kesehatan anda baik";
+            status = "Kesehatan anda baik*";
         else if (average.equals("Rendah") && current.equals("Normal") && !isIncreased && isDecreased)
             status = "Kesehatan anda kurang baik";
         else if (average.equals("Rendah") && current.equals("Normal") && isIncreased && isDecreased)
