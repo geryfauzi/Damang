@@ -13,7 +13,7 @@ public interface Api {
 
     @POST("user/userRegister.php")
     @FormUrlEncoded
-    Call<CheckUser> register(
+    Call<CheckUser> registerUser(
             @Field("email") String email,
             @Field("nama") String nama,
             @Field("tanggalLahir") String tanggalLahir,
