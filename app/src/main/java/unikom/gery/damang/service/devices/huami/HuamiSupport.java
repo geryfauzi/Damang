@@ -68,12 +68,17 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import cyanogenmod.weather.util.WeatherUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.Logging;
 import unikom.gery.damang.R;
 import unikom.gery.damang.activities.SettingsActivity;
 import unikom.gery.damang.activities.charts.ActivityListingAdapter;
 import unikom.gery.damang.activities.charts.StepAnalysis;
+import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.database.DBHandler;
 import unikom.gery.damang.database.DBHelper;
 import unikom.gery.damang.deviceevents.GBDeviceEventBatteryInfo;
@@ -125,6 +130,7 @@ import unikom.gery.damang.model.NotificationType;
 import unikom.gery.damang.model.RecordedDataTypes;
 import unikom.gery.damang.model.Weather;
 import unikom.gery.damang.model.WeatherSpec;
+import unikom.gery.damang.response.CheckUser;
 import unikom.gery.damang.service.btle.AbstractBTLEDeviceSupport;
 import unikom.gery.damang.service.btle.BLETypeConversions;
 import unikom.gery.damang.service.btle.BtLEAction;
@@ -1785,6 +1791,8 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                             LOG.debug("realtime sample: " + sample);
                         }
 
+                        Api api = BaseApi.getRetrofit().create(Api.class);
+                        Call<CheckUser> response;
                         SharedPreference sharedPreference = new SharedPreference(getContext());
                         HeartRateHelper heartRateHelper = HeartRateHelper.getInstance(getContext());
                         String mode = sharedPreference.getMode();
@@ -1820,6 +1828,18 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
 
                         } else if (mode.equals("Normal")) {
                             if (sample.getHeartRate() > 0) {
+                                response = api.insertHeartRateNormal(heartRate.getEmail(), heartRate.getDate_time(), heartRate.getHeart_rate(), heartRate.getMode(), heartRate.getStatus());
+                                response.enqueue(new Callback<CheckUser>() {
+                                    @Override
+                                    public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
+                                        
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<CheckUser> call, Throwable t) {
+
+                                    }
+                                });
                                 heartRateHelper.insertHeartRateNormalMode(heartRate);
                                 if (!status.equals("Normal"))
                                     createNotificationNormalMode(status);

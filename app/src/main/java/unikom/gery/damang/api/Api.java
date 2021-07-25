@@ -22,4 +22,14 @@ public interface Api {
             @Field("height") Float height,
             @Field("photo") String photo
     );
+
+    @POST("user/insertHeartRateNormal.php")
+    @FormUrlEncoded
+    Call<CheckUser> insertHeartRateNormal(
+            @Field("email") String email,
+            @Field("date_time") String dateTime,
+            @Field("heart_rate") int heartRate,
+            @Field("mode") String mode,
+            @Field("status") String status
+    );
 }
