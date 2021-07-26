@@ -9,6 +9,7 @@ public class SharedPreference {
     private static final String firstTime = "firstTime";
     private static final String prefName = "damang_pref";
     private static final String isLoggedIn = "isLoggedIn";
+    private static final String level = "level";
     //User Session
     private static final String email = "email";
     private static final String name = "name";
@@ -114,6 +115,16 @@ public class SharedPreference {
         SharedPreferences.Editor editor = sharedPreference.edit();
         editor.putInt(steps, value);
         editor.apply();
+    }
+
+    public void setLevel(String value){
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putString(level, value);
+        editor.apply();
+    }
+
+    public String getLevel(){
+        return sharedPreference.getString(level,"Pemula");
     }
 
     public void setLatitudeLongitude(double mLatitude, double mLongitude) {
