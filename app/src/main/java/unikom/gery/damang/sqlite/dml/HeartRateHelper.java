@@ -98,7 +98,7 @@ public class HeartRateHelper {
         args.put(HEART_RATE, heartRate.getHeart_rate());
         args.put(MODE, heartRate.getMode());
         args.put(STATUS, heartRate.getStatus());
-        if (!heartRate.getLatitude().isEmpty() || heartRate.getLatitude() != null) {
+        if (heartRate.getLatitude() != null) {
             args.put(LATITUDE, heartRate.getLatitude());
             args.put(LONGITUDE, heartRate.getLongitude());
         }

@@ -1823,6 +1823,18 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                                 heartRateHelper.insertHeartRateSportMode(heartRate);
                                 if (sample.getHeartRate() >= bodyCapacity)
                                     createSportNotification();
+                                response = api.insertHeartRateSport(heartRate.getEmail(), heartRate.getId_sport(), heartRate.getDate_time(), heartRate.getHeart_rate(), heartRate.getMode(), heartRate.getStatus());
+                                response.enqueue(new Callback<CheckUser>() {
+                                    @Override
+                                    public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<CheckUser> call, Throwable t) {
+
+                                    }
+                                });
                             }
                         } else if (mode.equals("Sleep")) {
 
@@ -1832,7 +1844,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                                 response.enqueue(new Callback<CheckUser>() {
                                     @Override
                                     public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
-                                        
+
                                     }
 
                                     @Override

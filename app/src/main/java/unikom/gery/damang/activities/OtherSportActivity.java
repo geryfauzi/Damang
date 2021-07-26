@@ -41,8 +41,14 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.Random;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import unikom.gery.damang.R;
+import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.model.DeviceService;
+import unikom.gery.damang.response.CheckUser;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SportReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
@@ -74,6 +80,8 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         }
     };
     private long duration;
+    private Api api;
+    private Call<CheckUser> response;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -112,6 +120,7 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         IntentFilter filterLocal = new IntentFilter();
         filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filterLocal);
+        api = BaseApi.getRetrofit().create(Api.class);
 
         chronometer.setBase(SystemClock.elapsedRealtime());
         try {
@@ -132,6 +141,18 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         sport.setTns_target(tns);
         sport.setType("Lainnya");
         heartRateHelper.insertSportData(sport);
+        response = api.insertSportData(sport.getId(), sport.getStart_time(), sport.getTns_target(), sport.getType());
+        response.enqueue(new Callback<CheckUser>() {
+            @Override
+            public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<CheckUser> call, Throwable t) {
+
+            }
+        });
     }
 
     private int calculateTNS(int age) {
@@ -241,6 +262,18 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         sport.setAverage_heart_rate(heartRateHelper.getAverageSportHearRate(id, sharedPreference.getUser().getEmail()));
         sport.setCalories_burned(calculateBurnedCalories(heartRateHelper.getAverageSportHearRate(id, sharedPreference.getUser().getEmail())));
         heartRateHelper.updateSportData(sport);
+        response = api.updateSportData(sport.getId(), sport.getEnd_time(), sport.getDuration(), sport.getTns_status(), sport.getAverage_heart_rate(), sport.getCalories_burned());
+        response.enqueue(new Callback<CheckUser>() {
+            @Override
+            public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<CheckUser> call, Throwable t) {
+
+            }
+        });
     }
 
     private int calculateBurnedCalories(int heartRate) {
@@ -315,6 +348,18 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
                 } else {
                     stop();
                     heartRateHelper.deleteSportData(id);
+                    response = api.deleteSportData(id);
+                    response.enqueue(new Callback<CheckUser>() {
+                        @Override
+                        public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<CheckUser> call, Throwable t) {
+
+                        }
+                    });
                     startActivity(new Intent(getApplicationContext(), SportActivity.class));
                     finish();
                 }
