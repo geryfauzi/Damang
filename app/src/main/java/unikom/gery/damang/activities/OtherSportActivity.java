@@ -68,6 +68,7 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
     private HeartRateHelper heartRateHelper;
     private int age, tns;
     private String id = "";
+    private long duration;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -79,7 +80,6 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
             }
         }
     };
-    private long duration;
     private Api api;
     private Call<CheckUser> response;
 
@@ -291,8 +291,17 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         if (heartRate >= tns && txtTNSStatus.getText().toString().equals("Belum")) {
             txtTNSStatus.setText("Iya");
             createNotificationNormalMode();
-            Toast.makeText(getApplicationContext(), "Selamat ! Anda telah mencapai TNS Anda !", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Selamat ! Anda telah mencapai TNS Anda ! Terus lanjutkan 10 s/d 20" +
+                    " menit, atau apabila sudah lelah, anda boleh menghentikan olahraga anda", Toast.LENGTH_LONG).show();
         }
+        duration = SystemClock.elapsedRealtime() - chronometer.getBase();
+        duration = Math.round(duration / 60000);
+        if (duration >= 20 && duration < 30 && txtTNSStatus.getText().equals("Belum"))
+            Toast.makeText(getApplicationContext(), "Jika anda sudah merasa lelah, segera istirahat atau hentikan" +
+                    " olahraga anda", Toast.LENGTH_LONG).show();
+        else if (duration >= 30 && txtTNSStatus.getText().equals("Belum"))
+            Toast.makeText(getApplicationContext(), "Segera hentikan olahraga anda sekarang, jangan memaksakan diri" +
+                    " anda", Toast.LENGTH_LONG).show();
     }
 
     private void createNotificationNormalMode() {
