@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import unikom.gery.damang.R;
@@ -73,6 +74,11 @@ public class CardioMenuActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         if (view == btnBack) {
             startActivity(new Intent(getApplicationContext(), SportActivity.class));
+            finish();
+        } else if (view == btnMulai) {
+            Intent intent = new Intent(getApplicationContext(), CardioSportActivity.class);
+            intent.putExtra("list", arrayList);
+            startActivity(intent);
             finish();
         }
     }

@@ -1,6 +1,8 @@
 package unikom.gery.damang.model;
 
-public class Cardio {
+import java.io.Serializable;
+
+public class Cardio implements Serializable {
     private String name;
     private int animation;
     private int count;
