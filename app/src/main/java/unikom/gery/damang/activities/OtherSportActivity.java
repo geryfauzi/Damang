@@ -62,6 +62,7 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
     private HeartRateHelper heartRateHelper;
     private int age, tns;
     private String id = "";
+    private long duration;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -73,7 +74,6 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
             }
         }
     };
-    private long duration;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -85,6 +85,7 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         getWindow().setStatusBarColor(Color.parseColor("#FFFFFF"));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         //
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_other_sport);
         //View Binding
@@ -259,6 +260,17 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
             txtTNSStatus.setText("Iya");
             createNotificationNormalMode();
             Toast.makeText(getApplicationContext(), "Selamat ! Anda telah mencapai TNS Anda !", Toast.LENGTH_LONG).show();
+        }
+        duration = SystemClock.elapsedRealtime() - chronometer.getBase();
+        duration = Math.round(duration / 60000);
+        if (txtTNSStatus.equals("Belum")) {
+            if (duration >= 20 && duration < 30) {
+                Toast.makeText(getApplicationContext(), "Sudah 20 menit anda belum mecapai TNS, istirahat sejenak" +
+                        " apabila merasa lelah. Apabila sangat lelah, boleh berhenti", Toast.LENGTH_LONG).show();
+            } else if (duration >= 30) {
+                Toast.makeText(getApplicationContext(), "Sistem mendeteksi sudah 30 menit tapi anda belum mencapai TNS," +
+                        " mohon segera menghentikan olahraga anda apabila merasa lelah", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

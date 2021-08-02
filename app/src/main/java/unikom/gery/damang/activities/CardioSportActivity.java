@@ -8,17 +8,14 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.WindowManager;
@@ -35,21 +32,19 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
+import com.bumptech.glide.Glide;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Random;
 
 import unikom.gery.damang.R;
+import unikom.gery.damang.model.Cardio;
 import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SportReceiver;
@@ -57,24 +52,20 @@ import unikom.gery.damang.sqlite.dml.HeartRateHelper;
 import unikom.gery.damang.sqlite.table.Sport;
 import unikom.gery.damang.util.SharedPreference;
 
-public class JoggingSportActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener, View.OnClickListener {
+public class CardioSportActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private GoogleMap mMap;
-    private LocationManager locationManager;
-    private String provider;
-    private Location lastLocation;
-    private SharedPreference sharedPreference;
     private Chronometer chronometer;
-    private ImageView btnBack;
+    private TextView txtDetakJantung, txtTargetTNS, txtTNSStatus, txtCardioName, txtCardioCount;
+    private ImageView imgAnimation, btnBack;
     private Button btnMulai, btnSelesai;
+    private ArrayList<Cardio> arrayList = new ArrayList<>();
     private CardView cvMulai, cvSelesai;
-    private long pauseOffset = 0;
+    private long pauseOffset;
+    private SharedPreference sharedPreference;
     private HeartRateHelper heartRateHelper;
-    private int age, tns;
+    private int age, tns, iteration;
     private String id = "";
-    private TextView txtDetakJantung, txtTNS, txtJarak;
-    private long duration = 0;
-    private String tnsStatus = "Belum";
+    private long duration;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -86,10 +77,8 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
             }
         }
     };
-    private double cLatitude, cLongitude, distance;
 
-    @SuppressLint("MissingPermission")
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,50 +88,83 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         getWindow().setStatusBarColor(Color.parseColor("#FFFFFF"));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         //
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getSupportActionBar().hide();
-        setContentView(R.layout.activity_jogging_sport);
-        //view Binding
-        chronometer = findViewById(R.id.txtTimer);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setContentView(R.layout.activity_cardio_sport);
+        //View Binding
         txtDetakJantung = findViewById(R.id.txtDetakJantung);
-        txtTNS = findViewById(R.id.txtTargetTNS);
-        txtJarak = findViewById(R.id.txtJarak);
+        txtTargetTNS = findViewById(R.id.txtTargetTNS);
+        txtTNSStatus = findViewById(R.id.txtStatusTNS);
+        imgAnimation = findViewById(R.id.imgAnimation);
         btnBack = findViewById(R.id.btnBack);
+        imgAnimation = findViewById(R.id.imgAnimation);
         btnMulai = findViewById(R.id.btnMulai);
         btnSelesai = findViewById(R.id.btnSelesai);
         cvMulai = findViewById(R.id.cardView16);
         cvSelesai = findViewById(R.id.cardView17);
-        //
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        provider = locationManager.getBestProvider(criteria, true);
-        lastLocation = locationManager.getLastKnownLocation(provider);
-        locationManager.requestLocationUpdates(provider, 1000, 0, this);
-        //
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        getLocation();
-        //
-        heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
+        txtCardioName = findViewById(R.id.txtCardioName);
+        txtCardioCount = findViewById(R.id.txtCardioCount);
+        chronometer = findViewById(R.id.txtTimer);
         sharedPreference = new SharedPreference(getApplicationContext());
+        heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
+
         btnBack.setOnClickListener(this);
         btnMulai.setOnClickListener(this);
         btnSelesai.setOnClickListener(this);
-        cvSelesai.setVisibility(View.INVISIBLE);
+
         IntentFilter filterLocal = new IntentFilter();
         filterLocal.addAction(DeviceService.ACTION_REALTIME_SAMPLES);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filterLocal);
-        //
+
+        arrayList = (ArrayList<Cardio>) getIntent().getSerializableExtra("list");
+
+        iteration = 0;
         chronometer.setBase(SystemClock.elapsedRealtime());
         try {
             age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
         } catch (ParseException e) {
             Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
         }
+        chronometer.setVisibility(View.INVISIBLE);
         tns = calculateTNS(age);
-        txtTNS.setText(Integer.toString(tns));
+        txtTargetTNS.setText(Integer.toString(tns));
+        start();
+        firstTimer();
+    }
+
+    private void firstTimer() {
+        Glide.with(getApplicationContext()).load(R.raw.timer_20).into(imgAnimation);
+        txtCardioCount.setVisibility(View.INVISIBLE);
+        txtCardioName.setText("Bersiaplah");
+        cvSelesai.setVisibility(View.INVISIBLE);
+        cvMulai.setVisibility(View.INVISIBLE);
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed((Runnable) () -> {
+            loadAnimation(iteration);
+        }, 21000);
+    }
+
+    private void timer() {
+        Glide.with(getApplicationContext()).load(R.raw.timer_10).into(imgAnimation);
+        txtCardioCount.setVisibility(View.INVISIBLE);
+        txtCardioName.setText("Beristirahatlah");
+        cvSelesai.setVisibility(View.INVISIBLE);
+        cvMulai.setVisibility(View.INVISIBLE);
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed((Runnable) () -> {
+            loadAnimation(iteration);
+        }, 11000);
+    }
+
+    private void loadAnimation(int iteration) {
+        txtCardioCount.setVisibility(View.VISIBLE);
+        cvSelesai.setVisibility(View.VISIBLE);
+        cvMulai.setVisibility(View.VISIBLE);
+
+        Glide.with(getApplicationContext()).load(arrayList.get(iteration).getAnimation()).into(imgAnimation);
+        txtCardioName.setText(arrayList.get(iteration).getName());
+        txtCardioCount.setText("x" + (arrayList.get(iteration).getCount()));
+        this.iteration += 1;
     }
 
     private void saveToDB(String id) {
@@ -152,7 +174,7 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         sport.setId(id);
         sport.setStart_time(date);
         sport.setTns_target(tns);
-        sport.setType("Jogging");
+        sport.setType("Cardio Lantai");
         heartRateHelper.insertSportData(sport);
     }
 
@@ -180,95 +202,6 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         int year2 = calendar.get(Calendar.YEAR);
         int monthResult = ((year2 - year1) * 12) + (month2 - month1);
         return monthResult / 12;
-    }
-
-
-    @SuppressLint("MissingPermission")
-    private void getLocation() {
-        if (lastLocation == null) {
-            locationManager.requestLocationUpdates(provider, 1000, 0, this);
-            lastLocation = locationManager.getLastKnownLocation(provider);
-            getLocation();
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        this.mMap = googleMap;
-        this.cLatitude = lastLocation.getLatitude();
-        this.cLongitude = lastLocation.getLongitude();
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        LatLng myPosition = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 20));
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (id.equals("")) {
-            sharedPreference.resetLatitudeLongitude();
-            startActivity(new Intent(getApplicationContext(), SportActivity.class));
-            finish();
-        } else
-            showAlertDialog();
-    }
-
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onLocationChanged(Location location) {
-        LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
-        sharedPreference.setLatitudeLongitude(location.getLatitude(), location.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 20));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 20));
-        //calculate distance
-        distance = distance + calculateDistance(cLatitude, cLongitude, location.getLatitude(), location.getLongitude());
-        txtJarak.setText(String.format("%.2f", distance));
-        this.cLatitude = location.getLatitude();
-        this.cLongitude = location.getLongitude();
-    }
-
-    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        double theta = lon1 - lon2;
-        double dist = Math.sin(deg2rad(lat1))
-                * Math.sin(deg2rad(lat2))
-                + Math.cos(deg2rad(lat1))
-                * Math.cos(deg2rad(lat2))
-                * Math.cos(deg2rad(theta));
-        dist = Math.acos(dist);
-        dist = rad2deg(dist);
-        dist = dist * 60 * 1.1515;
-        return (dist * 1.609);
-    }
-
-    private double deg2rad(double deg) {
-        return (deg * Math.PI / 180.0);
-    }
-
-    private double rad2deg(double rad) {
-        return (rad * 180.0 / Math.PI);
-    }
-
-    @SuppressLint("MissingPermission")
-    @Override
-    protected void onResume() {
-        super.onResume();
-        locationManager.requestLocationUpdates(provider, 1000, 0, this);
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -336,11 +269,6 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         chronometer.start();
     }
 
-    private void pause() {
-        chronometer.stop();
-        pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
-    }
-
     private void updateDB() {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String date = format.format(new Date(System.currentTimeMillis()));
@@ -348,8 +276,7 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         sport.setId(id);
         sport.setEnd_time(date);
         sport.setDuration((int) duration);
-        sport.setTns_status(tnsStatus);
-        sport.setDistance((float) distance);
+        sport.setTns_status(txtTNSStatus.getText().toString());
         sport.setAverage_heart_rate(heartRateHelper.getAverageSportHearRate(id, sharedPreference.getUser().getEmail()));
         sport.setCalories_burned(calculateBurnedCalories(heartRateHelper.getAverageSportHearRate(id, sharedPreference.getUser().getEmail())));
         heartRateHelper.updateSportData(sport);
@@ -367,14 +294,14 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
     private void updateView() {
         int heartRate = heartRateHelper.getLatesHeartRateSportMode(id, sharedPreference.getUser().getEmail());
         txtDetakJantung.setText(String.valueOf(heartRate));
-        if (heartRate >= tns && tnsStatus.equals("Belum")) {
-            tnsStatus = "Iya";
+        if (heartRate >= tns && txtTNSStatus.getText().toString().equals("Belum")) {
+            txtTNSStatus.setText("Iya");
             createNotificationNormalMode();
             Toast.makeText(getApplicationContext(), "Selamat ! Anda telah mencapai TNS Anda !", Toast.LENGTH_LONG).show();
         }
         duration = SystemClock.elapsedRealtime() - chronometer.getBase();
         duration = Math.round(duration / 60000);
-        if (tnsStatus.equals("Belum")) {
+        if (txtTNSStatus.equals("Belum")) {
             if (duration >= 20 && duration < 30) {
                 Toast.makeText(getApplicationContext(), "Sudah 20 menit anda belum mecapai TNS, istirahat sejenak" +
                         " apabila merasa lelah. Apabila sangat lelah, boleh berhenti", Toast.LENGTH_LONG).show();
@@ -414,7 +341,6 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         pauseSportMode();
         sharedPreference.setMode("Normal");
         sharedPreference.setSportId("null");
-        sharedPreference.resetLatitudeLongitude();
         chronometer.stop();
         duration = SystemClock.elapsedRealtime() - chronometer.getBase();
         duration = Math.round(duration / 60000);
@@ -422,35 +348,27 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         pauseOffset = 0;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Apakah anda yakin ingin menghentikan olahraga ?");
         builder.setTitle("Perhatian!");
         builder.setCancelable(false);
-        builder.setPositiveButton("Iya", new DialogInterface.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (heartRateHelper.checkHeartRateSportMode(id, sharedPreference.getUser().getEmail())) {
-                    stop();
-                    updateDB();
-                    startActivity(new Intent(getApplicationContext(), SportActivity.class));
-                    finish();
-                } else {
-                    stop();
-                    heartRateHelper.deleteSportData(id);
-                    startActivity(new Intent(getApplicationContext(), SportActivity.class));
-                    finish();
-                }
+        builder.setPositiveButton("Iya", (dialog, which) -> {
+            if (heartRateHelper.checkHeartRateSportMode(id, sharedPreference.getUser().getEmail())) {
+                stop();
+                updateDB();
+                startActivity(new Intent(getApplicationContext(), SportActivity.class));
+                finish();
+            } else {
+                stop();
+                heartRateHelper.deleteSportData(id);
+                startActivity(new Intent(getApplicationContext(), SportActivity.class));
+                finish();
+            }
 
-            }
         });
-        builder.setNegativeButton("Batal", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton("Batal", (dialog, which) -> dialog.cancel());
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -459,33 +377,24 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onClick(View view) {
         if (view == btnMulai) {
-            if (btnMulai.getText().equals("Mulai")) {
-                start();
-                btnMulai.setText("Jeda");
-            } else {
-                pause();
-                btnMulai.setText("Mulai");
-            }
-            cvSelesai.setVisibility(View.VISIBLE);
-        } else if (view == btnSelesai) {
-            if (!heartRateHelper.checkHeartRateSportMode(id, sharedPreference.getUser().getEmail()))
-                showAlertDialog();
-            else {
+            if (iteration == arrayList.size()) {
                 stop();
                 updateDB();
                 Intent intent = new Intent(getApplicationContext(), OtherSportDetailActivity.class);
                 intent.putExtra("id", id);
                 startActivity(intent);
                 finish();
-            }
-
-        } else if (view == btnBack) {
-            if (id.equals("")) {
-                sharedPreference.resetLatitudeLongitude();
-                startActivity(new Intent(getApplicationContext(), SportActivity.class));
-                finish();
             } else
-                showAlertDialog();
-        }
+                timer();
+        } else if (view == btnSelesai)
+            showAlertDialog();
+        else if (view == btnBack)
+            showAlertDialog();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onBackPressed() {
+        showAlertDialog();
     }
 }

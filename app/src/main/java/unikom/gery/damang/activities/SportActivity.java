@@ -2,6 +2,7 @@ package unikom.gery.damang.activities;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -12,10 +13,13 @@ import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -42,7 +46,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
     private ImageView btnBack;
     private TextView btnViewAll;
     private ConstraintLayout cvNoData;
-    private CardView btnOtherSport, btnJogging;
+    private CardView btnOtherSport, btnJogging, btnCardio;
     private RecyclerView rvSport;
     private ArrayList<Sport> arrayList;
     private HeartRateHelper heartRateHelper;
@@ -69,6 +73,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
         btnViewAll = findViewById(R.id.btnViewAll);
         btnOtherSport = findViewById(R.id.btnSportOther);
         btnJogging = findViewById(R.id.btnJogging);
+        btnCardio = findViewById(R.id.btnCardioLantai);
         cvNoData = findViewById(R.id.cvNoData);
         heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
         arrayList = heartRateHelper.getSportData();
@@ -78,6 +83,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
         btnBack.setOnClickListener(this);
         btnOtherSport.setOnClickListener(this);
         btnJogging.setOnClickListener(this);
+        btnCardio.setOnClickListener(this);
         setView();
     }
 
@@ -129,6 +135,29 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
         return status;
     }
 
+    private void showAlertDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Bagimana kemampuan anda dalam berolahraga ?");
+        builder.setMessage("Kedepannya level olahraga akan menyesuaikan secara otomatis berdasarkan detak jantung.");
+        final View layout = getLayoutInflater().inflate(R.layout.custom_alert_dialog_cardio, null);
+        builder.setView(layout);
+
+        final RadioGroup radioGroup = layout.findViewById(R.id.btnGroup);
+        builder.setPositiveButton("Terapkan", (dialogInterface, i) -> {
+            int selectedID = radioGroup.getCheckedRadioButtonId();
+            RadioButton radioButton = layout.findViewById(selectedID);
+            Intent intent = new Intent(getApplicationContext(), CardioMenuActivity.class);
+            intent.putExtra("level", radioButton.getText().toString());
+            startActivity(intent);
+            finish();
+            dialogInterface.dismiss();
+        });
+        builder.setNegativeButton("Batal", (dialogInterface, i) -> dialogInterface.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     @Override
     public void onClick(View view) {
         if (view == btnBack)
@@ -145,6 +174,8 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
                 checkGPS();
             } else
                 Toast.makeText(getApplicationContext(), "Harap hubungkan dahulu sistem dengan perangkat wearable device", Toast.LENGTH_SHORT).show();
+        } else if (view == btnCardio){
+            showAlertDialog();
         }
     }
 

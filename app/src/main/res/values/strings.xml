@@ -1273,4 +1273,15 @@
     <string name="cadangkan">Cadangkan</string>
     <string name="pulihkan">Pulihkan</string>
     <string name="jarak_km">Jarak (km)</string>
+    <string name="pemula">Pemula (5 - 10 menit)</string>
+    <string name="menengah">Menengah (10 - 20 menit)</string>
+    <string name="lanjutan">Lanjutan (15 - 30 menit)</string>
+    <string name="instruksi">Instruksi</string>
+    <string name="program_latihan_ini_dirancangan_dengan_memadukan_aerobik_dasar_dan_latihan_anaerobik_yang_menggunakan_berat_badan_untuk_melatih_semua_kelompok_otot_dan_memacu_pembakaran_lemak">Program latihan ini dirancangan dengan memadukan aerobik dasar dan latihan anaerobik, yang menggunakan berat badan untuk melatih semua kelompok otot dan memacu pembakaran lemak.</string>
+    <string name="bagi_anda_yang_sedang_dalam_penurunan_berat_badan_tetaplah_menjalani_diet_menu_rendah_kalori_untuk_memaksimalkan_hasil_dari_program_penurunan_berat_badan">Bagi anda yang sedang dalam penurunan berat badan, tetaplah menjalani diet menu rendah kalori untuk memaksimalkan hasil dari program penurunan berat badan.</string>
+    <string name="daftar_gerakan_latihan">Daftar Gerakan Latihan</string>
+    <string name="mountain_climbers">Mountain Climbers</string>
+    <string name="lewati">Lewati</string>
+    <string name="pendaki_gunung">Pendaki Gunung</string>
+    <string name="hentikan_mode_olahraga">Hentikan Mode Olahraga</string>
 </resources>

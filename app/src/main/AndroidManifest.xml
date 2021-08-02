@@ -61,7 +61,9 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/GadgetbridgeTheme">
-        <activity android:name=".activities.JoggingSportActivity"></activity>
+        <activity android:name=".activities.CardioSportActivity"></activity>
+        <activity android:name=".activities.CardioMenuActivity" />
+        <activity android:name=".activities.JoggingSportActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
