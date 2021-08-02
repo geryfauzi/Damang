@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:layout_height="100dp">
+
+   <androidx.constraintlayout.widget.ConstraintLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+
+       <ImageView
+           android:id="@+id/imgCardio"
+           android:layout_width="130dp"
+           android:layout_height="100dp"
+           app:layout_constraintBottom_toBottomOf="parent"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintTop_toTopOf="parent" />
+
+       <TextView
+           android:layout_marginTop="30dp"
+           android:layout_marginStart="16dp"
+           android:textStyle="bold"
+           android:textColor="@android:color/black"
+           android:textSize="16sp"
+           android:id="@+id/txtCardioName"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/mountain_climbers"
+           app:layout_constraintStart_toEndOf="@+id/imgCardio"
+           app:layout_constraintTop_toTopOf="parent" />
+
+       <TextView
+           android:id="@+id/txtCardioCount"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="x16"
+           android:textStyle="bold"
+           android:layout_marginTop="3dp"
+           android:textColor="@color/primary_light"
+           app:layout_constraintStart_toStartOf="@+id/txtCardioName"
+           app:layout_constraintTop_toBottomOf="@+id/txtCardioName" />
+
+   </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

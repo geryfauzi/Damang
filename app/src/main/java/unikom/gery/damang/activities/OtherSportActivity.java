@@ -93,6 +93,7 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         getWindow().setStatusBarColor(Color.parseColor("#FFFFFF"));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         //
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_other_sport);
         //View Binding
