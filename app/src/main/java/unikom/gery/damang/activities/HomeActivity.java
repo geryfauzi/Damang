@@ -231,47 +231,23 @@ public class HomeActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
         }
 
-        imgProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
-            }
+        imgProfile.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), ProfileActivity.class)));
+
+        btnAddDevice.setOnClickListener(view -> launchDiscoveryActivity());
+
+        cvHeartRate.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), DailyConditionActivity.class)));
+
+        cvPengaturanAlat.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), MiBandPreferencesActivity.class);
+            startActivity(intent);
         });
 
-        btnAddDevice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                launchDiscoveryActivity();
-            }
-        });
+        cvOlahraga.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), SportActivity.class)));
 
-        cvHeartRate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), DailyConditionActivity.class));
-            }
-        });
+        btnSettings.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), SystemSettingsActivity.class)));
 
-        cvPengaturanAlat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), MiBandPreferencesActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        cvOlahraga.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), SportActivity.class));
-            }
-        });
-
-        btnSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), SystemSettingsActivity.class));
-            }
+        cvArtikel.setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), ArticleActivity.class));
         });
     }
 
