@@ -13,11 +13,9 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
-import unikom.gery.damang.R;
 import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
@@ -318,31 +316,47 @@ public class HeartRateHelper {
         return arrayList;
     }
 
+    public Sport getLatestSportData() {
+        database = dbHelper.getWritableDatabase();
+        Sport sport = new Sport();
+        Cursor cursor = database.rawQuery("SELECT DATE(end_time),type FROM sport_activity ORDER BY end_time DESC LIMIT 1", new String[]{});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                sport.setEnd_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(end_time)")));
+                sport.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return sport;
+    }
+
     public void performBackup(Context context) {
-        try{
+        try {
             File sd = context.getExternalFilesDir(Environment.DIRECTORY_PODCASTS);
             File data = Environment.getDataDirectory();
 
-            String currentDBPath = "/data/"+ "unikom.gery.damang" +"/databases/"+DBHelper.DATABASE_NAME;
+            String currentDBPath = "/data/" + "unikom.gery.damang" + "/databases/" + DBHelper.DATABASE_NAME;
             String backupDBPath = DBHelper.DATABASE_NAME;
 
             File currentDB = new File(data, currentDBPath);
-            File backupDB = new File(sd,backupDBPath);
+            File backupDB = new File(sd, backupDBPath);
 
 
-            if(currentDB.exists()){
+            if (currentDB.exists()) {
                 FileChannel source = new FileInputStream(currentDB).getChannel();
                 FileChannel destination = new FileOutputStream(backupDB).getChannel();
-                destination.transferFrom(source,0,source.size());
+                destination.transferFrom(source, 0, source.size());
                 source.close();
                 destination.close();
-                Toast.makeText(context,"Selesai",Toast.LENGTH_SHORT).show();
-            }else
-                Toast.makeText(context,"Tidak ditemukan",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Selesai", Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(context, "Tidak ditemukan", Toast.LENGTH_SHORT).show();
 
-        }catch (Exception error){
-            Toast.makeText(context,"Error : " + error.toString(),Toast.LENGTH_LONG).show();
-            Log.d("Tag","Error : " + error.toString());
+        } catch (Exception error) {
+            Toast.makeText(context, "Error : " + error.toString(), Toast.LENGTH_LONG).show();
+            Log.d("Tag", "Error : " + error.toString());
         }
     }
 
