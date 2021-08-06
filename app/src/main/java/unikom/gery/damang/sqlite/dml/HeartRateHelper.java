@@ -6,9 +6,18 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
+import unikom.gery.damang.R;
 import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
@@ -307,6 +316,34 @@ public class HeartRateHelper {
         }
         cursor.close();
         return arrayList;
+    }
+
+    public void performBackup(Context context) {
+        try{
+            File sd = context.getExternalFilesDir(Environment.DIRECTORY_PODCASTS);
+            File data = Environment.getDataDirectory();
+
+            String currentDBPath = "/data/"+ "unikom.gery.damang" +"/databases/"+DBHelper.DATABASE_NAME;
+            String backupDBPath = DBHelper.DATABASE_NAME;
+
+            File currentDB = new File(data, currentDBPath);
+            File backupDB = new File(sd,backupDBPath);
+
+
+            if(currentDB.exists()){
+                FileChannel source = new FileInputStream(currentDB).getChannel();
+                FileChannel destination = new FileOutputStream(backupDB).getChannel();
+                destination.transferFrom(source,0,source.size());
+                source.close();
+                destination.close();
+                Toast.makeText(context,"Selesai",Toast.LENGTH_SHORT).show();
+            }else
+                Toast.makeText(context,"Tidak ditemukan",Toast.LENGTH_SHORT).show();
+
+        }catch (Exception error){
+            Toast.makeText(context,"Error : " + error.toString(),Toast.LENGTH_LONG).show();
+            Log.d("Tag","Error : " + error.toString());
+        }
     }
 
 }
