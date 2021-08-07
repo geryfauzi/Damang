@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.DateFormat;
@@ -24,9 +25,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
+import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
+import unikom.gery.damang.adapter.SleepAdapter;
+import unikom.gery.damang.devices.DeviceManager;
+import unikom.gery.damang.impl.GBDevice;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SleepReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
@@ -36,6 +42,9 @@ import unikom.gery.damang.util.SharedPreference;
 public class SleepActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ArrayList<Sleep> list = new ArrayList<>();
+    private DeviceManager deviceManager;
+    private List<GBDevice> deviceList;
+    private GBDevice device;
     private HeartRateHelper heartRateHelper;
     private RecyclerView rvSleep;
     private Button btnMulai;
@@ -43,6 +52,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
     private ConstraintLayout cvNoData;
     private SharedPreference sharedPreference;
     private String id = "";
+    private SleepAdapter sleepAdapter;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -64,6 +74,9 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
         heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
         list = heartRateHelper.getSleepData();
         sharedPreference = new SharedPreference(getApplicationContext());
+        deviceManager = ((GBApplication) getApplication()).getDeviceManager();
+        deviceList = deviceManager.getDevices();
+        sleepAdapter = new SleepAdapter(list, getApplicationContext());
 
         btnViewAll.setOnClickListener(this);
         btnMulai.setOnClickListener(this);
@@ -71,11 +84,29 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
         viewSleepData();
     }
 
+    private boolean checkDevice() {
+        boolean status = false;
+        if (deviceList.size() <= 0)
+            return false;
+        else {
+            for (int i = 0; i < deviceList.size(); i++) {
+                device = deviceList.get(i);
+                if (device.isConnected()) {
+                    status = true;
+                }
+            }
+        }
+        return status;
+    }
+
     public void viewSleepData() {
         if (list.size() > 0) {
             rvSleep.setVisibility(View.VISIBLE);
             btnViewAll.setVisibility(View.VISIBLE);
             cvNoData.setVisibility(View.GONE);
+            rvSleep.setHasFixedSize(true);
+            rvSleep.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            rvSleep.setAdapter(sleepAdapter);
         } else {
             rvSleep.setVisibility(View.GONE);
             btnViewAll.setVisibility(View.INVISIBLE);
@@ -313,8 +344,11 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         if (view == btnMulai) {
             if (sharedPreference.getMode().equals("Normal")) {
-                start();
-                btnMulai.setText("Hentikan Mode Tidur");
+                if (checkDevice()) {
+                    start();
+                    btnMulai.setText("Hentikan Mode Tidur");
+                } else
+                    Toast.makeText(getApplicationContext(), "Harap hubungkan dahulu sistem dengan perangkat wearable device", Toast.LENGTH_SHORT).show();
             } else if (sharedPreference.getMode().equals("Sleep")) {
                 try {
                     showAlertDialog();
