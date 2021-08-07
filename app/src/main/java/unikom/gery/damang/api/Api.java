@@ -27,7 +27,7 @@ public interface Api {
     );
 
     @GET("top-headlines")
-    Call<News> getArtikelBerita(
+    Call<News> getArticleNewsData(
             @Query("country") String country,
             @Query("category") String category,
             @Query("apiKey") String apiKey

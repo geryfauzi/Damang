@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -29,7 +30,6 @@ public class ArticleActivity extends AppCompatActivity {
 
     private ImageView btnBack;
     private RecyclerView rvBerita;
-    private ArrayList<Article> list;
     private BeritaAdapter beritaAdapter;
     private ProgressDialog progressDialog;
 
@@ -37,11 +37,12 @@ public class ArticleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.getSupportActionBar().hide();
         //Change statusbar color
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(Color.parseColor("#FFFFFF"));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        getSupportActionBar().hide();
         //
         setContentView(R.layout.activity_article);
         progressDialog = new ProgressDialog(this);
@@ -51,17 +52,17 @@ public class ArticleActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         rvBerita.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         rvBerita.setHasFixedSize(true);
-        loadBerita();
+        viewArticleData();
 
         btnBack.setOnClickListener(view -> {
             finish();
         });
     }
 
-    private void loadBerita() {
+    private void viewArticleData() {
         progressDialog.show();
         Api api = BaseApi.getRetrofit("https://newsapi.org/v2/").create(Api.class);
-        Call<News> response = api.getArtikelBerita("id", "health", "02c679d51abf4f51b390841dab64b436");
+        Call<News> response = api.getArticleNewsData("id", "health", "02c679d51abf4f51b390841dab64b436");
         response.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {

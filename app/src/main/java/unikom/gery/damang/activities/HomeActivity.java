@@ -91,7 +91,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private ArrayList<DetailHeartRate> arrayList;
-    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga;
+    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga, cvTidur;
     private ImageView btnAddDevice;
     private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar, txtInfoDataOlahraga;
     private ImageView imgProfile, btnSettings;
@@ -150,6 +150,7 @@ public class HomeActivity extends AppCompatActivity
         cvRumahSakit = findViewById(R.id.cvRumahSakit);
         cvPengaturanAlat = findViewById(R.id.cvPengaturanAlat);
         cvOlahraga = findViewById(R.id.cvOlahraga);
+        cvTidur = findViewById(R.id.cvTidur);
         btnAddDevice = findViewById(R.id.btnAddDevice);
         btnSettings = findViewById(R.id.imageView6);
         txtHeartRate = findViewById(R.id.txtHeartRate);
@@ -208,7 +209,7 @@ public class HomeActivity extends AppCompatActivity
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
         sharedPreference.setSportId("null");
         txtUser.setText(sharedPreference.getUser().getName());
-        if (!sharedPreference.getMode().equals("Normal")) {
+        if (sharedPreference.getMode().equals("Sport")) {
             //Start Normal Mode
             ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
             PackageManager packageManager = this.getPackageManager();
@@ -248,6 +249,10 @@ public class HomeActivity extends AppCompatActivity
 
         cvArtikel.setOnClickListener(view -> {
             startActivity(new Intent(getApplicationContext(), ArticleActivity.class));
+        });
+
+        cvTidur.setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), SleepActivity.class));
         });
     }
 

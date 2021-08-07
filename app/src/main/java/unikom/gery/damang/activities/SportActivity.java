@@ -2,7 +2,6 @@ package unikom.gery.damang.activities;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -84,6 +83,7 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
         btnOtherSport.setOnClickListener(this);
         btnJogging.setOnClickListener(this);
         btnCardio.setOnClickListener(this);
+        btnViewAll.setOnClickListener(this);
         setView();
     }
 
@@ -92,15 +92,15 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
             btnViewAll.setVisibility(View.VISIBLE);
             cvNoData.setVisibility(View.GONE);
             rvSport.setVisibility(View.VISIBLE);
+            sportAdapter = new SportAdapter(arrayList, getApplicationContext());
+            rvSport.setHasFixedSize(true);
+            rvSport.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            rvSport.setAdapter(sportAdapter);
         } else {
             btnViewAll.setVisibility(View.INVISIBLE);
             rvSport.setVisibility(View.GONE);
             cvNoData.setVisibility(View.VISIBLE);
         }
-        sportAdapter = new SportAdapter(arrayList, getApplicationContext());
-        rvSport.setHasFixedSize(true);
-        rvSport.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        rvSport.setAdapter(sportAdapter);
     }
 
     private void checkGPS() {
@@ -174,8 +174,13 @@ public class SportActivity extends AppCompatActivity implements View.OnClickList
                 checkGPS();
             } else
                 Toast.makeText(getApplicationContext(), "Harap hubungkan dahulu sistem dengan perangkat wearable device", Toast.LENGTH_SHORT).show();
-        } else if (view == btnCardio){
-            showAlertDialog();
+        } else if (view == btnCardio) {
+            if (checkDevice()) {
+                showAlertDialog();
+            } else
+                Toast.makeText(getApplicationContext(), "Harap hubungkan dahulu sistem dengan perangkat wearable device", Toast.LENGTH_SHORT).show();
+        } else if (view == btnViewAll) {
+            startActivity(new Intent(getApplicationContext(), DataOlahragaActivity.class));
         }
     }
 

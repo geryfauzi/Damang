@@ -20,6 +20,7 @@ import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
 import unikom.gery.damang.sqlite.table.HeartRate;
+import unikom.gery.damang.sqlite.table.Sleep;
 import unikom.gery.damang.sqlite.table.Sport;
 import unikom.gery.damang.util.SharedPreference;
 
@@ -299,6 +300,48 @@ public class HeartRateHelper {
         database = dbHelper.getWritableDatabase();
         ArrayList<Sport> arrayList = new ArrayList<>();
         Cursor cursor = database.rawQuery("SELECT _id, average_heart_rate, type, DATE(start_time) FROM sport_activity ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
+        cursor.moveToFirst();
+        Sport sport;
+        if (cursor.getCount() > 0) {
+            do {
+                sport = new Sport();
+                sport.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sport.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
+                sport.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sport.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
+                arrayList.add(sport);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public ArrayList<Sleep> getSleepData() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<Sleep> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT _id, duration, status, DATE(start_time) FROM sleep_activity ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
+        cursor.moveToFirst();
+        Sleep sleep;
+        if (cursor.getCount() > 0) {
+            do {
+                sleep = new Sleep();
+                sleep.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sleep.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sleep.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow("duration")));
+                sleep.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                arrayList.add(sleep);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public ArrayList<Sport> getAllSportData() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<Sport> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT _id, average_heart_rate, type, DATE(start_time) FROM sport_activity ORDER BY DATE(start_time) DESC", new String[]{});
         cursor.moveToFirst();
         Sport sport;
         if (cursor.getCount() > 0) {

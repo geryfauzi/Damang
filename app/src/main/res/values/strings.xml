@@ -1286,4 +1286,9 @@
     <string name="hentikan_mode_olahraga">Hentikan Mode Olahraga</string>
     <string name="cara_menjaga_kesehatan_di_masa_pandemi">Cara Menjaga Kesehatan di Masa Pandemi</string>
     <string name="viva_co_id">Viva.co.id</string>
+    <string name="menu_tidur">Menu Tidur</string>
+    <string name="aktifkan_mode_tidur">Aktifkan Mode Tidur</string>
+    <string name="riwayat_tidur">Riwayat Tidur</string>
+    <string name="_8_jam">8 Jam Durasi Tidur</string>
+    <string name="sangat_baik">Sangat Baik</string>
 </resources>
