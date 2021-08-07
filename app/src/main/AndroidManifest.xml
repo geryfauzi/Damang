@@ -103,6 +103,9 @@
         <receiver
             android:name=".service.SportReceiver"
             android:process=":remote" />
+        <receiver
+            android:name=".service.SleepReceiver"
+            android:process=":remote" />
 
         <activity android:name=".activities.RegisterActivity" />
         <activity android:name=".activities.LoginActivity" />

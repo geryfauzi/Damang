@@ -1817,7 +1817,10 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                                     createSportNotification();
                             }
                         } else if (mode.equals("Sleep")) {
-
+                            if (sample.getHeartRate() > 0) {
+                                heartRate.setId_sleep(sharedPreference.getSleepId());
+                                heartRateHelper.insertHeartRateSleepMode(heartRate);
+                            }
                         } else if (mode.equals("Normal")) {
                             if (sample.getHeartRate() > 0) {
                                 heartRateHelper.insertHeartRateNormalMode(heartRate);

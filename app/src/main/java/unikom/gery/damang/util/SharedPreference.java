@@ -25,6 +25,8 @@ public class SharedPreference {
     private static final String sportId = "sportId";
     private static final String latitude = "latitude";
     private static final String longitude = "longitude";
+    private static final String sleepId = "sleepId";
+    private static final String startTime = "startTime";
     private final SharedPreferences sharedPreference;
 
 
@@ -96,6 +98,26 @@ public class SharedPreference {
         editor.apply();
     }
 
+    public String getSleepId() {
+        return sharedPreference.getString(sleepId, "null");
+    }
+
+    public void setSleepId(String value) {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putString(sleepId, value);
+        editor.apply();
+    }
+
+    public String getStartTime() {
+        return sharedPreference.getString(startTime, "null");
+    }
+
+    public void setStartTime(String value) {
+        SharedPreferences.Editor editor = sharedPreference.edit();
+        editor.putString(startTime, value);
+        editor.apply();
+    }
+
     //Ini hanya untuk area uji coba saja
     public int getHeartRate() {
         return sharedPreference.getInt(heartRate, 0);
@@ -117,14 +139,14 @@ public class SharedPreference {
         editor.apply();
     }
 
-    public void setLevel(String value){
+    public String getLevel() {
+        return sharedPreference.getString(level, "Pemula");
+    }
+
+    public void setLevel(String value) {
         SharedPreferences.Editor editor = sharedPreference.edit();
         editor.putString(level, value);
         editor.apply();
-    }
-
-    public String getLevel(){
-        return sharedPreference.getString(level,"Pemula");
     }
 
     public void setLatitudeLongitude(double mLatitude, double mLongitude) {
