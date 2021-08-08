@@ -140,7 +140,7 @@ public class CardioSportActivity extends AppCompatActivity implements View.OnCli
         cvMulai.setVisibility(View.INVISIBLE);
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed((Runnable) () -> {
-            loadAnimation(iteration);
+            displayAnimation(iteration);
         }, 21000);
     }
 
@@ -152,11 +152,11 @@ public class CardioSportActivity extends AppCompatActivity implements View.OnCli
         cvMulai.setVisibility(View.INVISIBLE);
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed((Runnable) () -> {
-            loadAnimation(iteration);
+            displayAnimation(iteration);
         }, 11000);
     }
 
-    private void loadAnimation(int iteration) {
+    private void displayAnimation(int iteration) {
         txtCardioCount.setVisibility(View.VISIBLE);
         cvSelesai.setVisibility(View.VISIBLE);
         cvMulai.setVisibility(View.VISIBLE);

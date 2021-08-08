@@ -1,6 +1,7 @@
 package unikom.gery.damang.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import unikom.gery.damang.R;
+import unikom.gery.damang.activities.DetailSleepActivity;
 import unikom.gery.damang.sqlite.table.Sleep;
 
 public class SleepAdapter extends RecyclerView.Adapter<SleepAdapter.ViewHolder> {
@@ -73,6 +75,13 @@ public class SleepAdapter extends RecyclerView.Adapter<SleepAdapter.ViewHolder> 
             holder.txtKeteranganSkor.setText("Sangat Kurang");
             holder.txtKeteranganSkor.setTextColor(Color.parseColor("#FF5959"));
         }
+
+        holder.itemView.setOnClickListener(view -> {
+            Intent intent = new Intent(holder.itemView.getContext(), DetailSleepActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("id", list.get(position).getId());
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override

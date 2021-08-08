@@ -6,14 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-import android.util.Log;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 import unikom.gery.damang.model.DetailHeartRate;
@@ -385,7 +378,7 @@ public class HeartRateHelper {
     public ArrayList<Sleep> getSleepData() {
         database = dbHelper.getWritableDatabase();
         ArrayList<Sleep> arrayList = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT _id, duration, status, DATE(start_time) FROM sleep_activity ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
+        Cursor cursor = database.rawQuery("SELECT _id, duration, status, DATE(start_time) FROM sleep_activity WHERE status IS NOT NULL ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
         cursor.moveToFirst();
         Sleep sleep;
         if (cursor.getCount() > 0) {
@@ -401,6 +394,25 @@ public class HeartRateHelper {
         }
         cursor.close();
         return arrayList;
+    }
+
+    public Sleep getDetailSleepData(String id) {
+        database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.rawQuery("SELECT _id, duration, status, average_heart_rate, DATE(start_time) FROM sleep_activity WHERE status IS NOT NULL AND _id = ?", new String[]{id});
+        cursor.moveToFirst();
+        Sleep sleep = new Sleep();
+        if (cursor.getCount() > 0) {
+            do {
+                sleep.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sleep.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
+                sleep.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sleep.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow("duration")));
+                sleep.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return sleep;
     }
 
     public ArrayList<Sport> getAllSportData() {
@@ -438,6 +450,21 @@ public class HeartRateHelper {
         }
         cursor.close();
         return sport;
+    }
+
+    public Sleep getLatestSleepData() {
+        database = dbHelper.getWritableDatabase();
+        Sleep sleep = new Sleep();
+        Cursor cursor = database.rawQuery("SELECT DATE(start_time) FROM sleep_activity ORDER BY end_time DESC LIMIT 1", new String[]{});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                sleep.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return sleep;
     }
 
 }

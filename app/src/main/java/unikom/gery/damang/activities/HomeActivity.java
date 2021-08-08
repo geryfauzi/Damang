@@ -73,6 +73,7 @@ import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SportReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
+import unikom.gery.damang.sqlite.table.Sleep;
 import unikom.gery.damang.sqlite.table.Sport;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
@@ -93,7 +94,7 @@ public class HomeActivity extends AppCompatActivity
     private ArrayList<DetailHeartRate> arrayList;
     private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga, cvTidur;
     private ImageView btnAddDevice;
-    private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar, txtInfoDataOlahraga;
+    private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar, txtInfoDataOlahraga, txtDataTidur;
     private ImageView imgProfile, btnSettings;
     private SharedPreference sharedPreference;
     private DeviceManager deviceManager;
@@ -159,6 +160,7 @@ public class HomeActivity extends AppCompatActivity
         txtJumlahLangkah = findViewById(R.id.txtJumlahLangkah);
         txtKaloriTerbakar = findViewById(R.id.txtKaloriTerbakar);
         txtInfoDataOlahraga = findViewById(R.id.txtInfoDataOlahraga);
+        txtDataTidur = findViewById(R.id.txtDataTidur);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
@@ -270,9 +272,17 @@ public class HomeActivity extends AppCompatActivity
             txtCurrentCondition.setText("Belum ada data detak jantung");
         }
         Sport sport = heartRateHelper.getLatestSportData();
-        if (sport.getType() != null)
-            txtInfoDataOlahraga.setText("Terakhir olahraga:\n" + sport.getType());
-
+        if (sport.getType() != null) {
+            Date date = new SimpleDateFormat("yyyy-MM-dd").parse(sport.getEnd_time());
+            String parseDate = new SimpleDateFormat("dd MMMM").format(date);
+            txtInfoDataOlahraga.setText("Terakhir olahraga:\n" + parseDate);
+        }
+        Sleep sleep = heartRateHelper.getLatestSleepData();
+        if (sleep.getStart_time() != null) {
+            Date date = new SimpleDateFormat("yyyy-MM-dd").parse(sleep.getStart_time());
+            String parseDate = new SimpleDateFormat("dd MMMM").format(date);
+            txtDataTidur.setText("Terakhir tidur:\n" + parseDate);
+        }
     }
 
     private void updateCurrentCondition() throws ParseException {

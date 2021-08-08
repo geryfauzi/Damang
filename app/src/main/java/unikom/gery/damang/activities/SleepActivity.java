@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +54,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
     private SharedPreference sharedPreference;
     private String id = "";
     private SleepAdapter sleepAdapter;
+    private ImageView btnBack;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -71,6 +73,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
         rvSleep = findViewById(R.id.rvSleepData);
         btnViewAll = findViewById(R.id.btnViewAll);
         cvNoData = findViewById(R.id.cvNoData);
+        btnBack = findViewById(R.id.btnBack);
         heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
         list = heartRateHelper.getSleepData();
         sharedPreference = new SharedPreference(getApplicationContext());
@@ -80,6 +83,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
 
         btnViewAll.setOnClickListener(this);
         btnMulai.setOnClickListener(this);
+        btnBack.setOnClickListener(this);
 
         viewSleepData();
     }
@@ -356,6 +360,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
                     e.printStackTrace();
                 }
             }
-        }
+        } else if (view == btnBack)
+            super.onBackPressed();
     }
 }

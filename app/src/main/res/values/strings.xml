@@ -1291,4 +1291,6 @@
     <string name="riwayat_tidur">Riwayat Tidur</string>
     <string name="_8_jam">8 Jam Durasi Tidur</string>
     <string name="sangat_baik">Sangat Baik</string>
+    <string name="detail_tidur">Detail Tidur</string>
+    <string name="catatan">Catatan</string>
 </resources>
