@@ -125,6 +125,33 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
         });
     }
 
+    private void restore() {
+        try {
+            File internal = getApplicationContext().getObbDir();
+
+            if (internal.canWrite()) {
+                File currentDB = new File("/data/data/" + getPackageName() + "/databases/", DBHelper.DATABASE_NAME);
+                File backupDB = new File(internal, "db_damang.db");
+
+                if (backupDB.exists()) {
+                    FileChannel src = new FileInputStream(backupDB).getChannel();
+                    FileChannel dst = new FileOutputStream(currentDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+                    Toast.makeText(getApplicationContext(), currentDB.toString(), Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(getApplicationContext(), "Error, tidak ditemukan file backup!", Toast.LENGTH_SHORT).show();
+
+            } else
+                Toast.makeText(getApplicationContext(), "Error, tidak bisa write internal!", Toast.LENGTH_SHORT).show();
+
+        } catch (Exception error) {
+            Toast.makeText(getApplicationContext(), "Error : " + error.toString(), Toast.LENGTH_LONG).show();
+            Log.d("Tag", "Error : " + error.toString());
+        }
+    }
+
     private void backup() {
         try {
             if (!isSDPresent(getApplicationContext())) {
@@ -134,7 +161,7 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
 
             File sd = new File(sdPath);
             File internal = getApplicationContext().getObbDir();
-            if (sd.canWrite()) {
+            if (internal.canWrite()) {
                 File currentDB = new File("/data/data/" + getPackageName() + "/databases/", DBHelper.DATABASE_NAME);
                 File backupDB = new File(internal, "db_damang.db");
 
@@ -184,7 +211,8 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
                 Toast.makeText(getApplicationContext(), "Sedang melakukan backup", Toast.LENGTH_SHORT).show();
                 backup();
             } else {
-
+                Toast.makeText(getApplicationContext(), "Sedang melakukan restore", Toast.LENGTH_SHORT).show();
+                restore();
             }
         }
     }
