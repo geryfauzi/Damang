@@ -1,11 +1,16 @@
 package unikom.gery.damang.api;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
+import unikom.gery.damang.response.Backup;
 import unikom.gery.damang.response.CheckUser;
 import unikom.gery.damang.response.News;
 
@@ -24,6 +29,15 @@ public interface Api {
             @Field("weight") Float weight,
             @Field("height") Float height,
             @Field("photo") String photo
+    );
+
+    @Multipart
+    @POST("user/backupFile.php")
+    Call<Backup> backupCloud(
+            @Part MultipartBody.Part file,
+            @Part("file") RequestBody name,
+            @Query("email") String email,
+            @Query("date") String date
     );
 
     @GET("top-headlines")
