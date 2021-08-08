@@ -52,6 +52,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private ProgressDialog progressDialog;
     private Spinner spinnerGender;
     private HeartRateHelper heartRateHelper;
+    private static final String baseUrl = "https://sohibultech.com/damang/";
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -155,7 +156,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private void register(final User data) {
         progressDialog.show();
-        Api api = BaseApi.getRetrofit().create(Api.class);
+        Api api = BaseApi.getRetrofit(baseUrl).create(Api.class);
         Call<CheckUser> response = api.registerUser(data.getEmail(), data.getName(), data.getDateofBirth(), data.getGender(), data.getWeight(), data.getHeight(), data.getPhoto());
         response.enqueue(new Callback<CheckUser>() {
             @Override

@@ -6,19 +6,28 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
 import unikom.gery.damang.sqlite.table.HeartRate;
+import unikom.gery.damang.sqlite.table.Sleep;
 import unikom.gery.damang.sqlite.table.Sport;
 import unikom.gery.damang.util.SharedPreference;
 
 public class HeartRateHelper {
     static String TABLE_HEART_RATE = "heart_rate_activity";
     static String TABLE_SPORT = "sport_activity";
+    static String TABLE_SLEEP = "sleep_activity";
     static String EMAIL = "email";
     static String _ID = "_id";
     static String ID_SPORT = "id_sport";
@@ -106,6 +115,19 @@ public class HeartRateHelper {
         return database.insert(TABLE_HEART_RATE, null, args);
     }
 
+    public long insertHeartRateSleepMode(HeartRate heartRate) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(EMAIL, heartRate.getEmail());
+        args.put(ID_SLEEP, heartRate.getId_sleep());
+        args.put(DATE_TIME, heartRate.getDate_time());
+        args.put(HEART_RATE, heartRate.getHeart_rate());
+        args.put(MODE, heartRate.getMode());
+        args.put(STATUS, heartRate.getStatus());
+        sharedPreference.setHeartRate(heartRate.getHeart_rate());
+        return database.insert(TABLE_HEART_RATE, null, args);
+    }
+
     public long insertSportData(Sport sport) {
         ContentValues args = new ContentValues();
         database = dbHelper.getWritableDatabase();
@@ -114,6 +136,24 @@ public class HeartRateHelper {
         args.put(TNS_TARGET, sport.getTns_target());
         args.put(TYPE, sport.getType());
         return database.insert(TABLE_SPORT, null, args);
+    }
+
+    public long insertSleepData(Sleep sleep) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(_ID, sleep.getId());
+        args.put(START_TIME, sleep.getStart_time());
+        return database.insert(TABLE_SLEEP, null, args);
+    }
+
+    public int updateSleepData(Sleep sleep) {
+        ContentValues args = new ContentValues();
+        database = dbHelper.getWritableDatabase();
+        args.put(END_TIME, sleep.getEnd_time());
+        args.put(DURATION, sleep.getDuration());
+        args.put(STATUS, sleep.getStatus());
+        args.put(AVERAGE_HEART_RATE, sleep.getAverage_heart_rate());
+        return database.update(TABLE_SLEEP, args, _ID + "= '" + sleep.getId() + "'", null);
     }
 
     public int updateSportData(Sport sport) {
@@ -132,6 +172,11 @@ public class HeartRateHelper {
     public int deleteSportData(String id) {
         database = dbHelper.getWritableDatabase();
         return database.delete(TABLE_SPORT, _ID + " = '" + id + "'", null);
+    }
+
+    public int deleteSleepData(String id) {
+        database = dbHelper.getWritableDatabase();
+        return database.delete(TABLE_SLEEP, _ID + " = '" + id + "'", null);
     }
 
     public long insertUser(User user) {
@@ -190,10 +235,38 @@ public class HeartRateHelper {
         }
     }
 
+    public boolean checkHeartRateSleepMode(String id, String email) {
+        database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.rawQuery("SELECT heart_rate FROM heart_rate_activity WHERE email = ? AND id_sleep = ? ORDER BY date_time DESC", new String[]{email, id});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            cursor.close();
+            return true;
+        } else {
+            cursor.close();
+            return false;
+        }
+    }
+
     public int getAverageSportHearRate(String id, String email) {
         database = dbHelper.getWritableDatabase();
         int bpm = 0;
         Cursor cursor = database.rawQuery("SELECT avg(heart_rate) FROM heart_rate_activity WHERE email = ? AND id_sport = ? ", new String[]{email, id});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                bpm = cursor.getInt(cursor.getColumnIndexOrThrow("avg(heart_rate)"));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return bpm;
+    }
+
+    public int getAverageSleepHearRate(String id, String email) {
+        database = dbHelper.getWritableDatabase();
+        int bpm = 0;
+        Cursor cursor = database.rawQuery("SELECT avg(heart_rate) FROM heart_rate_activity WHERE email = ? AND id_sleep = ? ", new String[]{email, id});
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             do {
@@ -307,6 +380,64 @@ public class HeartRateHelper {
         }
         cursor.close();
         return arrayList;
+    }
+
+    public ArrayList<Sleep> getSleepData() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<Sleep> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT _id, duration, status, DATE(start_time) FROM sleep_activity ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
+        cursor.moveToFirst();
+        Sleep sleep;
+        if (cursor.getCount() > 0) {
+            do {
+                sleep = new Sleep();
+                sleep.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sleep.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sleep.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow("duration")));
+                sleep.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                arrayList.add(sleep);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public ArrayList<Sport> getAllSportData() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<Sport> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT _id, average_heart_rate, type, DATE(start_time) FROM sport_activity ORDER BY DATE(start_time) DESC", new String[]{});
+        cursor.moveToFirst();
+        Sport sport;
+        if (cursor.getCount() > 0) {
+            do {
+                sport = new Sport();
+                sport.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sport.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
+                sport.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sport.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
+                arrayList.add(sport);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public Sport getLatestSportData() {
+        database = dbHelper.getWritableDatabase();
+        Sport sport = new Sport();
+        Cursor cursor = database.rawQuery("SELECT DATE(end_time),type FROM sport_activity ORDER BY end_time DESC LIMIT 1", new String[]{});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                sport.setEnd_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(end_time)")));
+                sport.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return sport;
     }
 
 }

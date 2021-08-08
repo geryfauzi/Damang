@@ -42,6 +42,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private User user;
     private ProgressDialog progressDialog;
     private HeartRateHelper heartRateHelper;
+    private static final String baseUrl = "https://sohibultech.com/damang/";
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -97,7 +98,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void checkEmail(GoogleSignInAccount account) {
         progressDialog.show();
-        Api api = BaseApi.getRetrofit().create(Api.class);
+        Api api = BaseApi.getRetrofit(baseUrl).create(Api.class);
         Call<CheckUser> response = api.checkUser(account.getEmail());
         user = new User();
         response.enqueue(new Callback<CheckUser>() {

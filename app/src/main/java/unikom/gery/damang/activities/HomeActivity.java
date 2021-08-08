@@ -73,6 +73,7 @@ import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SportReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
+import unikom.gery.damang.sqlite.table.Sport;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
@@ -90,9 +91,9 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private ArrayList<DetailHeartRate> arrayList;
-    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga;
+    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga, cvTidur;
     private ImageView btnAddDevice;
-    private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar;
+    private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar, txtInfoDataOlahraga;
     private ImageView imgProfile, btnSettings;
     private SharedPreference sharedPreference;
     private DeviceManager deviceManager;
@@ -149,6 +150,7 @@ public class HomeActivity extends AppCompatActivity
         cvRumahSakit = findViewById(R.id.cvRumahSakit);
         cvPengaturanAlat = findViewById(R.id.cvPengaturanAlat);
         cvOlahraga = findViewById(R.id.cvOlahraga);
+        cvTidur = findViewById(R.id.cvTidur);
         btnAddDevice = findViewById(R.id.btnAddDevice);
         btnSettings = findViewById(R.id.imageView6);
         txtHeartRate = findViewById(R.id.txtHeartRate);
@@ -156,6 +158,7 @@ public class HomeActivity extends AppCompatActivity
         txtUser = findViewById(R.id.txtUser);
         txtJumlahLangkah = findViewById(R.id.txtJumlahLangkah);
         txtKaloriTerbakar = findViewById(R.id.txtKaloriTerbakar);
+        txtInfoDataOlahraga = findViewById(R.id.txtInfoDataOlahraga);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
@@ -206,7 +209,7 @@ public class HomeActivity extends AppCompatActivity
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
         sharedPreference.setSportId("null");
         txtUser.setText(sharedPreference.getUser().getName());
-        if (!sharedPreference.getMode().equals("Normal")) {
+        if (sharedPreference.getMode().equals("Sport")) {
             //Start Normal Mode
             ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
             PackageManager packageManager = this.getPackageManager();
@@ -229,47 +232,27 @@ public class HomeActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
         }
 
-        imgProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
-            }
+        imgProfile.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), ProfileActivity.class)));
+
+        btnAddDevice.setOnClickListener(view -> launchDiscoveryActivity());
+
+        cvHeartRate.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), DailyConditionActivity.class)));
+
+        cvPengaturanAlat.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), MiBandPreferencesActivity.class);
+            startActivity(intent);
         });
 
-        btnAddDevice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                launchDiscoveryActivity();
-            }
+        cvOlahraga.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), SportActivity.class)));
+
+        btnSettings.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), SystemSettingsActivity.class)));
+
+        cvArtikel.setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), ArticleActivity.class));
         });
 
-        cvHeartRate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), DailyConditionActivity.class));
-            }
-        });
-
-        cvPengaturanAlat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), MiBandPreferencesActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        cvOlahraga.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), SportActivity.class));
-            }
-        });
-
-        btnSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), SystemSettingsActivity.class));
-            }
+        cvTidur.setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), SleepActivity.class));
         });
     }
 
@@ -286,6 +269,10 @@ public class HomeActivity extends AppCompatActivity
             txtHeartRate.setVisibility(View.INVISIBLE);
             txtCurrentCondition.setText("Belum ada data detak jantung");
         }
+        Sport sport = heartRateHelper.getLatestSportData();
+        if (sport.getType() != null)
+            txtInfoDataOlahraga.setText("Terakhir olahraga:\n" + sport.getType());
+
     }
 
     private void updateCurrentCondition() throws ParseException {
