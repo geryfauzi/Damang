@@ -15,7 +15,7 @@ import unikom.gery.damang.response.CheckUser;
 import unikom.gery.damang.response.News;
 import unikom.gery.damang.response.PlaceResponse;
 
-public interface Api {
+public interface WebService {
     @POST("user/checkUser.php")
     @FormUrlEncoded
     Call<CheckUser> checkUser(@Field("email") String email);

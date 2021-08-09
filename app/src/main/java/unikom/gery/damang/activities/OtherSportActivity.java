@@ -41,8 +41,11 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.Random;
 
+import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
 import unikom.gery.damang.model.DeviceService;
+import unikom.gery.damang.model.NotificationSpec;
+import unikom.gery.damang.model.NotificationType;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SportReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
@@ -122,6 +125,17 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
         }
         tns = calculateTNS(age);
         txtTNS.setText(Integer.toString(tns));
+    }
+
+    private void sendNotification(String value){
+        NotificationSpec notificationSpec = new NotificationSpec();
+        String testString = value;
+        notificationSpec.phoneNumber = testString;
+        notificationSpec.body = testString;
+        notificationSpec.sender = testString;
+        notificationSpec.subject = testString;
+        notificationSpec.type = NotificationType.values()[0];
+        GBApplication.deviceService().onNotification(notificationSpec);
     }
 
     private void saveToDB(String id) {
@@ -260,17 +274,7 @@ public class OtherSportActivity extends AppCompatActivity implements View.OnClic
             txtTNSStatus.setText("Iya");
             createNotificationNormalMode();
             Toast.makeText(getApplicationContext(), "Selamat ! Anda telah mencapai TNS Anda !", Toast.LENGTH_LONG).show();
-        }
-        duration = SystemClock.elapsedRealtime() - chronometer.getBase();
-        duration = Math.round(duration / 60000);
-        if (txtTNSStatus.equals("Belum")) {
-            if (duration >= 20 && duration < 30) {
-                Toast.makeText(getApplicationContext(), "Sudah 20 menit anda belum mecapai TNS, istirahat sejenak" +
-                        " apabila merasa lelah. Apabila sangat lelah, boleh berhenti", Toast.LENGTH_LONG).show();
-            } else if (duration >= 30) {
-                Toast.makeText(getApplicationContext(), "Sistem mendeteksi sudah 30 menit tapi anda belum mencapai TNS," +
-                        " mohon segera menghentikan olahraga anda apabila merasa lelah", Toast.LENGTH_LONG).show();
-            }
+            sendNotification("Selamat ! Anda telah mencapai TNS Anda ! Pertahankan posisi ini selama minimal 10 menit untuk mendapat hasil maksimal!");
         }
     }
 

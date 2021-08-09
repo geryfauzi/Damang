@@ -272,7 +272,6 @@ public class HomeActivity extends AppCompatActivity
         try {
             if (lManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || lManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                 startActivity(new Intent(getApplicationContext(), NearHospitalActivity.class));
-                finish();
             } else {
                 toast(HomeActivity.this, "Harap nyalakan GPS untuk menggunakan fitur ini", Toast.LENGTH_SHORT, GB.ERROR);
                 HomeActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));

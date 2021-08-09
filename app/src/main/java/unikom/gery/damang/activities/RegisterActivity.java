@@ -32,7 +32,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import unikom.gery.damang.R;
-import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.WebService;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.response.CheckUser;
@@ -156,8 +156,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private void register(final User data) {
         progressDialog.show();
-        Api api = BaseApi.getRetrofit(baseUrl).create(Api.class);
-        Call<CheckUser> response = api.registerUser(data.getEmail(), data.getName(), data.getDateofBirth(), data.getGender(), data.getWeight(), data.getHeight(), data.getPhoto());
+        WebService webService = BaseApi.getRetrofit(baseUrl).create(WebService.class);
+        Call<CheckUser> response = webService.registerUser(data.getEmail(), data.getName(), data.getDateofBirth(), data.getGender(), data.getWeight(), data.getHeight(), data.getPhoto());
         response.enqueue(new Callback<CheckUser>() {
             @Override
             public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {

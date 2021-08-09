@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import unikom.gery.damang.R;
-import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.WebService;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.response.CheckUser;
@@ -98,8 +98,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void checkEmail(GoogleSignInAccount account) {
         progressDialog.show();
-        Api api = BaseApi.getRetrofit(baseUrl).create(Api.class);
-        Call<CheckUser> response = api.checkUser(account.getEmail());
+        WebService webService = BaseApi.getRetrofit(baseUrl).create(WebService.class);
+        Call<CheckUser> response = webService.checkUser(account.getEmail());
         user = new User();
         response.enqueue(new Callback<CheckUser>() {
             @Override

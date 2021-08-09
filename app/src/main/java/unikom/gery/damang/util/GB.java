@@ -112,7 +112,6 @@ public class GB {
                 .setTicker(deviceName + " - " + text)
                 .setContentText(text)
                 .setSmallIcon(connected ? device.getNotificationIconConnected() : device.getNotificationIconDisconnected())
-                .setContentIntent(getContentIntent(context))
                 .setColor(context.getResources().getColor(R.color.accent))
                 .setOngoing(true);
 
@@ -147,7 +146,6 @@ public class GB {
         builder.setTicker(text)
                 .setContentText(text)
                 .setSmallIcon(R.drawable.ic_bluetooth_disconnect)
-                .setContentIntent(getContentIntent(context))
                 .setColor(context.getResources().getColor(R.color.accent))
                 .setOngoing(true);
         if (GBApplication.getPrefs().getString("last_device_address", null) != null) {

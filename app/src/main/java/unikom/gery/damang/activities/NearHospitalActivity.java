@@ -27,7 +27,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.RumahSakitAdapter;
-import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.WebService;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.response.PlaceResponse;
 import unikom.gery.damang.response.Properties;
@@ -91,8 +91,8 @@ public class NearHospitalActivity extends AppCompatActivity implements LocationL
         String bias = "proximity:" + lastLocation.getLongitude() + "," + lastLocation.getLatitude();
         String apiKey = "8a5772921fcb4a08aee2bc08d87a6540";
 
-        Api api = BaseApi.getRetrofit("https://api.geoapify.com/").create(Api.class);
-        Call<PlaceResponse> response = api.getNearbyPlace(categories, filter, bias, 20, apiKey);
+        WebService webService = BaseApi.getRetrofit("https://api.geoapify.com/").create(WebService.class);
+        Call<PlaceResponse> response = webService.getNearbyPlace(categories, filter, bias, 20, apiKey);
         response.enqueue(new Callback<PlaceResponse>() {
             @Override
             public void onResponse(Call<PlaceResponse> call, Response<PlaceResponse> response) {

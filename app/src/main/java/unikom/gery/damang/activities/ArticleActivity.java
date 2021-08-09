@@ -21,7 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.BeritaAdapter;
-import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.WebService;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.response.Article;
 import unikom.gery.damang.response.News;
@@ -61,8 +61,8 @@ public class ArticleActivity extends AppCompatActivity {
 
     private void viewArticleData() {
         progressDialog.show();
-        Api api = BaseApi.getRetrofit("https://newsapi.org/v2/").create(Api.class);
-        Call<News> response = api.getArticleNewsData("id", "health", "02c679d51abf4f51b390841dab64b436");
+        WebService webService = BaseApi.getRetrofit("https://newsapi.org/v2/").create(WebService.class);
+        Call<News> response = webService.getArticleNewsData("id", "health", "02c679d51abf4f51b390841dab64b436");
         response.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {

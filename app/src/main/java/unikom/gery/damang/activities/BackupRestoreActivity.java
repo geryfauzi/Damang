@@ -37,7 +37,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import unikom.gery.damang.R;
-import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.WebService;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.response.Backup;
 import unikom.gery.damang.sqlite.ddl.DBHelper;
@@ -107,8 +107,8 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
         MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
         RequestBody fileName = RequestBody.create(MediaType.parse("text/plain"), file.getName());
 
-        Api api = BaseApi.getRetrofit(baseUrl).create(Api.class);
-        Call<Backup> response = api.backupCloud(fileToUpload, fileName, sharedPreference.getUser().getEmail(), getTodayDate());
+        WebService webService = BaseApi.getRetrofit(baseUrl).create(WebService.class);
+        Call<Backup> response = webService.backupCloud(fileToUpload, fileName, sharedPreference.getUser().getEmail(), getTodayDate());
         response.enqueue(new Callback<Backup>() {
             @Override
             public void onResponse(Call<Backup> call, Response<Backup> response) {
