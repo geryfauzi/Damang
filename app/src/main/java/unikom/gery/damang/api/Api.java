@@ -13,6 +13,7 @@ import retrofit2.http.Query;
 import unikom.gery.damang.response.Backup;
 import unikom.gery.damang.response.CheckUser;
 import unikom.gery.damang.response.News;
+import unikom.gery.damang.response.PlaceResponse;
 
 public interface Api {
     @POST("user/checkUser.php")
@@ -45,5 +46,14 @@ public interface Api {
             @Query("country") String country,
             @Query("category") String category,
             @Query("apiKey") String apiKey
+    );
+
+    @GET("v2/places")
+    Call<PlaceResponse> getNearbyPlace(
+            @Query(value = "categories",encoded = true) String categories,
+            @Query(value = "filter", encoded = true) String filter,
+            @Query(value = "bias", encoded = true) String bias,
+            @Query(value = "limit", encoded = true) int limit,
+            @Query(value = "apiKey", encoded = true) String key
     );
 }

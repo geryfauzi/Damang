@@ -45,7 +45,7 @@ public class ArticleActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         //
         setContentView(R.layout.activity_article);
-        progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(ArticleActivity.this);
         progressDialog.setTitle("Sedang memuat...");
         progressDialog.setCancelable(false);
         rvBerita = findViewById(R.id.rvBerita);

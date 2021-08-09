@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import org.jetbrains.annotations.NotNull;
-import org.ocpsoft.prettytime.PrettyTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -61,20 +60,6 @@ public class BeritaAdapter extends RecyclerView.Adapter<BeritaAdapter.ViewHolder
             context.startActivity(intent);
         });
 
-    }
-
-    private String dateTimeHourAgo(String dateTime) {
-        PrettyTime prettyTime = new PrettyTime(Locale.getDefault());
-        String isTime = "";
-        try {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
-            Date date = simpleDateFormat.parse(dateTime);
-            isTime = prettyTime.format(date);
-        } catch (Exception error) {
-            error.printStackTrace();
-            Toast.makeText(context, "Terjadi kesalahan saat memeuat berita", Toast.LENGTH_SHORT).show();
-        }
-        return isTime;
     }
 
     private String dateFormat(String dateNews) {

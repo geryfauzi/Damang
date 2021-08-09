@@ -27,8 +27,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -79,6 +81,8 @@ import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
 import unikom.gery.damang.util.SharedPreference;
+
+import static unikom.gery.damang.util.GB.toast;
 
 //TODO: extend AbstractGBActivity, but it requires actionbar that is not available
 public class HomeActivity extends AppCompatActivity
@@ -256,6 +260,42 @@ public class HomeActivity extends AppCompatActivity
         cvTidur.setOnClickListener(view -> {
             startActivity(new Intent(getApplicationContext(), SleepActivity.class));
         });
+
+        cvRumahSakit.setOnClickListener(view -> {
+            checkLocationPermission();
+            checkGPS();
+        });
+    }
+
+    private void checkGPS() {
+        LocationManager lManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try {
+            if (lManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || lManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                startActivity(new Intent(getApplicationContext(), NearHospitalActivity.class));
+                finish();
+            } else {
+                toast(HomeActivity.this, "Harap nyalakan GPS untuk menggunakan fitur ini", Toast.LENGTH_SHORT, GB.ERROR);
+                HomeActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                toast(HomeActivity.this, "Harap nyalakan GPS untuk menggunakan fitur ini", Toast.LENGTH_SHORT, GB.ERROR);
+                return;
+            }
+        } catch (Exception error) {
+
+        }
+    }
+
+    private void checkLocationPermission() {
+        List<String> wantedPermissions = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(getApplicationContext(), "Harap berikan izin lokasi untuk menggunakan fitur ini", Toast.LENGTH_SHORT).show();
+            wantedPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+            return;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(getApplicationContext(), "Harap berikan izin lokasi untuk menggunakan fitur ini", Toast.LENGTH_SHORT).show();
+            wantedPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+            return;
+        }
     }
 
     private String getTodayDate() {
