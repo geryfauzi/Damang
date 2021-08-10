@@ -10,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -25,10 +26,11 @@ import java.util.ArrayList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.RumahSakitAdapter;
 import unikom.gery.damang.api.WebService;
-import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.response.PlaceResponse;
 import unikom.gery.damang.response.Properties;
 
@@ -90,17 +92,19 @@ public class NearHospitalActivity extends AppCompatActivity implements LocationL
         String filter = "circle:" + lastLocation.getLongitude() + "," + lastLocation.getLatitude() + ",5000";
         String bias = "proximity:" + lastLocation.getLongitude() + "," + lastLocation.getLatitude();
         String apiKey = "8a5772921fcb4a08aee2bc08d87a6540";
-
-        WebService webService = BaseApi.getRetrofit("https://api.geoapify.com/").create(WebService.class);
+        WebService webService = new Retrofit.Builder().baseUrl("https://api.geoapify.com/").addConverterFactory(GsonConverterFactory.create()).build().create(WebService.class);
         Call<PlaceResponse> response = webService.getNearbyPlace(categories, filter, bias, 20, apiKey);
         response.enqueue(new Callback<PlaceResponse>() {
             @Override
             public void onResponse(Call<PlaceResponse> call, Response<PlaceResponse> response) {
-                if (response.body().getType() != null) {
-                    progressDialog.dismiss();
+                progressDialog.dismiss();
+                if (response.code() == 200) {
                     ArrayList<Properties> list = (ArrayList<Properties>) response.body().getFeatures();
                     rumahSakitAdapter = new RumahSakitAdapter(list, getApplicationContext());
                     rvHospital.setAdapter(rumahSakitAdapter);
+                } else {
+                    Log.d("TAG", "Error : " + response.toString());
+                    Toast.makeText(getApplicationContext(), "Terjadi kesalahan! Silahkan coba lagi!", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -131,4 +135,18 @@ public class NearHospitalActivity extends AppCompatActivity implements LocationL
     public void onProviderDisabled(String s) {
 
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
+    }
+
 }

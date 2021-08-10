@@ -102,7 +102,6 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
     }
 
     private void uploadToClound(File file) {
-        progressDialog.show();
         RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), file);
         MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
         RequestBody fileName = RequestBody.create(MediaType.parse("text/plain"), file.getName());
@@ -112,14 +111,14 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
         response.enqueue(new Callback<Backup>() {
             @Override
             public void onResponse(Call<Backup> call, Response<Backup> response) {
-                progressDialog.dismiss();
+                progressDialog.hide();
                 String pesan = response.body().getMessage();
                 Toast.makeText(getApplicationContext(), pesan, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Call<Backup> call, Throwable t) {
-                progressDialog.dismiss();
+                progressDialog.hide();
                 Toast.makeText(getApplicationContext(), "Terjadi kesalahan saat melakukan backup!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -172,8 +171,9 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
                     src.close();
                     dst.close();
                     //Method Upload
+                    progressDialog.dismiss();
                     Toast.makeText(getApplicationContext(), backupDB.toString(), Toast.LENGTH_SHORT).show();
-                    uploadToClound(backupDB);
+                    //uploadToClound(backupDB);
                 } else
                     Toast.makeText(getApplicationContext(), "Database tidak ditemukan!", Toast.LENGTH_SHORT).show();
 
@@ -208,6 +208,7 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
             int pilihan = rgPilihan.getCheckedRadioButtonId();
             rbPilihan = findViewById(pilihan);
             if (rbPilihan.getText().equals("Cadangkan")) {
+                progressDialog.show();
                 Toast.makeText(getApplicationContext(), "Sedang melakukan backup", Toast.LENGTH_SHORT).show();
                 backup();
             } else {
@@ -216,4 +217,18 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
             }
         }
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
+    }
+
 }

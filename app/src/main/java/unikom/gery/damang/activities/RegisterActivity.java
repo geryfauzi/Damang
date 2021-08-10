@@ -161,7 +161,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         response.enqueue(new Callback<CheckUser>() {
             @Override
             public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 if (response.body().getCode() == 1) {
                     Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     setUserSession(data);
@@ -171,7 +171,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             @Override
             public void onFailure(Call<CheckUser> call, Throwable t) {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), t.toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -214,5 +214,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
     }
 }
