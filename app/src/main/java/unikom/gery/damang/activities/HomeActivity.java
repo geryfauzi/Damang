@@ -213,9 +213,11 @@ public class HomeActivity extends AppCompatActivity
 
         sharedPreference = new SharedPreference(this);
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
-        sharedPreference.setSportId("null");
         txtUser.setText(sharedPreference.getUser().getName());
         if (sharedPreference.getMode().equals("Sport")) {
+            heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
+            heartRateHelper.deleteEmptySportData();
+            sharedPreference.setSportId("null");
             //Start Normal Mode
             ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
             PackageManager packageManager = this.getPackageManager();
@@ -311,7 +313,7 @@ public class HomeActivity extends AppCompatActivity
             txtCurrentCondition.setText("Belum ada data detak jantung");
         }
         Sport sport = heartRateHelper.getLatestSportData();
-        if (sport.getType() != null) {
+        if (sport.getEnd_time() != null) {
             Date date = new SimpleDateFormat("yyyy-MM-dd").parse(sport.getEnd_time());
             String parseDate = new SimpleDateFormat("dd MMMM").format(date);
             txtInfoDataOlahraga.setText("Terakhir olahraga:\n" + parseDate);

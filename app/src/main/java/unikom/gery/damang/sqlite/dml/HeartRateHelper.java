@@ -172,6 +172,14 @@ public class HeartRateHelper {
         return database.delete(TABLE_SLEEP, _ID + " = '" + id + "'", null);
     }
 
+    public int deleteEmptySportData() {
+        database = dbHelper.getWritableDatabase();
+        Cursor cursor =  database.rawQuery("DELETE FROM sport_activity WHERE end_time IS NULL", new String[]{});
+        cursor.moveToFirst();
+        cursor.close();
+        return 1;
+    }
+
     public long insertUser(User user) {
         ContentValues args = new ContentValues();
         database = dbHelper.getWritableDatabase();
@@ -439,7 +447,7 @@ public class HeartRateHelper {
     public Sport getLatestSportData() {
         database = dbHelper.getWritableDatabase();
         Sport sport = new Sport();
-        Cursor cursor = database.rawQuery("SELECT DATE(end_time),type FROM sport_activity ORDER BY end_time DESC LIMIT 1", new String[]{});
+        Cursor cursor = database.rawQuery("SELECT DATE(end_time),type FROM sport_activity WHERE end_time IS NOT NULL ORDER BY end_time DESC LIMIT 1", new String[]{});
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             do {
