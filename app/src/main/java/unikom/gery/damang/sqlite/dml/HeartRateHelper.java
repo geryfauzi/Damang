@@ -475,4 +475,22 @@ public class HeartRateHelper {
         return sleep;
     }
 
+    public ArrayList<DetailHeartRate> getDetailSportData(String id) {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<DetailHeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT heart_rate FROM heart_rate_activity WHERE id_sport = ?", new String[]{id});
+        cursor.moveToFirst();
+        DetailHeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                heartRate = new DetailHeartRate();
+                heartRate.setHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
 }

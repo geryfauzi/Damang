@@ -46,6 +46,7 @@ import java.util.Random;
 import unikom.gery.damang.GBApplication;
 import unikom.gery.damang.R;
 import unikom.gery.damang.model.Cardio;
+import unikom.gery.damang.model.DetailHeartRate;
 import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.model.NotificationSpec;
 import unikom.gery.damang.model.NotificationType;
@@ -135,7 +136,7 @@ public class CardioSportActivity extends AppCompatActivity implements View.OnCli
         firstTimer();
     }
 
-    private void sendNotification(String value){
+    private void sendNotification(String value) {
         NotificationSpec notificationSpec = new NotificationSpec();
         String testString = value;
         notificationSpec.phoneNumber = testString;
@@ -314,6 +315,47 @@ public class CardioSportActivity extends AppCompatActivity implements View.OnCli
             sendNotification("Selamat, anda telah mencapai TNS anda ! Pertahankan fase ini sampai cardio selesai untuk mendapat hasil maksimal!");
             Toast.makeText(getApplicationContext(), "Selamat ! Anda telah mencapai TNS Anda !", Toast.LENGTH_LONG).show();
         }
+        checkTNS();
+    }
+
+    private void checkTNS() {
+        if (sharedPreference.getMode().equals("Sport")) {
+            String message = "";
+            ArrayList<DetailHeartRate> list = heartRateHelper.getDetailSportData(id);
+            boolean isDecreased = isDecreased(list);
+            duration = SystemClock.elapsedRealtime() - chronometer.getBase();
+            duration = Math.round(duration / 60000);
+            if (duration >= 20 && duration < 30 && txtTNSStatus.getText().equals("Belum")) {
+                if (isDecreased) {
+                    message = message + "Detak jantung anda mengalami penurunan.";
+                    message = message + "Jika anda sudah merasa lelah, istirahat dahulu dari olahraga anda" +
+                            " atau hentikan olahraga anda.";
+                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                    sendNotification(message);
+                }
+            } else if (duration >= 30 && txtTNSStatus.getText().equals("Belum"))
+                if (isDecreased) {
+                    message = message + "Detak jantung anda mengalami penuruan.";
+                    message = message + "Segera hentikan olahraga anda sekarang juga!";
+                    sendNotification(message);
+                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                }
+        }
+    }
+
+    private boolean isDecreased(ArrayList<DetailHeartRate> list) {
+        boolean status = false;
+        if (list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                if (i > 0) {
+                    if (list.get(i).getHeartRate() < list.get(i - 1).getHeartRate()) {
+                        status = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return status;
     }
 
     private void createNotificationNormalMode() {
