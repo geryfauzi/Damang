@@ -61,7 +61,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/GadgetbridgeTheme">
-        <activity android:name=".activities.NearHospitalActivity"></activity>
+        <activity android:name=".activities.CaloriesActivity"></activity>
+        <activity android:name=".activities.NearHospitalActivity" />
         <activity android:name=".activities.DetailSleepActivity" />
         <activity android:name=".activities.SleepActivity" />
         <activity android:name=".activities.DataOlahragaActivity" />

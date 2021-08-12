@@ -96,7 +96,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private ArrayList<DetailHeartRate> arrayList;
-    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga, cvTidur;
+    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga, cvTidur, cvKalori;
     private ImageView btnAddDevice;
     private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar, txtInfoDataOlahraga, txtDataTidur;
     private ImageView imgProfile, btnSettings;
@@ -156,6 +156,7 @@ public class HomeActivity extends AppCompatActivity
         cvPengaturanAlat = findViewById(R.id.cvPengaturanAlat);
         cvOlahraga = findViewById(R.id.cvOlahraga);
         cvTidur = findViewById(R.id.cvTidur);
+        cvKalori = findViewById(R.id.cvKalori);
         btnAddDevice = findViewById(R.id.btnAddDevice);
         btnSettings = findViewById(R.id.imageView6);
         txtHeartRate = findViewById(R.id.txtHeartRate);
@@ -267,6 +268,11 @@ public class HomeActivity extends AppCompatActivity
             checkLocationPermission();
             checkGPS();
         });
+
+        cvKalori.setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), CaloriesActivity.class));
+        });
+
     }
 
     private void checkGPS() {
