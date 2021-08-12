@@ -150,7 +150,7 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         txtTNS.setText(Integer.toString(tns));
     }
 
-    private void sendNotification(String value){
+    private void sendNotification(String value) {
         NotificationSpec notificationSpec = new NotificationSpec();
         String testString = value;
         notificationSpec.phoneNumber = testString;
@@ -407,13 +407,17 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                     sendNotification(message);
                 }
-            } else if (duration >= 30 && tnsStatus.equals("Belum"))
+            } else if (duration >= 30 && tnsStatus.equals("Belum")) {
                 if (isDecreased) {
                     message = message + "Detak jantung anda mengalami penuruan.";
                     message = message + "Segera hentikan olahraga anda sekarang juga!";
-                    sendNotification(message);
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                } else {
+                    message = message + "Jika anda sudah merasa lelah, istirahat dahulu dari olahraga anda" +
+                            " atau hentikan olahraga anda.";
                 }
+                sendNotification(message);
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
