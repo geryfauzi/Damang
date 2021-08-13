@@ -132,7 +132,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         user.setDateofBirth(data.getDateofBirth());
         user.setGender(data.getGender());
         user.setHeight(data.getHeight());
-        user.setWeight(data.getHeight());
+        user.setWeight(data.getWeight());
         user.setPhoto(data.getPhoto());
         heartRateHelper.insertUser(user);
         sharedPreference.setUser(user);

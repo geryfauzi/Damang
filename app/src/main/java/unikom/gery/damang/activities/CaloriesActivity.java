@@ -55,16 +55,16 @@ public class CaloriesActivity extends AppCompatActivity {
 
         sharedPreference = new SharedPreference(getApplicationContext());
         try {
-            updateView();
+            viewCalories();
         } catch (Exception error) {
             Toast.makeText(getApplicationContext(), " Terjadi kesalahan!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void updateView() throws ParseException {
+    private void viewCalories() throws ParseException {
         String burnedCalories = String.format("%.2f", getBurnedCalories(sharedPreference.getSteps(), Math.round(sharedPreference.getUser().getWeight())));
         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
-        int calories = getCalories(Math.round(sharedPreference.getUser().getWeight()), Math.round(sharedPreference.getUser().getHeight()), age);
+        int calories = calculateCalories(Math.round(sharedPreference.getUser().getWeight()), Math.round(sharedPreference.getUser().getHeight()), age);
         String status = getStatusBMI(Math.round(sharedPreference.getUser().getWeight()), Math.round(sharedPreference.getUser().getHeight()));
         //Update View
         txtJumlahLangkah.setText(sharedPreference.getSteps() + " Langkah");
@@ -90,7 +90,7 @@ public class CaloriesActivity extends AppCompatActivity {
         return staus;
     }
 
-    private int getCalories(int beratBadan, int tinggiBadan, int usia) {
+    private int calculateCalories(int beratBadan, int tinggiBadan, int usia) {
         int kalori = 0;
         if (sharedPreference.getUser().getGender().equals("Laki - Laki"))
             kalori = (int) (66 + (13.7 * beratBadan) + (5 * tinggiBadan) - (6.8 * usia));
