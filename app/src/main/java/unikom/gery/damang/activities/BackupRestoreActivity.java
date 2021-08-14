@@ -67,16 +67,19 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
     private SharedPreference sharedPreference;
     private ProgressDialog progressDialog;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                File internal = new File(Environment.getDataDirectory().getAbsolutePath());
+                File internal = new File(Environment.DIRECTORY_DOWNLOADS);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    internal = getApplicationContext().getObbDir();
+                    String obb = internal.toString().replace("obb/unikom.gery.damang", "data/unikom.gery.damang/files/Download");
+                    internal = new File(obb);
+                }
 
-                if (internal.canWrite()) {
+                if (internal.canRead()) {
                     File currentDB = new File("/data/data/" + getPackageName() + "/databases/", DBHelper.DATABASE_NAME);
-                    File backupDB = new File(internal, "files/Download/"+sharedPreference.getUser().getEmail() + ".db");
-                    Toast.makeText(getApplicationContext(),backupDB.toString(),Toast.LENGTH_SHORT).show();
+                    File backupDB = new File(internal, sharedPreference.getUser().getEmail() + ".db");
 
                     if (backupDB.exists()) {
                         FileChannel src = new FileInputStream(backupDB).getChannel();
@@ -85,15 +88,16 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
                         src.close();
                         dst.close();
                         progressDialog.dismiss();
-                        Toast.makeText(getApplicationContext(), backupDB.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Sukses melakukan restore ! Harap tutup, dan buka kembali aplikasi anda!", Toast.LENGTH_SHORT).show();
+                        backupDB.delete();
                     } else {
                         progressDialog.dismiss();
-                        Toast.makeText(getApplicationContext(), "Error, tidak ditemukan file backup!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Error, file not exist!", Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
                     progressDialog.dismiss();
-                    Toast.makeText(getApplicationContext(), "Error, tidak bisa write internal!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Error, cannot read the directory!", Toast.LENGTH_SHORT).show();
                 }
 
             } catch (Exception error) {
@@ -161,11 +165,13 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
                 progressDialog.dismiss();
                 String pesan = response.body().getMessage();
                 Toast.makeText(getApplicationContext(), pesan, Toast.LENGTH_SHORT).show();
+                file.delete();
             }
 
             @Override
             public void onFailure(Call<Backup> call, Throwable t) {
                 progressDialog.dismiss();
+                file.delete();
                 Toast.makeText(getApplicationContext(), "Terjadi kesalahan saat melakukan backup!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -186,7 +192,6 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
                         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                         Uri uri = Uri.parse(response.body().getPath());
                         DownloadManager.Request request = new DownloadManager.Request(uri);
-                        String obb = getApplicationContext().getObbDir().getAbsolutePath();
                         request.setDestinationInExternalFilesDir(getApplicationContext(), Environment.DIRECTORY_DOWNLOADS, sharedPreference.getUser().getEmail() + ".db");
                         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
                         request.setTitle(sharedPreference.getUser().getEmail() + ".db");
