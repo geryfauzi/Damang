@@ -41,6 +41,12 @@ public interface WebService {
             @Query("date") String date
     );
 
+    @FormUrlEncoded
+    @POST("user/checkBackup.php")
+    Call<Backup> restoreCloud(
+            @Field("email") String email
+    );
+
     @GET("top-headlines")
     Call<News> getArticleNewsData(
             @Query("country") String country,
@@ -50,7 +56,7 @@ public interface WebService {
 
     @GET("v2/places")
     Call<PlaceResponse> getNearbyPlace(
-            @Query(value = "categories",encoded = true) String categories,
+            @Query(value = "categories", encoded = true) String categories,
             @Query(value = "filter", encoded = true) String filter,
             @Query(value = "bias", encoded = true) String bias,
             @Query(value = "limit", encoded = true) int limit,
