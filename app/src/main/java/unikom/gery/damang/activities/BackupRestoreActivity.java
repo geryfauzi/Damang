@@ -201,8 +201,10 @@ public class BackupRestoreActivity extends AppCompatActivity implements View.OnC
                         progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(), " Error : " + error.toString(), Toast.LENGTH_SHORT).show();
                     }//endcatch
-                } else
+                } else {
+                    progressDialog.dismiss();
                     Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
