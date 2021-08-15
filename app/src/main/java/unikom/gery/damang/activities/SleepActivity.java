@@ -254,7 +254,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 7 && hour <= 9)
                 score -= 20;
             else if (hour < 7)
-                score -= 25;
+                score -= 35;
             //
         } else if (age >= 14 && age <= 17) {
             if (hour > 10)
@@ -262,7 +262,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 5 && hour <= 7)
                 score -= 20;
             else if (hour < 5)
-                score -= 25;
+                score -= 35;
             //
         } else if (age >= 18 && age <= 25) {
             if (hour > 9)
@@ -270,7 +270,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 4 && hour <= 6)
                 score -= 20;
             else if (hour < 4)
-                score -= 25;
+                score -= 35;
             //
         } else if (age >= 26 && age <= 64) {
             if (hour > 9)
@@ -278,7 +278,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 4 && hour <= 6)
                 score -= 20;
             else if (hour < 4)
-                score -= 25;
+                score -= 35;
             //
         } else if (age >= 65) {
             if (hour > 8)
@@ -286,7 +286,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 4 && hour <= 6)
                 score -= 20;
             else if (hour < 4)
-                score -= 25;
+                score -= 35;
             //
         }
         return score;
@@ -362,5 +362,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             }
         } else if (view == btnBack)
             super.onBackPressed();
+        else if (view == btnViewAll)
+            startActivity(new Intent(getApplicationContext(), DataTidurActivity.class));
     }
 }

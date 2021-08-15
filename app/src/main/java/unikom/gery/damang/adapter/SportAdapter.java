@@ -61,14 +61,10 @@ public class SportAdapter extends RecyclerView.Adapter<SportAdapter.ViewHolder> 
             Glide.with(context).load(R.drawable.ic_sport_cardio).into(holder.imgSportType);
 
         holder.itemView.setOnClickListener(view -> {
-            if (sportList.get(position).getType().equals("Jogging")) {
-                //TODO Saat backend olahraga jogging dan frontend hasil olahraga jogging selesai
-            } else {
                 Intent intent = new Intent(context, OtherSportDetailActivity.class);
                 intent.putExtra("id", sportList.get(position).getId());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
-            }
         });
     }
 

@@ -488,6 +488,27 @@ public class HeartRateHelper {
         return arrayList;
     }
 
+    public ArrayList<Sleep> getAllSleepData() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<Sleep> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT _id, duration, status, DATE(start_time) FROM sleep_activity WHERE status IS NOT NULL ORDER BY DATE(start_time) DESC", new String[]{});
+        cursor.moveToFirst();
+        Sleep sleep;
+        if (cursor.getCount() > 0) {
+            do {
+                sleep = new Sleep();
+                sleep.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sleep.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sleep.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow("duration")));
+                sleep.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                arrayList.add(sleep);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
     public Sleep getDetailSleepData(String id) {
         database = dbHelper.getWritableDatabase();
         Cursor cursor = database.rawQuery("SELECT _id, duration, status, average_heart_rate, DATE(start_time) FROM sleep_activity WHERE status IS NOT NULL AND _id = ?", new String[]{id});
