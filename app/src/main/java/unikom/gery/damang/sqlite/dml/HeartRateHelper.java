@@ -6,14 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-import android.util.Log;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 import unikom.gery.damang.model.DetailHeartRate;
@@ -179,6 +172,14 @@ public class HeartRateHelper {
         return database.delete(TABLE_SLEEP, _ID + " = '" + id + "'", null);
     }
 
+    public int deleteEmptySportData() {
+        database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.rawQuery("DELETE FROM sport_activity WHERE end_time IS NULL", new String[]{});
+        cursor.moveToFirst();
+        cursor.close();
+        return 1;
+    }
+
     public long insertUser(User user) {
         ContentValues args = new ContentValues();
         database = dbHelper.getWritableDatabase();
@@ -342,10 +343,94 @@ public class HeartRateHelper {
         return arrayList;
     }
 
+    public ArrayList<unikom.gery.damang.model.HeartRate> getWeeklyCondition() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<unikom.gery.damang.model.HeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT strftime(?, date_time ) as minggu,  strftime(?, date_time ) as tahun, strftime(?, date_time ) as tanggal, AVG(heart_rate) FROM heart_rate_activity WHERE mode = ? GROUP BY strftime(?, date_time ) ORDER BY strftime(?, date_time ) desc", new String[]{"%W", "%Y", "%Y-%W", "Normal", "%Y-%W","%Y-%W"});
+        cursor.moveToFirst();
+        unikom.gery.damang.model.HeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                Cursor cLastHeartRate = database.rawQuery("SELECT date_time, heart_rate FROM heart_rate_activity WHERE mode = ? AND strftime(?, date_time ) = ? ORDER BY date_time DESC LIMIT 1", new String[]{"Normal", "%Y-%W", cursor.getString(cursor.getColumnIndexOrThrow("tanggal"))});
+                cLastHeartRate.moveToFirst();
+                heartRate = new unikom.gery.damang.model.HeartRate();
+                heartRate.setArrayList(getDetailWeeklyCondition(cursor.getString(cursor.getColumnIndexOrThrow("tanggal"))));
+                heartRate.setDate(cursor.getString(cursor.getColumnIndexOrThrow("tahun")) + " Minggu ke " + cursor.getString(cursor.getColumnIndexOrThrow("minggu")));
+                heartRate.setAverageHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("AVG(heart_rate)")));
+                heartRate.setCurrentHeartRate(cLastHeartRate.getInt(cLastHeartRate.getColumnIndexOrThrow("heart_rate")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public ArrayList<DetailHeartRate> getDetailWeeklyCondition(String date) {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<DetailHeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT strftime(?,date_time) AS hour, heart_rate FROM heart_rate_activity WHERE strftime(?, date_time ) = ? AND mode = ?", new String[]{"%H:%M", "%Y-%W", date, "Normal"});
+        cursor.moveToFirst();
+        DetailHeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                heartRate = new DetailHeartRate();
+                heartRate.setHour(cursor.getString(cursor.getColumnIndexOrThrow("hour")));
+                heartRate.setHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
     public ArrayList<DetailHeartRate> getDetailDailyCondition(String email, String date) {
         database = dbHelper.getWritableDatabase();
         ArrayList<DetailHeartRate> arrayList = new ArrayList<>();
         Cursor cursor = database.rawQuery("SELECT strftime(?,date_time) AS hour, heart_rate FROM heart_rate_activity WHERE DATE(date_time) = ? AND email = ? AND mode = ?", new String[]{"%H:%M", date, email, "Normal"});
+        cursor.moveToFirst();
+        DetailHeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                heartRate = new DetailHeartRate();
+                heartRate.setHour(cursor.getString(cursor.getColumnIndexOrThrow("hour")));
+                heartRate.setHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public ArrayList<unikom.gery.damang.model.HeartRate> getMonthlyCondition() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<unikom.gery.damang.model.HeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT strftime(?, date_time ) as bulan,  strftime(?, date_time ) as tahun, strftime(?, date_time ) as tanggal, AVG(heart_rate) FROM heart_rate_activity WHERE mode = ? GROUP BY strftime(?, date_time ) ORDER BY strftime(?, date_time ) desc", new String[]{"%m", "%Y", "%Y-%m", "Normal", "%Y-%m","%Y-%m"});
+        cursor.moveToFirst();
+        unikom.gery.damang.model.HeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                Cursor cLastHeartRate = database.rawQuery("SELECT date_time, heart_rate FROM heart_rate_activity WHERE mode = ? AND strftime(?, date_time ) = ? ORDER BY date_time DESC LIMIT 1", new String[]{"Normal", "%Y-%m", cursor.getString(cursor.getColumnIndexOrThrow("tanggal"))});
+                cLastHeartRate.moveToFirst();
+                heartRate = new unikom.gery.damang.model.HeartRate();
+                heartRate.setArrayList(getDetailMonthlyCondition(cursor.getString(cursor.getColumnIndexOrThrow("tanggal"))));
+                heartRate.setDate(cursor.getString(cursor.getColumnIndexOrThrow("tahun")) + " Bulan ke " + cursor.getString(cursor.getColumnIndexOrThrow("bulan")));
+                heartRate.setAverageHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("AVG(heart_rate)")));
+                heartRate.setCurrentHeartRate(cLastHeartRate.getInt(cLastHeartRate.getColumnIndexOrThrow("heart_rate")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public ArrayList<DetailHeartRate> getDetailMonthlyCondition(String date) {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<DetailHeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT strftime(?,date_time) AS hour, heart_rate FROM heart_rate_activity WHERE strftime(?, date_time ) = ? AND mode = ?", new String[]{"%H:%M", "%Y-%m", date, "Normal"});
         cursor.moveToFirst();
         DetailHeartRate heartRate;
         if (cursor.getCount() > 0) {
@@ -385,7 +470,7 @@ public class HeartRateHelper {
     public ArrayList<Sleep> getSleepData() {
         database = dbHelper.getWritableDatabase();
         ArrayList<Sleep> arrayList = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT _id, duration, status, DATE(start_time) FROM sleep_activity ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
+        Cursor cursor = database.rawQuery("SELECT _id, duration, status, DATE(start_time) FROM sleep_activity WHERE status IS NOT NULL ORDER BY DATE(start_time) DESC LIMIT 3", new String[]{});
         cursor.moveToFirst();
         Sleep sleep;
         if (cursor.getCount() > 0) {
@@ -401,6 +486,46 @@ public class HeartRateHelper {
         }
         cursor.close();
         return arrayList;
+    }
+
+    public ArrayList<Sleep> getAllSleepData() {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<Sleep> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT _id, duration, status, DATE(start_time) FROM sleep_activity WHERE status IS NOT NULL ORDER BY DATE(start_time) DESC", new String[]{});
+        cursor.moveToFirst();
+        Sleep sleep;
+        if (cursor.getCount() > 0) {
+            do {
+                sleep = new Sleep();
+                sleep.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sleep.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sleep.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow("duration")));
+                sleep.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                arrayList.add(sleep);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    public Sleep getDetailSleepData(String id) {
+        database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.rawQuery("SELECT _id, duration, status, average_heart_rate, DATE(start_time) FROM sleep_activity WHERE status IS NOT NULL AND _id = ?", new String[]{id});
+        cursor.moveToFirst();
+        Sleep sleep = new Sleep();
+        if (cursor.getCount() > 0) {
+            do {
+                sleep.setId(cursor.getString(cursor.getColumnIndexOrThrow("_id")));
+                sleep.setAverage_heart_rate(cursor.getInt(cursor.getColumnIndexOrThrow("average_heart_rate")));
+                sleep.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                sleep.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow("duration")));
+                sleep.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return sleep;
     }
 
     public ArrayList<Sport> getAllSportData() {
@@ -427,7 +552,7 @@ public class HeartRateHelper {
     public Sport getLatestSportData() {
         database = dbHelper.getWritableDatabase();
         Sport sport = new Sport();
-        Cursor cursor = database.rawQuery("SELECT DATE(end_time),type FROM sport_activity ORDER BY end_time DESC LIMIT 1", new String[]{});
+        Cursor cursor = database.rawQuery("SELECT DATE(end_time),type FROM sport_activity WHERE end_time IS NOT NULL ORDER BY end_time DESC LIMIT 1", new String[]{});
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             do {
@@ -438,6 +563,39 @@ public class HeartRateHelper {
         }
         cursor.close();
         return sport;
+    }
+
+    public Sleep getLatestSleepData() {
+        database = dbHelper.getWritableDatabase();
+        Sleep sleep = new Sleep();
+        Cursor cursor = database.rawQuery("SELECT DATE(start_time) FROM sleep_activity ORDER BY end_time DESC LIMIT 1", new String[]{});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            do {
+                sleep.setStart_time(cursor.getString(cursor.getColumnIndexOrThrow("DATE(start_time)")));
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return sleep;
+    }
+
+    public ArrayList<DetailHeartRate> getDetailSportData(String id) {
+        database = dbHelper.getWritableDatabase();
+        ArrayList<DetailHeartRate> arrayList = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT heart_rate FROM heart_rate_activity WHERE id_sport = ?", new String[]{id});
+        cursor.moveToFirst();
+        DetailHeartRate heartRate;
+        if (cursor.getCount() > 0) {
+            do {
+                heartRate = new DetailHeartRate();
+                heartRate.setHeartRate(cursor.getInt(cursor.getColumnIndexOrThrow("heart_rate")));
+                arrayList.add(heartRate);
+                cursor.moveToNext();
+            } while (!cursor.isAfterLast());
+        }
+        cursor.close();
+        return arrayList;
     }
 
 }

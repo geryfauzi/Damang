@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -19,10 +20,11 @@ import java.util.ArrayList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import unikom.gery.damang.R;
 import unikom.gery.damang.adapter.BeritaAdapter;
-import unikom.gery.damang.api.Api;
-import unikom.gery.damang.api.BaseApi;
+import unikom.gery.damang.api.WebService;
 import unikom.gery.damang.response.Article;
 import unikom.gery.damang.response.News;
 
@@ -45,7 +47,7 @@ public class ArticleActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         //
         setContentView(R.layout.activity_article);
-        progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(ArticleActivity.this);
         progressDialog.setTitle("Sedang memuat...");
         progressDialog.setCancelable(false);
         rvBerita = findViewById(R.id.rvBerita);
@@ -61,16 +63,21 @@ public class ArticleActivity extends AppCompatActivity {
 
     private void viewArticleData() {
         progressDialog.show();
-        Api api = BaseApi.getRetrofit("https://newsapi.org/v2/").create(Api.class);
-        Call<News> response = api.getArticleNewsData("id", "health", "02c679d51abf4f51b390841dab64b436");
+        WebService webService = new Retrofit.Builder().baseUrl("https://newsapi.org/v2/").addConverterFactory(GsonConverterFactory.create()).build().create(WebService.class);
+        Call<News> response = webService.getArticleNewsData("id", "health", "02c679d51abf4f51b390841dab64b436");
         response.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {
-                ArrayList<Article> articleArrayList = (ArrayList<Article>) response.body().getArticles();
-                beritaAdapter = new BeritaAdapter(articleArrayList, getApplicationContext());
-                rvBerita.setAdapter(beritaAdapter);
-                beritaAdapter.notifyDataSetChanged();
                 progressDialog.dismiss();
+                if (response.code() == 200) {
+                    ArrayList<Article> articleArrayList = (ArrayList<Article>) response.body().getArticles();
+                    beritaAdapter = new BeritaAdapter(articleArrayList, getApplicationContext());
+                    rvBerita.setAdapter(beritaAdapter);
+                    beritaAdapter.notifyDataSetChanged();
+                } else {
+                    Log.d("TAG", "Error : " + response.toString());
+                    Toast.makeText(getApplicationContext(), "Terjadi kesalahan! Silahkan coba lagi!", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -79,5 +86,17 @@ public class ArticleActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
     }
 }

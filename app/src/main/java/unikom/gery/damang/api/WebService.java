@@ -13,8 +13,9 @@ import retrofit2.http.Query;
 import unikom.gery.damang.response.Backup;
 import unikom.gery.damang.response.CheckUser;
 import unikom.gery.damang.response.News;
+import unikom.gery.damang.response.PlaceResponse;
 
-public interface Api {
+public interface WebService {
     @POST("user/checkUser.php")
     @FormUrlEncoded
     Call<CheckUser> checkUser(@Field("email") String email);
@@ -40,10 +41,36 @@ public interface Api {
             @Query("date") String date
     );
 
+    @FormUrlEncoded
+    @POST("user/checkBackup.php")
+    Call<Backup> restoreCloud(
+            @Field("email") String email
+    );
+
     @GET("top-headlines")
     Call<News> getArticleNewsData(
             @Query("country") String country,
             @Query("category") String category,
             @Query("apiKey") String apiKey
+    );
+
+    @GET("v2/places")
+    Call<PlaceResponse> getNearbyPlace(
+            @Query(value = "categories", encoded = true) String categories,
+            @Query(value = "filter", encoded = true) String filter,
+            @Query(value = "bias", encoded = true) String bias,
+            @Query(value = "limit", encoded = true) int limit,
+            @Query(value = "apiKey", encoded = true) String key
+    );
+
+    @POST("user/updateData.php")
+    @FormUrlEncoded
+    Call<CheckUser> updateData(
+            @Field("email") String email,
+            @Field("nama") String nama,
+            @Field("tanggalLahir") String tanggalLahir,
+            @Field("gender") String gender,
+            @Field("weight") Float weight,
+            @Field("height") Float height
     );
 }

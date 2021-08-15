@@ -32,7 +32,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import unikom.gery.damang.R;
-import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.WebService;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.response.CheckUser;
@@ -132,7 +132,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         user.setDateofBirth(data.getDateofBirth());
         user.setGender(data.getGender());
         user.setHeight(data.getHeight());
-        user.setWeight(data.getHeight());
+        user.setWeight(data.getWeight());
         user.setPhoto(data.getPhoto());
         heartRateHelper.insertUser(user);
         sharedPreference.setUser(user);
@@ -156,12 +156,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private void register(final User data) {
         progressDialog.show();
-        Api api = BaseApi.getRetrofit(baseUrl).create(Api.class);
-        Call<CheckUser> response = api.registerUser(data.getEmail(), data.getName(), data.getDateofBirth(), data.getGender(), data.getWeight(), data.getHeight(), data.getPhoto());
+        WebService webService = BaseApi.getRetrofit(baseUrl).create(WebService.class);
+        Call<CheckUser> response = webService.registerUser(data.getEmail(), data.getName(), data.getDateofBirth(), data.getGender(), data.getWeight(), data.getHeight(), data.getPhoto());
         response.enqueue(new Callback<CheckUser>() {
             @Override
             public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 if (response.body().getCode() == 1) {
                     Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     setUserSession(data);
@@ -171,7 +171,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             @Override
             public void onFailure(Call<CheckUser> call, Throwable t) {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), t.toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -214,5 +214,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
     }
 }

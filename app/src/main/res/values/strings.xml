@@ -1291,4 +1291,20 @@
     <string name="riwayat_tidur">Riwayat Tidur</string>
     <string name="_8_jam">8 Jam Durasi Tidur</string>
     <string name="sangat_baik">Sangat Baik</string>
+    <string name="detail_tidur">Detail Tidur</string>
+    <string name="catatan">Catatan</string>
+    <string name="rs_al_ihsan_baleendah">RS Al-Ihsan Baleendah</string>
+    <string name="menu_kalori">Menu Kalori</string>
+    <string name="langkah_hari_ini">Langkah Hari Ini</string>
+    <string name="_1400_langkah">1400 Langkah</string>
+    <string name="_100_kalori">100 Kalori</string>
+    <string name="kalkulator_bmi">Kalkulator BMI</string>
+    <string name="usia">Usia</string>
+    <string name="_23_tahun">23 Tahun</string>
+    <string name="tinggi_badan">Tinggi Badan</string>
+    <string name="_58_kg">58 KG</string>
+    <string name="status">Status</string>
+    <string name="normal">Normal</string>
+    <string name="kebutuhan_kalori">Kebutuhan Kalori</string>
+    <string name="_2100_kalori">2100 Kalori</string>
 </resources>

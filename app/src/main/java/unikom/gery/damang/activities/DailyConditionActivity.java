@@ -75,6 +75,7 @@ public class DailyConditionActivity extends AppCompatActivity implements View.On
                 int selectedID = radioGroup.getCheckedRadioButtonId();
                 RadioButton radioButton = layout.findViewById(selectedID);
                 Toast.makeText(getApplicationContext(), radioButton.getText(), Toast.LENGTH_SHORT).show();
+                getDailyCondition(radioButton.getText().toString());
                 dialogInterface.dismiss();
             }
         });
@@ -87,6 +88,31 @@ public class DailyConditionActivity extends AppCompatActivity implements View.On
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void getDailyCondition(String tipe) {
+        if (tipe.equals("Mingguan")) {
+            dailyConditionAdapter.notifyItemRangeRemoved(0, arrayList.size());
+            arrayList.clear();
+            //
+            arrayList = heartRateHelper.getWeeklyCondition();
+            dailyConditionAdapter = new DailyConditionAdapter(arrayList, getApplicationContext());
+            rvDailyCondition.setAdapter(dailyConditionAdapter);
+        } else if (tipe.equals("Harian")) {
+            dailyConditionAdapter.notifyItemRangeRemoved(0, arrayList.size());
+            arrayList.clear();
+            //
+            arrayList = heartRateHelper.getDailyCondition(sharedPreference.getUser().getEmail());
+            dailyConditionAdapter = new DailyConditionAdapter(arrayList, getApplicationContext());
+            rvDailyCondition.setAdapter(dailyConditionAdapter);
+        } else if (tipe.equals("Bulanan")) {
+            dailyConditionAdapter.notifyItemRangeRemoved(0, arrayList.size());
+            arrayList.clear();
+            //
+            arrayList = heartRateHelper.getMonthlyCondition();
+            dailyConditionAdapter = new DailyConditionAdapter(arrayList, getApplicationContext());
+            rvDailyCondition.setAdapter(dailyConditionAdapter);
+        }
     }
 
     @Override

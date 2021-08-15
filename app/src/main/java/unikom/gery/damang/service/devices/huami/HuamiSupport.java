@@ -1793,7 +1793,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         int age = getCurrentAge(getTodayDate(), sharedPreference.getUser().getDateofBirth());
                         int currentHeartRate = heartRateHelper.getCurrentHeartRate(sharedPreference.getUser().getEmail(), getTodayDate());
                         String status = "Normal";
-                        int bodyCapacity = maxBodyCapacity(age);
+                        int bodyCapacity = maxBodyCapacity(age) - 10;
                         if (currentHeartRate > 0)
                             status = getCurrentHeartRateStatus(age, currentHeartRate);
                         //Menyimpan ke database
@@ -1813,8 +1813,10 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                                     heartRate.setLongitude(sharedPreference.getLongitude());
                                 }
                                 heartRateHelper.insertHeartRateSportMode(heartRate);
-                                if (sample.getHeartRate() >= bodyCapacity)
+                                if (sample.getHeartRate() >= bodyCapacity) {
                                     createSportNotification();
+                                    sendNotification("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!");
+                                }
                             }
                         } else if (mode.equals("Sleep")) {
                             if (sample.getHeartRate() > 0) {
@@ -1824,8 +1826,10 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
                         } else if (mode.equals("Normal")) {
                             if (sample.getHeartRate() > 0) {
                                 heartRateHelper.insertHeartRateNormalMode(heartRate);
-                                if (!status.equals("Normal"))
+                                if (!status.equals("Normal")) {
                                     createNotificationNormalMode(status);
+                                    sendNotification("Sistem damang mendeteksi detak jantung yang " + status + " pada jantung anda. Apakah anda baik - baik saja ?");
+                                }
                             }
                         }
                         //
@@ -1840,6 +1844,17 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
             };
         }
         return realtimeSamplesSupport;
+    }
+
+    private void sendNotification(String value){
+        NotificationSpec notificationSpec = new NotificationSpec();
+        String testString = value;
+        notificationSpec.phoneNumber = testString;
+        notificationSpec.body = testString;
+        notificationSpec.sender = testString;
+        notificationSpec.subject = testString;
+        notificationSpec.type = NotificationType.values()[0];
+        GBApplication.deviceService().onNotification(notificationSpec);
     }
 
     private void createNotificationNormalMode(String status) {
@@ -1870,7 +1885,7 @@ public class HuamiSupport extends AbstractBTLEDeviceSupport {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel notificationChannel = new NotificationChannel("notif", "notifikasi", importance);
             @SuppressLint("WrongConstant") Notification.Builder notificationBuilder = new Notification.Builder(getContext(), "notif").setSmallIcon(R.drawable.notif_warning)
-                    .setContentTitle("Anda sudah melewati batas!")
+                    .setContentTitle("Anda hampir melewati batas!")
                     .setContentText("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setStyle(new Notification.BigTextStyle().bigText("Sistem damang mendeteksi bahwa anda sudah berolahraga terlalu berlebihan! Sebaiknya anda beristirahat sejenak atau menghentikan olahraga anda!"));

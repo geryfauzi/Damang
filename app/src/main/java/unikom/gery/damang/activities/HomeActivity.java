@@ -27,8 +27,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -73,11 +75,14 @@ import unikom.gery.damang.model.DeviceService;
 import unikom.gery.damang.service.NormalReceiver;
 import unikom.gery.damang.service.SportReceiver;
 import unikom.gery.damang.sqlite.dml.HeartRateHelper;
+import unikom.gery.damang.sqlite.table.Sleep;
 import unikom.gery.damang.sqlite.table.Sport;
 import unikom.gery.damang.util.AndroidUtils;
 import unikom.gery.damang.util.GB;
 import unikom.gery.damang.util.Prefs;
 import unikom.gery.damang.util.SharedPreference;
+
+import static unikom.gery.damang.util.GB.toast;
 
 //TODO: extend AbstractGBActivity, but it requires actionbar that is not available
 public class HomeActivity extends AppCompatActivity
@@ -91,9 +96,9 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private ArrayList<DetailHeartRate> arrayList;
-    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga, cvTidur;
+    private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga, cvTidur, cvKalori;
     private ImageView btnAddDevice;
-    private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar, txtInfoDataOlahraga;
+    private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar, txtInfoDataOlahraga, txtDataTidur;
     private ImageView imgProfile, btnSettings;
     private SharedPreference sharedPreference;
     private DeviceManager deviceManager;
@@ -151,6 +156,7 @@ public class HomeActivity extends AppCompatActivity
         cvPengaturanAlat = findViewById(R.id.cvPengaturanAlat);
         cvOlahraga = findViewById(R.id.cvOlahraga);
         cvTidur = findViewById(R.id.cvTidur);
+        cvKalori = findViewById(R.id.cvKalori);
         btnAddDevice = findViewById(R.id.btnAddDevice);
         btnSettings = findViewById(R.id.imageView6);
         txtHeartRate = findViewById(R.id.txtHeartRate);
@@ -159,6 +165,7 @@ public class HomeActivity extends AppCompatActivity
         txtJumlahLangkah = findViewById(R.id.txtJumlahLangkah);
         txtKaloriTerbakar = findViewById(R.id.txtKaloriTerbakar);
         txtInfoDataOlahraga = findViewById(R.id.txtInfoDataOlahraga);
+        txtDataTidur = findViewById(R.id.txtDataTidur);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
@@ -207,9 +214,11 @@ public class HomeActivity extends AppCompatActivity
 
         sharedPreference = new SharedPreference(this);
         Glide.with(getApplicationContext()).load(sharedPreference.getUser().getPhoto()).into(imgProfile);
-        sharedPreference.setSportId("null");
         txtUser.setText(sharedPreference.getUser().getName());
         if (sharedPreference.getMode().equals("Sport")) {
+            heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
+            heartRateHelper.deleteEmptySportData();
+            sharedPreference.setSportId("null");
             //Start Normal Mode
             ComponentName normalMode = new ComponentName(this, NormalReceiver.class);
             PackageManager packageManager = this.getPackageManager();
@@ -254,6 +263,46 @@ public class HomeActivity extends AppCompatActivity
         cvTidur.setOnClickListener(view -> {
             startActivity(new Intent(getApplicationContext(), SleepActivity.class));
         });
+
+        cvRumahSakit.setOnClickListener(view -> {
+            checkLocationPermission();
+            checkGPS();
+        });
+
+        cvKalori.setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), CaloriesActivity.class));
+        });
+
+    }
+
+    private void checkGPS() {
+        LocationManager lManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try {
+            if (lManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || lManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                startActivity(new Intent(getApplicationContext(), NearHospitalActivity.class));
+            } else {
+                toast(HomeActivity.this, "Harap nyalakan GPS untuk menggunakan fitur ini", Toast.LENGTH_SHORT, GB.ERROR);
+                HomeActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                toast(HomeActivity.this, "Harap nyalakan GPS untuk menggunakan fitur ini", Toast.LENGTH_SHORT, GB.ERROR);
+                return;
+            }
+        } catch (Exception error) {
+
+        }
+    }
+
+    private void checkLocationPermission() {
+        List<String> wantedPermissions = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(getApplicationContext(), "Harap berikan izin lokasi untuk menggunakan fitur ini", Toast.LENGTH_SHORT).show();
+            wantedPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+            return;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            Toast.makeText(getApplicationContext(), "Harap berikan izin lokasi untuk menggunakan fitur ini", Toast.LENGTH_SHORT).show();
+            wantedPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+            return;
+        }
     }
 
     private String getTodayDate() {
@@ -270,9 +319,17 @@ public class HomeActivity extends AppCompatActivity
             txtCurrentCondition.setText("Belum ada data detak jantung");
         }
         Sport sport = heartRateHelper.getLatestSportData();
-        if (sport.getType() != null)
-            txtInfoDataOlahraga.setText("Terakhir olahraga:\n" + sport.getType());
-
+        if (sport.getEnd_time() != null) {
+            Date date = new SimpleDateFormat("yyyy-MM-dd").parse(sport.getEnd_time());
+            String parseDate = new SimpleDateFormat("dd MMMM").format(date);
+            txtInfoDataOlahraga.setText("Terakhir olahraga:\n" + parseDate);
+        }
+        Sleep sleep = heartRateHelper.getLatestSleepData();
+        if (sleep.getStart_time() != null) {
+            Date date = new SimpleDateFormat("yyyy-MM-dd").parse(sleep.getStart_time());
+            String parseDate = new SimpleDateFormat("dd MMMM").format(date);
+            txtDataTidur.setText("Terakhir tidur:\n" + parseDate);
+        }
     }
 
     private void updateCurrentCondition() throws ParseException {

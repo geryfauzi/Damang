@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +54,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
     private SharedPreference sharedPreference;
     private String id = "";
     private SleepAdapter sleepAdapter;
+    private ImageView btnBack;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -71,6 +73,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
         rvSleep = findViewById(R.id.rvSleepData);
         btnViewAll = findViewById(R.id.btnViewAll);
         cvNoData = findViewById(R.id.cvNoData);
+        btnBack = findViewById(R.id.btnBack);
         heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
         list = heartRateHelper.getSleepData();
         sharedPreference = new SharedPreference(getApplicationContext());
@@ -80,6 +83,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
 
         btnViewAll.setOnClickListener(this);
         btnMulai.setOnClickListener(this);
+        btnBack.setOnClickListener(this);
 
         viewSleepData();
     }
@@ -250,7 +254,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 7 && hour <= 9)
                 score -= 20;
             else if (hour < 7)
-                score -= 25;
+                score -= 35;
             //
         } else if (age >= 14 && age <= 17) {
             if (hour > 10)
@@ -258,7 +262,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 5 && hour <= 7)
                 score -= 20;
             else if (hour < 5)
-                score -= 25;
+                score -= 35;
             //
         } else if (age >= 18 && age <= 25) {
             if (hour > 9)
@@ -266,7 +270,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 4 && hour <= 6)
                 score -= 20;
             else if (hour < 4)
-                score -= 25;
+                score -= 35;
             //
         } else if (age >= 26 && age <= 64) {
             if (hour > 9)
@@ -274,7 +278,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 4 && hour <= 6)
                 score -= 20;
             else if (hour < 4)
-                score -= 25;
+                score -= 35;
             //
         } else if (age >= 65) {
             if (hour > 8)
@@ -282,7 +286,7 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
             else if (hour >= 4 && hour <= 6)
                 score -= 20;
             else if (hour < 4)
-                score -= 25;
+                score -= 35;
             //
         }
         return score;
@@ -356,6 +360,9 @@ public class SleepActivity extends AppCompatActivity implements View.OnClickList
                     e.printStackTrace();
                 }
             }
-        }
+        } else if (view == btnBack)
+            super.onBackPressed();
+        else if (view == btnViewAll)
+            startActivity(new Intent(getApplicationContext(), DataTidurActivity.class));
     }
 }

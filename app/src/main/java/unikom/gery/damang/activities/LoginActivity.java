@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import unikom.gery.damang.R;
-import unikom.gery.damang.api.Api;
+import unikom.gery.damang.api.WebService;
 import unikom.gery.damang.api.BaseApi;
 import unikom.gery.damang.model.User;
 import unikom.gery.damang.response.CheckUser;
@@ -98,13 +98,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void checkEmail(GoogleSignInAccount account) {
         progressDialog.show();
-        Api api = BaseApi.getRetrofit(baseUrl).create(Api.class);
-        Call<CheckUser> response = api.checkUser(account.getEmail());
+        WebService webService = BaseApi.getRetrofit(baseUrl).create(WebService.class);
+        Call<CheckUser> response = webService.checkUser(account.getEmail());
         user = new User();
         response.enqueue(new Callback<CheckUser>() {
             @Override
             public void onResponse(Call<CheckUser> call, Response<CheckUser> response) {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 if (response.body().getCode() == 1) {
                     setUserLogin(response);
                 } else {
@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<CheckUser> call, Throwable t) {
-                progressDialog.hide();
+                progressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), t.toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -136,4 +136,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         }
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
+    }
+
 }
