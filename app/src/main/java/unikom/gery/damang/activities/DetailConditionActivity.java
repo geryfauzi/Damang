@@ -34,9 +34,8 @@ import unikom.gery.damang.util.SharedPreference;
 
 public class DetailConditionActivity extends AppCompatActivity {
 
-    private String date, parseDate, averageStatus, currentStatus;
+    private String parseDate, averageStatus, currentStatus;
     private SharedPreference sharedPreference;
-    private HeartRateHelper heartRateHelper;
     private ArrayList<DetailHeartRate> arrayList;
     private TextView txtTerendah, txtRataRata, txtTertinggi, txtHasilAnalisis;
     private LineChart lineChart;
@@ -50,10 +49,8 @@ public class DetailConditionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_condition);
 
         sharedPreference = new SharedPreference(getApplicationContext());
-        date = getIntent().getStringExtra("date");
         parseDate = getIntent().getStringExtra("parseDate");
-        heartRateHelper = HeartRateHelper.getInstance(getApplicationContext());
-        arrayList = heartRateHelper.getDetailDailyCondition(sharedPreference.getUser().getEmail(), date);
+        arrayList = (ArrayList<DetailHeartRate>) getIntent().getSerializableExtra("array");
 
         txtTerendah = findViewById(R.id.txtTerendah);
         txtRataRata = findViewById(R.id.txtRataRata);
@@ -73,12 +70,7 @@ public class DetailConditionActivity extends AppCompatActivity {
         setToview();
         setBarChart(arrayList);
         updateAnalyst();
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        btnBack.setOnClickListener(view -> finish());
     }
 
     private void setBarChart(ArrayList<DetailHeartRate> list) {

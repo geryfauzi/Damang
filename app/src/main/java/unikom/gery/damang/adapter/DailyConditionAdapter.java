@@ -64,9 +64,13 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
                 holder.txtStatus.setTextColor(Color.parseColor("#FF5959"));
             }
             holder.txtStatus.setText(status);
-            Date date = new SimpleDateFormat("yyyy-MM-dd").parse(arrayList.get(position).getDate());
-            String parseDate = new SimpleDateFormat("dd MMMM yyyy").format(date);
-            holder.txtTanggal.setText(parseDate);
+            if(arrayList.get(position).getDate().length() == 10){
+                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(arrayList.get(position).getDate());
+                String parseDate = new SimpleDateFormat("dd MMMM yyyy").format(date);
+                holder.txtTanggal.setText(parseDate);
+            }else
+                holder.txtTanggal.setText(arrayList.get(position).getDate());
+
         } catch (ParseException e) {
             Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
         }
@@ -75,8 +79,8 @@ public class DailyConditionAdapter extends RecyclerView.Adapter<DailyConditionAd
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, DetailConditionActivity.class);
-                intent.putExtra("date", arrayList.get(position).getDate());
                 intent.putExtra("parseDate", holder.txtTanggal.getText().toString());
+                intent.putExtra("array", arrayList.get(position).getArrayList());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }

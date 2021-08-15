@@ -62,4 +62,15 @@ public interface WebService {
             @Query(value = "limit", encoded = true) int limit,
             @Query(value = "apiKey", encoded = true) String key
     );
+
+    @POST("user/updateData.php")
+    @FormUrlEncoded
+    Call<CheckUser> updateData(
+            @Field("email") String email,
+            @Field("nama") String nama,
+            @Field("tanggalLahir") String tanggalLahir,
+            @Field("gender") String gender,
+            @Field("weight") Float weight,
+            @Field("height") Float height
+    );
 }
