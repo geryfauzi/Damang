@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import unikom.gery.damang.R;
+import unikom.gery.damang.activities.JoggingSportDetailActivity;
 import unikom.gery.damang.activities.OtherSportDetailActivity;
 import unikom.gery.damang.sqlite.table.Sport;
 
@@ -61,10 +62,17 @@ public class SportAdapter extends RecyclerView.Adapter<SportAdapter.ViewHolder> 
             Glide.with(context).load(R.drawable.ic_sport_cardio).into(holder.imgSportType);
 
         holder.itemView.setOnClickListener(view -> {
+            if (!sportList.get(position).getType().equals("Jogging")) {
                 Intent intent = new Intent(context, OtherSportDetailActivity.class);
                 intent.putExtra("id", sportList.get(position).getId());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
+            } else {
+                Intent intent = new Intent(context, JoggingSportDetailActivity.class);
+                intent.putExtra("id", sportList.get(position).getId());
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
         });
     }
 

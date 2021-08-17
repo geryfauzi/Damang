@@ -99,7 +99,7 @@ public class HomeActivity extends AppCompatActivity
     private CardView cvNoDevice, cvHeartRate, cvRumahSakit, cvArtikel, cvPengaturanAlat, cvOlahraga, cvTidur, cvKalori;
     private ImageView btnAddDevice;
     private TextView txtHeartRate, txtCurrentCondition, txtUser, txtJumlahLangkah, txtKaloriTerbakar, txtInfoDataOlahraga, txtDataTidur;
-    private ImageView imgProfile, btnSettings;
+    private ImageView imgProfile, btnSettings, imgStatusKesehatan;
     private SharedPreference sharedPreference;
     private DeviceManager deviceManager;
     private DeviceAdapter mGBDeviceAdapter;
@@ -166,6 +166,7 @@ public class HomeActivity extends AppCompatActivity
         txtKaloriTerbakar = findViewById(R.id.txtKaloriTerbakar);
         txtInfoDataOlahraga = findViewById(R.id.txtInfoDataOlahraga);
         txtDataTidur = findViewById(R.id.txtDataTidur);
+        imgStatusKesehatan = findViewById(R.id.imgStatusKesehatan);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
@@ -350,6 +351,10 @@ public class HomeActivity extends AppCompatActivity
         txtCurrentCondition.setText(condition);
         txtJumlahLangkah.setText(sharedPreference.getSteps() + " langkah");
         txtKaloriTerbakar.setText(burnedCalories + " kalori");
+        if (condition.equals("Kesehatan anda baik") || condition.equals("Kesehatan anda baik*"))
+            Glide.with(getApplicationContext()).load(R.drawable.good_condition).into(imgStatusKesehatan);
+        else
+            Glide.with(getApplicationContext()).load(R.drawable.bad_condition).into(imgStatusKesehatan);
     }
 
     private float getBurnedCalories(int jumlahLangkah, int beratBadan) {

@@ -1307,4 +1307,7 @@
     <string name="normal">Normal</string>
     <string name="kebutuhan_kalori">Kebutuhan Kalori</string>
     <string name="_2100_kalori">2100 Kalori</string>
+    <string name="hasil_olahraga_jogging">Hasil Olahraga Jogging</string>
+    <string name="damang_running_tracker">Damang Running Tracker</string>
+    <string name="durasi_menit">Durasi (Menit)</string>
 </resources>

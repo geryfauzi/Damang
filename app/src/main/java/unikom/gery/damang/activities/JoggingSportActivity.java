@@ -40,6 +40,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -92,6 +93,7 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         }
     };
     private double cLatitude, cLongitude, distance;
+    private PolylineOptions polylineOptions;
 
     @SuppressLint("MissingPermission")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -148,6 +150,7 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         }
         tns = calculateTNS(age);
         txtTNS.setText(Integer.toString(tns));
+        polylineOptions = new PolylineOptions().width(15).color(Color.parseColor("#2DA4E1"));
     }
 
     private void sendNotification(String value) {
@@ -220,6 +223,7 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 20));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBackPressed() {
         if (id.equals("")) {
@@ -242,6 +246,8 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         txtJarak.setText(String.format("%.2f", distance));
         this.cLatitude = location.getLatitude();
         this.cLongitude = location.getLongitude();
+        polylineOptions.add(myPosition);
+        mMap.addPolyline(polylineOptions);
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -473,35 +479,27 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
         pauseOffset = 0;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Apakah anda yakin ingin menghentikan olahraga ?");
         builder.setTitle("Perhatian!");
         builder.setCancelable(false);
-        builder.setPositiveButton("Iya", new DialogInterface.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (heartRateHelper.checkHeartRateSportMode(id, sharedPreference.getUser().getEmail())) {
-                    stop();
-                    updateDB();
-                    startActivity(new Intent(getApplicationContext(), SportActivity.class));
-                    finish();
-                } else {
-                    stop();
-                    heartRateHelper.deleteSportData(id);
-                    startActivity(new Intent(getApplicationContext(), SportActivity.class));
-                    finish();
-                }
+        builder.setPositiveButton("Iya", (dialog, which) -> {
+            if (heartRateHelper.checkHeartRateSportMode(id, sharedPreference.getUser().getEmail())) {
+                stop();
+                updateDB();
+                startActivity(new Intent(getApplicationContext(), SportActivity.class));
+                finish();
+            } else {
+                stop();
+                heartRateHelper.deleteSportData(id);
+                startActivity(new Intent(getApplicationContext(), SportActivity.class));
+                finish();
+            }
 
-            }
         });
-        builder.setNegativeButton("Batal", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton("Batal", (dialog, which) -> dialog.cancel());
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -524,7 +522,7 @@ public class JoggingSportActivity extends AppCompatActivity implements OnMapRead
             else {
                 stop();
                 updateDB();
-                Intent intent = new Intent(getApplicationContext(), OtherSportDetailActivity.class);
+                Intent intent = new Intent(getApplicationContext(), JoggingSportDetailActivity.class);
                 intent.putExtra("id", id);
                 startActivity(intent);
                 finish();

@@ -17,6 +17,8 @@ public class DetailHeartRate implements Parcelable {
     };
     private String hour;
     private int heartRate;
+    private double latitude;
+    private double longitude;
 
     public DetailHeartRate() {
 
@@ -30,6 +32,26 @@ public class DetailHeartRate implements Parcelable {
     protected DetailHeartRate(Parcel in) {
         this.hour = in.readString();
         this.heartRate = in.readInt();
+    }
+
+    public static Creator<DetailHeartRate> getCREATOR() {
+        return CREATOR;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public String getHour() {
