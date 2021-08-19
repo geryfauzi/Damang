@@ -24,7 +24,7 @@ import unikom.gery.damang.util.SharedPreference;
 public class CaloriesActivity extends AppCompatActivity {
 
     private TextView txtJumlahLangkah, txtKaloriTerbakar, txtTinggiBadan, txtBeratBadan;
-    private TextView txtStatus, txtKebutuhanKalori;
+    private TextView txtStatus, txtKebutuhanKalori, txtUsia;
     private ImageView btnBack;
     private SharedPreference sharedPreference;
 
@@ -47,6 +47,7 @@ public class CaloriesActivity extends AppCompatActivity {
         txtTinggiBadan = findViewById(R.id.txtTinggiBadan);
         txtKaloriTerbakar = findViewById(R.id.txtKaloriTerbakar);
         txtJumlahLangkah = findViewById(R.id.txtJumlahLangkah);
+        txtUsia = findViewById(R.id.txtUsia);
         btnBack = findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(view -> {
@@ -73,6 +74,7 @@ public class CaloriesActivity extends AppCompatActivity {
         txtBeratBadan.setText(Math.round(sharedPreference.getUser().getWeight()) + " KG");
         txtKebutuhanKalori.setText(calories + " Kalori");
         txtStatus.setText(status);
+        txtUsia.setText(age + " Tahun");
     }
 
     private String getStatusBMI(int beratBadan, int tinggiBadan) {
