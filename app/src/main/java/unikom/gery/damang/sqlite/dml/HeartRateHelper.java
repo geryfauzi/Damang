@@ -236,6 +236,35 @@ public class HeartRateHelper {
         }
     }
 
+    public boolean checkOldData() {
+        database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.rawQuery("SELECT * FROM heart_rate_activity WHERE date_time <= date('now','-3 month')", new String[]{});
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            cursor.close();
+            return true;
+        } else {
+            cursor.close();
+            return false;
+        }
+    }
+
+    public int deleteOldData() {
+        database = dbHelper.getWritableDatabase();
+        Cursor cursorHeartRate = database.rawQuery("DELETE FROM heart_rate_activity WHERE date_time <= date('now','-3 month')", new String[]{});
+        cursorHeartRate.moveToFirst();
+        cursorHeartRate.close();
+        //
+        Cursor cursorSleep = database.rawQuery("DELETE FROM sleep_activity WHERE start_time <= date('now','-3 month')", new String[]{});
+        cursorSleep.moveToFirst();
+        cursorSleep.close();
+        //
+        Cursor cursorSport = database.rawQuery("DELETE FROM sport_activity WHERE start_time <= date('now','-3 month')", new String[]{});
+        cursorSport.moveToFirst();
+        cursorSport.close();
+        return 1;
+    }
+
     public boolean checkHeartRateSleepMode(String id, String email) {
         database = dbHelper.getWritableDatabase();
         Cursor cursor = database.rawQuery("SELECT heart_rate FROM heart_rate_activity WHERE email = ? AND id_sleep = ? ORDER BY date_time DESC", new String[]{email, id});

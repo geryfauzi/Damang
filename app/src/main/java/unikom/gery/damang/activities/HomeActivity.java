@@ -19,6 +19,7 @@ package unikom.gery.damang.activities;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -274,6 +275,26 @@ public class HomeActivity extends AppCompatActivity
             startActivity(new Intent(getApplicationContext(), CaloriesActivity.class));
         });
 
+        checkOldData();
+    }
+
+    private void checkOldData() {
+        boolean isThereAreOldData = heartRateHelper.checkOldData();
+        if (isThereAreOldData) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+            alertDialog.setTitle("Terdapat Data Lama");
+            alertDialog.setMessage("Dikarenakan terdapat data lama yang umurnya lebih dari sama" +
+                    " dengan tiga bulan, maka sistem akan menghapus data tersebut untuk tetap" +
+                    " menjaga performa smartphone anda.")
+                    .setCancelable(false)
+                    .setPositiveButton("Oke", (dialog, which) -> {
+                        heartRateHelper.deleteEmptySportData();
+                        Toast.makeText(getApplicationContext(), "Sistem berhasil menghapus data lama", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    });
+            AlertDialog dialog = alertDialog.create();
+            dialog.show();
+        }
     }
 
     private void checkGPS() {
