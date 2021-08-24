@@ -288,7 +288,7 @@ public class HomeActivity extends AppCompatActivity
                     " menjaga performa smartphone anda.")
                     .setCancelable(false)
                     .setPositiveButton("Oke", (dialog, which) -> {
-                        heartRateHelper.deleteEmptySportData();
+                        heartRateHelper.deleteOldData();
                         Toast.makeText(getApplicationContext(), "Sistem berhasil menghapus data lama", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     });
